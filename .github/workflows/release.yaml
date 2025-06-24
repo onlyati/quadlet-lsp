@@ -1,0 +1,77 @@
+name: Go Release Build
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Upload Binaries
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goos: darwin
+            goarch: arm64 # Optional: exclude unsupported
+        include:
+          - goos: windows
+            ext: .exe
+            archive: zip
+          - goos: linux
+            ext: ""
+            archive: tar.gz
+          - goos: darwin
+            ext: ""
+            archive: tar.gz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.4"
+
+      - name: Set Environment Variables
+        run: |
+          echo "GOOS=${{ matrix.goos }}" >> $GITHUB_ENV
+          echo "GOARCH=${{ matrix.goarch }}" >> $GITHUB_ENV
+          echo "EXT=${{ matrix.ext }}" >> $GITHUB_ENV
+          echo "ARCHIVE=${{ matrix.archive }}" >> $GITHUB_ENV
+          echo "CGO_ENABLED=0" >> $GITHUB_ENV
+
+      - name: Extract Version from Tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build Binary
+        run: |
+          mkdir -p dist
+          OUTPUT_NAME="quadlet-lsp${EXT}"
+          go build -ldflags "-s -w -X main.version=${VERSION}" -o dist/$OUTPUT_NAME .
+
+      - name: Archive Binary
+        run: |
+          cd dist
+          ARCHIVE_NAME="quadlet-lsp-${VERSION}-${GOOS}-${GOARCH}.${ARCHIVE}"
+          if [ "$ARCHIVE" = "zip" ]; then
+            zip "$ARCHIVE_NAME" "quadlet-lsp${EXT}"
+          else
+            tar -czf "$ARCHIVE_NAME" "quadlet-lsp${EXT}"
+          fi
+          echo "ASSET_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ env.ASSET_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
