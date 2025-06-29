@@ -46,7 +46,22 @@ func listPropertyCompletions(lines []string, lineNumber protocol.UInteger) []pro
 
 	section := findSection(lines, lineNumber)
 
+	// If no section at all, assume a new empty file
+	// advice some basic template
 	if section == "" {
+		insertFormat := protocol.InsertTextFormatSnippet
+		itemKind := protocol.CompletionItemKindSnippet
+
+		for k, category := range defineCategoryProperties() {
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label:            k,
+				Detail:           category.details,
+				InsertText:       category.insertText,
+				InsertTextFormat: &insertFormat,
+				Kind:             &itemKind,
+			})
+		}
+
 		return completionItems
 	}
 
@@ -59,6 +74,7 @@ func listPropertyCompletions(lines []string, lineNumber protocol.UInteger) []pro
 			},
 		})
 	}
+
 	return completionItems
 }
 

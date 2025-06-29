@@ -38,29 +38,29 @@ func execPodmanCommand(params []string) ([]string, error) {
 func listQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 	dirs := []protocol.CompletionItem{}
 
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	homeDir = filepath.Join(homeDir, ".config", "containers", "systemd", ext)
-	files, err := filepath.Glob(homeDir)
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range files {
-		chunks := strings.Split(file, string(os.PathSeparator))
-		dirs = append(dirs, protocol.CompletionItem{
-			Label:         chunks[len(chunks)-1],
-			Documentation: "From home: " + homeDir,
-		})
-	}
+	// homeDir, err := os.UserHomeDir()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// homeDir = filepath.Join(homeDir, ".config", "containers", "systemd", ext)
+	// files, err := filepath.Glob(homeDir)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// for _, file := range files {
+	// 	chunks := strings.Split(file, string(os.PathSeparator))
+	// 	dirs = append(dirs, protocol.CompletionItem{
+	// 		Label:         chunks[len(chunks)-1],
+	// 		Documentation: "From home: " + homeDir,
+	// 	})
+	// }
 
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 	cwd = filepath.Join(cwd, ext)
-	files, err = filepath.Glob(cwd)
+	files, err := filepath.Glob(cwd)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func listQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 		chunks := strings.Split(file, string(os.PathSeparator))
 		dirs = append(dirs, protocol.CompletionItem{
 			Label:         chunks[len(chunks)-1],
-			Documentation: "From work directory: " + homeDir,
+			Documentation: "From work directory: " + cwd,
 		})
 	}
 
@@ -89,4 +89,8 @@ func findSection(lines []string, lineNumber protocol.UInteger) string {
 		}
 	}
 	return section
+}
+
+func returnAsStringPtr(s string) *string {
+	return &s
 }

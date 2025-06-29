@@ -6,6 +6,47 @@ type propertyMapItem struct {
 	parameters []string
 }
 
+type categoryPropertyItem struct {
+	insertText *string
+	details    *string
+}
+
+func defineCategoryProperties() map[string]categoryPropertyItem {
+	return map[string]categoryPropertyItem{
+		"newContainer": {
+			insertText: returnAsStringPtr(`[Unit]
+Description=${1:description}
+
+[Container]
+Image=${2:image}
+AutoUpdate=registry
+$0
+
+[Service]
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+
+[Install]
+WantedBy=default.target
+`),
+			details: returnAsStringPtr("define a new container"),
+		},
+		"newVolume": {
+			insertText: returnAsStringPtr("[Volume]\n$0"),
+			details:    returnAsStringPtr("define new volume"),
+		},
+		"newPod": {
+			insertText: returnAsStringPtr("[Pod]\n$0"),
+			details:    returnAsStringPtr("define new pod"),
+		},
+		"newNetwork": {
+			insertText: returnAsStringPtr("[Network]\n$0"),
+			details:    returnAsStringPtr("define new network"),
+		},
+	}
+}
+
 func propertiesMap() map[string][]propertyMapItem {
 	return map[string][]propertyMapItem{
 		"Container": {
