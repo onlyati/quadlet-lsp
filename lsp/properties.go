@@ -14,6 +14,7 @@ type categoryPropertyItem struct {
 func defineCategoryProperties() map[string]categoryPropertyItem {
 	return map[string]categoryPropertyItem{
 		"newContainer": {
+			details: returnAsStringPtr("define a new container"),
 			insertText: returnAsStringPtr(`[Unit]
 Description=${1:description}
 
@@ -30,19 +31,18 @@ StartLimitBurst=5
 [Install]
 WantedBy=default.target
 `),
-			details: returnAsStringPtr("define a new container"),
 		},
 		"newVolume": {
-			insertText: returnAsStringPtr("[Volume]\n$0"),
 			details:    returnAsStringPtr("define new volume"),
+			insertText: returnAsStringPtr("[Volume]\n$0"),
 		},
 		"newPod": {
-			insertText: returnAsStringPtr("[Pod]\n$0"),
 			details:    returnAsStringPtr("define new pod"),
+			insertText: returnAsStringPtr("[Pod]\n$0"),
 		},
 		"newNetwork": {
-			insertText: returnAsStringPtr("[Network]\n$0"),
 			details:    returnAsStringPtr("define new network"),
+			insertText: returnAsStringPtr("[Network]\n$0"),
 		},
 	}
 }
