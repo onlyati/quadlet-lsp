@@ -27,6 +27,7 @@ func Start() {
 		TextDocumentCompletion: textCompletion,
 		TextDocumentHover:      textHover,
 		TextDocumentDefinition: textDefinition,
+		TextDocumentReferences: textReferences,
 
 		// Document sync
 		TextDocumentDidOpen: func(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {

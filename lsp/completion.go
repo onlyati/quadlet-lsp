@@ -130,9 +130,7 @@ func listPropertyParameter(lines []string, lineNumber protocol.UInteger, charPos
 	}
 
 	if property == "Network" {
-		networks, err := listNetworks(
-			lines[lineNumber][:charPos],
-		)
+		networks, err := listNetworks()
 		if err != nil {
 			fmt.Printf("failed to list networks: %s", err.Error())
 			return completionItems
@@ -154,7 +152,7 @@ func listPropertyParameter(lines []string, lineNumber protocol.UInteger, charPos
 	return completionItems
 }
 
-func listNetworks(line string) ([]protocol.CompletionItem, error) {
+func listNetworks() ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	// List networks from podman

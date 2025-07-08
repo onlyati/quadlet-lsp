@@ -12,7 +12,7 @@ func textDefinition(
 	context *glsp.Context,
 	params *protocol.DefinitionParams,
 ) (any, error) {
-	var locations []protocol.Location
+	var location protocol.Location
 
 	uri := string(params.TextDocument.URI)
 	text := documents.read(uri)
@@ -42,13 +42,13 @@ func textDefinition(
 
 		for _, vol := range volumes {
 			if volName == vol.Label {
-				locations = append(locations, protocol.Location{
-					URI: "file://" + currDir + string(os.PathSeparator) + vol.Label,
-				})
+				return protocol.Location{
+					URI: protocol.DocumentUri("file://" + currDir + string(os.PathSeparator) + vol.Label),
+				}, nil
 			}
 		}
 
-		return locations, nil
+		return location, nil
 	}
 
 	if prop[0] == "Pod" {
@@ -59,13 +59,13 @@ func textDefinition(
 
 		for _, pod := range pods {
 			if prop[1] == pod.Label {
-				locations = append(locations, protocol.Location{
-					URI: "file://" + currDir + string(os.PathSeparator) + pod.Label,
-				})
+				return protocol.Location{
+					URI: protocol.DocumentUri("file://" + currDir + string(os.PathSeparator) + pod.Label),
+				}, nil
 			}
 		}
 
-		return locations, nil
+		return location, nil
 	}
 
 	if prop[0] == "Network" {
@@ -76,14 +76,14 @@ func textDefinition(
 
 		for _, network := range networks {
 			if prop[1] == network.Label {
-				locations = append(locations, protocol.Location{
-					URI: "file://" + currDir + string(os.PathSeparator) + network.Label,
-				})
+				return protocol.Location{
+					URI: protocol.DocumentUri("file://" + currDir + string(os.PathSeparator) + network.Label),
+				}, nil
 			}
 		}
 
-		return locations, nil
+		return location, nil
 	}
 
-	return locations, nil
+	return location, nil
 }

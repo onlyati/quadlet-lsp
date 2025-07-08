@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -93,4 +94,53 @@ func findSection(lines []string, lineNumber protocol.UInteger) string {
 
 func returnAsStringPtr(s string) *string {
 	return &s
+}
+
+func findLineStartWith(prefix string) ([]protocol.Location, error) {
+	var locations []protocol.Location
+
+	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		absPath, err := filepath.Abs(path)
+		if err != nil {
+			return err
+		}
+
+		scanner := bufio.NewScanner(file)
+		lineNum := 0
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(line, prefix) {
+				locations = append(locations, protocol.Location{
+					URI: protocol.DocumentUri("file://" + absPath),
+					Range: protocol.Range{
+						Start: protocol.Position{Line: protocol.UInteger(lineNum), Character: 0},
+						End:   protocol.Position{Line: protocol.UInteger(lineNum), Character: protocol.UInteger(len(line) - 1)},
+					},
+				})
+			}
+
+			lineNum++
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return locations, nil
 }
