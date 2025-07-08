@@ -1,0 +1,1 @@
+# Podman Quadlet language server
