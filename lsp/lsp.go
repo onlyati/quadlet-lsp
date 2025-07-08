@@ -26,6 +26,7 @@ func Start() {
 		// Make LSP thing
 		TextDocumentCompletion: textCompletion,
 		TextDocumentHover:      textHover,
+		TextDocumentDefinition: textDefinition,
 
 		// Document sync
 		TextDocumentDidOpen: func(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
