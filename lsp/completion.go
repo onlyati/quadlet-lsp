@@ -120,6 +120,26 @@ func listPropertyParameter(lines []string, lineNumber protocol.UInteger, charPos
 		return volumes
 	}
 
+	if property == "Pod" {
+		pods, err := listQuadletFiles("*.pod")
+		if err != nil {
+			fmt.Printf("failed to list pods: %s", err.Error())
+			return completionItems
+		}
+		return pods
+	}
+
+	if property == "Network" {
+		networks, err := listNetworks(
+			lines[lineNumber][:charPos],
+		)
+		if err != nil {
+			fmt.Printf("failed to list networks: %s", err.Error())
+			return completionItems
+		}
+		return networks
+	}
+
 	for _, p := range propertiesMap()[section] {
 		if property == p.label {
 			for _, parm := range p.parameters {
@@ -132,6 +152,31 @@ func listPropertyParameter(lines []string, lineNumber protocol.UInteger, charPos
 	}
 
 	return completionItems
+}
+
+func listNetworks(line string) ([]protocol.CompletionItem, error) {
+	var completionItems []protocol.CompletionItem
+
+	// List networks from podman
+	output, err := execPodmanCommand(
+		[]string{"network", "ls", "--format", "{{ .Name }}"},
+	)
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range output {
+		completionItems = append(completionItems, protocol.CompletionItem{
+			Label: item,
+		})
+	}
+
+	// List *.network files
+	volFiles, err := listQuadletFiles("*.network")
+	if err != nil {
+		return nil, err
+	}
+	completionItems = append(completionItems, volFiles...)
+	return completionItems, nil
 }
 
 func listVolumes(line string) ([]protocol.CompletionItem, error) {
