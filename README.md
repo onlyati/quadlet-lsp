@@ -90,5 +90,7 @@ return {
 
 ## Usage with VS Code
 
-VS Code itself also support LSP, so it should work, but currently I don't even
-have sample for a VS Code plugin to use it.
+There is a simple VS Code extension to use it:
+
+- [MarketPlace](https://marketplace.visualstudio.com/items?itemName=onlyati.quadlet-lsp)
+- [Repository](https://github.com/onlyati/quadlet-lsp-vscode-extension)
