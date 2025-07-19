@@ -91,14 +91,35 @@ func listNewMacros(lines []string, lineNumber protocol.UInteger) []protocol.Comp
 	insertFormat := protocol.InsertTextFormatSnippet
 	itemKind := protocol.CompletionItemKindSnippet
 
-	propName, _ := strings.CutPrefix(lines[lineNumber], "new.")
+	lineText := lines[lineNumber]
+
+	// Try to find the character range of "new." (if present)
+	if !strings.HasPrefix(lineText, "new.") {
+		return completionItems
+	}
+
+	// Get the rest of the line after "new." prefix
+	propName := strings.TrimPrefix(lineText, "new.")
+
+	// We'll replace from position 0 to len("new."+propName)
+	startChar := 0
+	endChar := len("new." + propName)
+
 	for _, p := range propertiesMap[section] {
 		if strings.HasPrefix(p.label, propName) && p.macro != "" {
+			textEdit := protocol.TextEdit{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: lineNumber, Character: uint32(startChar)},
+					End:   protocol.Position{Line: lineNumber, Character: uint32(endChar)},
+				},
+				NewText: p.macro,
+			}
+
 			completionItems = append(completionItems, protocol.CompletionItem{
 				Label:            "new." + p.label,
-				InsertText:       &p.macro,
-				InsertTextFormat: &insertFormat,
 				Kind:             &itemKind,
+				TextEdit:         &textEdit,
+				InsertTextFormat: &insertFormat,
 			})
 		}
 	}
