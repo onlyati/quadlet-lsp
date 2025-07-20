@@ -18,7 +18,9 @@ For a more details overview, with visual examples see the
 
 <img src="docs/assets/overall_demo.gif" style="width: 100%;"/>
 
-## Download the latest version
+## Get the executable
+
+### Download the latest version
 
 Check GitHub [release page](https://github.com/onlyati/quadlet-lsp/releases) and
 download the version you need. The archive contains only the binary of language
@@ -36,6 +38,14 @@ rm quadlet-lsp-${LATEST_VERSION}-${OS}-${ARCH}.tar.gz
 wget "https://github.com/onlyati/quadlet-lsp/releases/download/${LATEST_VERSION}/quadlet-lsp-${LATEST_VERSION}-${OS}-${ARCH}.tar.gz"
 sudo tar -xvf "quadlet-lsp-${LATEST_VERSION}-${OS}-${ARCH}.tar.gz" \
     -C /usr/local/bin/
+```
+
+### Compile with Go
+
+You can also install the binary using Go.
+
+```bash
+go install github.com/onlyati/quadlet-lsp@latest
 ```
 
 ## Usage with Neovim
