@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tliron/commonlog"
+	_ "github.com/tliron/commonlog/simple"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/tliron/glsp/server"
@@ -18,7 +18,11 @@ var (
 	documents = newDocuments()
 )
 
+// Entry point of the language server
 func Start() {
+	// To download automatically during extension install,
+	// I've made a simple `version` subcommand, so it is easy
+	// to verify which version is downloaded and need to download newer one
 	args := os.Args
 	if len(args) == 2 {
 		if args[1] == "version" {
@@ -27,20 +31,21 @@ func Start() {
 		}
 	}
 
-	commonlog.Configure(1, nil)
-
 	handler = protocol.Handler{
+		// The `hello` and `goodbye` handlers
 		Initialize:  initialize,
 		Initialized: initialized,
 		Shutdown:    shutdown,
 
-		// Make LSP thing
+		// Make LSP thing, point of this whole thing
 		TextDocumentCompletion: textCompletion,
 		TextDocumentHover:      textHover,
 		TextDocumentDefinition: textDefinition,
 		TextDocumentReferences: textReferences,
 
-		// Document sync
+		// Store document in memory and keep every changes on track
+		// It is needed when we want to looking for something in a file,
+		// like looking for references.
 		TextDocumentDidOpen: func(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
 			documents.add(uri, params.TextDocument.Text)
@@ -66,6 +71,8 @@ func Start() {
 			documents.delete(uri)
 			return nil
 		},
+
+		// For future use
 		TextDocumentDidSave: func(context *glsp.Context, params *protocol.DidSaveTextDocumentParams) error {
 			return nil
 		},
@@ -77,8 +84,6 @@ func Start() {
 }
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, error) {
-	commonlog.NewInfoMessage(0, "Initializing server...")
-
 	capabilities := handler.CreateServerCapabilities()
 
 	capabilities.CompletionProvider = &protocol.CompletionOptions{

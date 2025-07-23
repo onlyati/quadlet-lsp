@@ -7,6 +7,10 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+// It is a very basic implementation. It is checking which section is,
+// like `[Volume]`, `[Container]`, etc. then looking for the property that is
+// in the current line. Then gather the document based on that and send the
+// markdown response back.
 func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := string(params.TextDocument.URI)
 	text := documents.read(uri)
