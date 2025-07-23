@@ -2,7 +2,6 @@ package lsp
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -198,6 +197,19 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 		return ports
 	}
 
+	if strings.HasPrefix(lines[lineNumber], "UserNS=keep-id:") {
+		id, err := listUserIdFromImage(
+			c,
+			lines,
+			lineNumber,
+		)
+		if err != nil {
+			fmt.Printf("failed to list user from image: %s", err.Error())
+			return completionItems
+		}
+		return id
+	}
+
 	section := findSection(lines, lineNumber)
 
 	if section == "" {
@@ -216,6 +228,47 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 	}
 
 	return completionItems
+}
+
+// If somebody type `UserNS=keep-id:`, then check if image has any user
+// defined, and provide its id for uid and gid as well
+func listUserIdFromImage(c Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
+	var completionItems []protocol.CompletionItem
+
+	imageName := findImageName(lines, lineNumber)
+
+	// We've found something, looking for User
+	if imageName != "" {
+		output, err := c.Run(
+			"podman",
+			"image", "inspect", imageName,
+		)
+		if err != nil {
+			return nil, err
+		}
+		inspectJSON := strings.Join(output, "")
+		var data []map[string]any
+		json.Unmarshal([]byte(inspectJSON), &data)
+
+		config, ok := data[0]["Config"].(map[string]any)
+		if !ok {
+			return nil, err
+		}
+
+		user, ok := config["User"].(string)
+		if !ok {
+			return nil, err
+		}
+
+		completionItems = append(completionItems, protocol.CompletionItem{
+			Label: "uid=" + user,
+		})
+		completionItems = append(completionItems, protocol.CompletionItem{
+			Label: "gid=" + user,
+		})
+	}
+
+	return completionItems, nil
 }
 
 // If user at the `PublihsPort=` line, and typting the exposed port number
@@ -242,39 +295,7 @@ func listPublishedPorts(c Commander, lines []string, lineNumber protocol.UIntege
 
 	// First looking for `Image=value` value
 	// First looing for reverse, people usually define image first then parameters
-	imageName := ""
-	for i := lineNumber; i > 0; i-- {
-		line := strings.TrimSpace(lines[i])
-		if strings.HasPrefix(line, "Image=") {
-			tmp := strings.Split(line, "=")
-			if len(tmp) != 2 {
-				return nil, errors.New("seems invalid value at `Image=` line")
-			}
-			imageName = tmp[1]
-		}
-		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			// We've reached the start of section, try in other direction
-			break
-		}
-	}
-
-	// Check rest of the file for `Image=`
-	if imageName == "" {
-		for i := lineNumber; int(i) < len(lines); i++ {
-			line := strings.TrimSpace(lines[i])
-			if strings.HasPrefix(line, "Image=") {
-				tmp := strings.Split(line, "=")
-				if len(tmp) != 2 {
-					return nil, errors.New("seems invalid value at `Image=` line")
-				}
-				imageName = tmp[1]
-			}
-			if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-				// We've reached the start of another section
-				break
-			}
-		}
-	}
+	imageName := findImageName(lines, lineNumber)
 
 	// We've found something, let's check it
 	if imageName != "" {
