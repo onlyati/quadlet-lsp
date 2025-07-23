@@ -1,6 +1,9 @@
 package lsp
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/tliron/commonlog"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -10,12 +13,20 @@ import (
 const lsName = "quadlet"
 
 var (
-	version   = "0.1.0"
+	version   = "0.2.0"
 	handler   protocol.Handler
 	documents = newDocuments()
 )
 
 func Start() {
+	args := os.Args
+	if len(args) == 2 {
+		if args[1] == "version" {
+			fmt.Println(version)
+			return
+		}
+	}
+
 	commonlog.Configure(1, nil)
 
 	handler = protocol.Handler{
