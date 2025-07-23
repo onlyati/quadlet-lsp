@@ -1,22 +1,24 @@
-package lsp
+package data
 
-type propertyMapItem struct {
-	label      string
-	hover      []string
-	parameters []string
-	macro      string
+import "github.com/onlyati/quadlet-lsp/internal/utils"
+
+type PropertyMapItem struct {
+	Label      string
+	Hover      []string
+	Parameters []string
+	Macro      string
 }
 
-type categoryPropertyItem struct {
-	insertText *string
-	details    *string
+type CategoryPropertyItem struct {
+	InsertText *string
+	Details    *string
 }
 
 var (
-	categoryProperty = map[string]categoryPropertyItem{
+	CategoryProperty = map[string]CategoryPropertyItem{
 		"newContainer": {
-			details: returnAsStringPtr("define a new container"),
-			insertText: returnAsStringPtr(`[Unit]
+			Details: utils.ReturnAsStringPtr("define a new container"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
 Description=${1:description}
 
 [Container]
@@ -34,8 +36,8 @@ WantedBy=default.target
 `),
 		},
 		"newVolume": {
-			details: returnAsStringPtr("define new volume"),
-			insertText: returnAsStringPtr(`[Unit]
+			Details: utils.ReturnAsStringPtr("define new volume"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
 Description=${1:description}
 
 [Volume]
@@ -43,8 +45,8 @@ $0
 `),
 		},
 		"newPod": {
-			details: returnAsStringPtr("define new pod"),
-			insertText: returnAsStringPtr(`[Unit]
+			Details: utils.ReturnAsStringPtr("define new pod"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
 Description=${1:description}
 
 [Pod]
@@ -52,8 +54,8 @@ $0
 `),
 		},
 		"newNetwork": {
-			details: returnAsStringPtr("define new network"),
-			insertText: returnAsStringPtr(`[Unit]
+			Details: utils.ReturnAsStringPtr("define new network"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
 Description=${1:description}
 
 [Network]
@@ -62,11 +64,11 @@ $0
 		},
 	}
 
-	propertiesMap = map[string][]propertyMapItem{
+	PropertiesMap = map[string][]PropertyMapItem{
 		"Container": {
 			{
-				label: "AddCapability",
-				hover: []string{
+				Label: "AddCapability",
+				Hover: []string{
 					"Add these capabilities, in addition to the default Podman capability set, to the container.",
 					"This is a space separated list of capabilities. This key can be listed multiple times.",
 					"",
@@ -77,44 +79,44 @@ $0
 				},
 			},
 			{
-				label: "AddDevice",
-				hover: []string{
+				Label: "AddDevice",
+				Hover: []string{
 					"Adds a device node from the host into the container. The format of this is HOST-DEVICE[:CONTAINER-DEVICE][:PERMISSIONS], where HOST-DEVICE is the path of the device node on the host, CONTAINER-DEVICE is the path of the device node in the container, and PERMISSIONS is a list of permissions combining 'r' for read, 'w' for write, and 'm' for mknod(2). The - prefix tells Quadlet to add the device only if it exists on the host.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "AddHost",
-				hover: []string{
+				Label: "AddHost",
+				Hover: []string{
 					"Add host-to-IP mapping to /etc/hosts. The format is hostname:ip.",
 					"",
 					"Equivalent to the Podman --add-host option. This key can be listed multiple times.",
 				},
-				macro: "AddHost=${1:hostname}:${2:ip}\n$0",
+				Macro: "AddHost=${1:hostname}:${2:ip}\n$0",
 			},
 			{
-				label: "Annotation",
-				hover: []string{
+				Label: "Annotation",
+				Hover: []string{
 					"Set one or more OCI annotations on the container. The format is a list of key=value items, similar to Environment.",
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "Annotation=${1:key}=${2:value}\n$0",
+				Macro: "Annotation=${1:key}=${2:value}\n$0",
 			},
 			{
-				label: "AutoUpdate",
-				hover: []string{
+				Label: "AutoUpdate",
+				Hover: []string{
 					"Indicates whether the container will be auto-updated ([podman-auto-update(1)](https://docs.podman.io/en/latest/markdown/podman-auto-update.1.html)). The following values are supported:",
 					"",
 					"- `registry`: Requires a fully-qualified image reference (e.g., quay.io/podman/stable:latest) to be used to create the container. This enforcement is necessary to know which image to actually check and pull. If an image ID was used, Podman does not know which image to check/pull anymore.",
 					"- `local`: Tells Podman to compare the image a container is using to the image with its raw name in local storage. If an image is updated locally, Podman simply restarts the systemd unit executing the container.",
 				},
-				parameters: []string{"registry", "local"},
+				Parameters: []string{"registry", "local"},
 			},
 			{
-				label: "CgroupsMode",
-				hover: []string{
+				Label: "CgroupsMode",
+				Hover: []string{
 					"The cgroups mode of the Podman container. Equivalent to the Podman `--cgroups` option.",
 					"",
 					"By default, the cgroups mode of the container created by Quadlet is `split`, which differs from the default (`enabled`) used by the Podman CLI.",
@@ -123,22 +125,22 @@ $0
 				},
 			},
 			{
-				label: "ContainerName",
-				hover: []string{
+				Label: "ContainerName",
+				Hover: []string{
 					"The (optional) name of the Podman container. If this is not specified, the default value of `systemd-%N` is used, which is the same as the service name but with a `systemd-` prefix to avoid conflicts with user-managed containers.",
 				},
 			},
 			{
-				label: "ContainersConfModule",
-				hover: []string{
+				Label: "ContainersConfModule",
+				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman --module option.",
 					"",
 					"This key can be listed multiple times",
 				},
 			},
 			{
-				label: "DNS",
-				hover: []string{
+				Label: "DNS",
+				Hover: []string{
 					"Set network-scoped DNS resolver/nameserver for containers in this network.",
 					"",
 					"This key can be listed multiple times.",
@@ -149,7 +151,7 @@ $0
 					"DNS=1.0.0.1",
 					"```",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"1.1.1.1",
 					"1.0.0.1",
 					"8.8.8.8",
@@ -159,24 +161,24 @@ $0
 				},
 			},
 			{
-				label: "DNSOption",
-				hover: []string{
+				Label: "DNSOption",
+				Hover: []string{
 					"Set custom DNS options.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "DNSSearch",
-				hover: []string{
+				Label: "DNSSearch",
+				Hover: []string{
 					"Set custom DNS search domains. Use `DNSSearch=`. to remove the search domain.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "DropCapability",
-				hover: []string{
+				Label: "DropCapability",
+				Hover: []string{
 					"Drop these capabilities from the default podman capability set, or `all` to drop all capabilities.",
 					"",
 					"This is a space separated list of capabilities. This key can be listed multiple times.",
@@ -188,14 +190,14 @@ $0
 				},
 			},
 			{
-				label: "Entrypoint",
-				hover: []string{
+				Label: "Entrypoint",
+				Hover: []string{
 					"Override the default ENTRYPOINT from the image. Equivalent to the Podman --entrypoint option. Specify multi option commands in the form of a JSON string.",
 				},
 			},
 			{
-				label: "Environment",
-				hover: []string{
+				Label: "Environment",
+				Hover: []string{
 					"Set an environment variable in the container. This uses the same format as services in systemd and can be listed multiple times.",
 					"",
 					"For example:",
@@ -203,23 +205,23 @@ $0
 					"Environment=APP_USERNAME=appuser",
 					"```",
 				},
-				macro: "Environment=${1:name}=${2:value}\n$0",
+				Macro: "Environment=${1:name}=${2:value}\n$0",
 			},
 			{
-				label: "EnvironmentFile",
-				hover: []string{
+				Label: "EnvironmentFile",
+				Hover: []string{
 					"Use a line-delimited file to set environment variables in the container. The path may be absolute or relative to the location of the unit file. This key may be used multiple times, and the order persists when passed to `podman run`.",
 				},
 			},
 			{
-				label: "EnvironmentHost",
-				hover: []string{
+				Label: "EnvironmentHost",
+				Hover: []string{
 					"Use the host environment inside of the container.",
 				},
 			},
 			{
-				label: "Exec",
-				hover: []string{
+				Label: "Exec",
+				Hover: []string{
 					"Additional arguments for the container; this has exactly the same effect as passing more arguments after a `podman run <image> <arguments>` invocation.",
 					"",
 					"The format is the same as for [systemd command lines](https://www.freedesktop.org/software/systemd/man/systemd.service.html#Command%20lines), However, unlike the usage scenario for similarly-named systemd `ExecStart=` verb which operates on the ambient root filesystem, it is very common for container images to have their own `ENTRYPOINT` or `CMD` metadata which this interacts with.",
@@ -230,24 +232,24 @@ $0
 				},
 			},
 			{
-				label: "ExposeHostPort",
-				hover: []string{
+				Label: "ExposeHostPort",
+				Hover: []string{
 					"Exposes a port, or a range of ports (e.g. `50-59`), from the host to the container. Equivalent to the Podman `--expose` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "GIDMap",
-				hover: []string{
+				Label: "GIDMap",
+				Hover: []string{
 					"Run the container in a new user namespace using the supplied GID mapping. Equivalent to the Podman `--gidmap` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "GlobalArgs",
-				hover: []string{
+				Label: "GlobalArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `run` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -256,32 +258,32 @@ $0
 				},
 			},
 			{
-				label: "Group",
-				hover: []string{
+				Label: "Group",
+				Hover: []string{
 					"The (numeric) GID to run as inside the container. This does not need to match the GID on the host, which can be modified with UserNS, but if that is not specified, this GID is also used on the host.",
 				},
 			},
 			{
-				label: "GroupAdd",
-				hover: []string{
+				Label: "GroupAdd",
+				Hover: []string{
 					"Assign additional groups to the primary user running within the container process. Also supports the keep-groups special flag. Equivalent to the Podman --group-add option.",
 				},
 			},
 			{
-				label: "HealthCmd",
-				hover: []string{
+				Label: "HealthCmd",
+				Hover: []string{
 					"Set or alter a healthcheck command for a container. A value of none disables existing healthchecks. Equivalent to the Podman `--health-cmd option`.",
 				},
 			},
 			{
-				label: "HealthInterval",
-				hover: []string{
+				Label: "HealthInterval",
+				Hover: []string{
 					"Set an interval for the healthchecks. An interval of disable results in no automatic timer setup. Equivalent to the Podman `--health-interval` option.",
 				},
 			},
 			{
-				label: "HealthLogDestination",
-				hover: []string{
+				Label: "HealthLogDestination",
+				Hover: []string{
 					"Set the destination of the HealthCheck log. Directory path, local or events_logger (local use container state file) (Default: local) Equivalent to the Podman `--health-log-destination` option.",
 					"",
 					"- `local`: (default) HealthCheck logs are stored in overlay containers. (For example: `$runroot/healthcheck.log`)",
@@ -290,80 +292,80 @@ $0
 				},
 			},
 			{
-				label: "HealthMaxLogCount",
-				hover: []string{
+				Label: "HealthMaxLogCount",
+				Hover: []string{
 					"Set maximum number of attempts in the HealthCheck log file. (‘0’ value means an infinite number of attempts in the log file) (Default: 5 attempts) Equivalent to the Podman `--Health-max-log-count` option.",
 				},
 			},
 			{
-				label: "HealthMaxLogSize",
-				hover: []string{
+				Label: "HealthMaxLogSize",
+				Hover: []string{
 					"Set maximum length in characters of stored HealthCheck log. (“0” value means an infinite log length) (Default: 500 characters) Equivalent to the Podman `--Health-max-log-size` option.",
 				},
 			},
 			{
-				label: "HealthOnFailure",
-				hover: []string{
+				Label: "HealthOnFailure",
+				Hover: []string{
 					"Action to take once the container transitions to an unhealthy state. The “kill” action in combination integrates best with systemd. Once the container turns unhealthy, it gets killed, and systemd restarts the service. Equivalent to the Podman `--health-on-failure` option.",
 				},
 			},
 			{
-				label: "HealthRetries",
-				hover: []string{
+				Label: "HealthRetries",
+				Hover: []string{
 					"The number of retries allowed before a healthcheck is considered to be unhealthy. Equivalent to the Podman `--health-retries` option.",
 				},
 			},
 			{
-				label: "HealthStartPeriod",
-				hover: []string{
+				Label: "HealthStartPeriod",
+				Hover: []string{
 					"The initialization time needed for a container to bootstrap. Equivalent to the Podman `--health-start-period` option.",
 				},
 			},
 			{
-				label: "HealthStartupCmd",
-				hover: []string{
+				Label: "HealthStartupCmd",
+				Hover: []string{
 					"Set a startup healthcheck command for a container. Equivalent to the Podman `--health-startup-cmd` option.",
 				},
 			},
 			{
-				label: "HealthStartupInterval",
-				hover: []string{
+				Label: "HealthStartupInterval",
+				Hover: []string{
 					"Set an interval for the startup healthcheck. An interval of disable results in no automatic timer setup. Equivalent to the Podman `--health-startup-interval` option.",
 				},
 			},
 			{
-				label: "HealthStartupRetries",
-				hover: []string{
+				Label: "HealthStartupRetries",
+				Hover: []string{
 					"The number of attempts allowed before the startup healthcheck restarts the container. Equivalent to the Podman `--health-startup-retries` option.",
 				},
 			},
 			{
-				label: "HealthStartupSuccess",
-				hover: []string{
+				Label: "HealthStartupSuccess",
+				Hover: []string{
 					"The number of successful runs required before the startup healthcheck succeeds and the regular healthcheck begins. Equivalent to the Podman `--health-startup-success` option.",
 				},
 			},
 			{
-				label: "HealthStartupTimeout",
-				hover: []string{
+				Label: "HealthStartupTimeout",
+				Hover: []string{
 					"The maximum time a startup healthcheck command has to complete before it is marked as failed. Equivalent to the Podman `--health-startup-timeout` option.",
 				},
 			},
 			{
-				label: "HealthTimeout",
-				hover: []string{
+				Label: "HealthTimeout",
+				Hover: []string{
 					"The maximum time allowed to complete the healthcheck before an interval is considered failed. Equivalent to the Podman `--health-timeout` option.",
 				},
 			},
 			{
-				label: "HostName",
-				hover: []string{
+				Label: "HostName",
+				Hover: []string{
 					"Sets the host name that is available inside the container. Equivalent to the Podman --hostname option.",
 				},
 			},
 			{
-				label: "Image",
-				hover: []string{
+				Label: "Image",
+				Hover: []string{
 					"The image to run in the container. It is recommended to use a fully qualified image name rather than a short name, both for performance and robustness reasons.",
 					"",
 					"The format of the name is the same as when passed to `podman pull`. So, it supports using `:tag` or digests to guarantee the specific image version.",
@@ -374,20 +376,20 @@ $0
 				},
 			},
 			{
-				label: "IP",
-				hover: []string{
+				Label: "IP",
+				Hover: []string{
 					"Specify a static IPv4 address for the container, for example **10.88.64.128**. Equivalent to the Podman `--ip` option.",
 				},
 			},
 			{
-				label: "IP6",
-				hover: []string{
+				Label: "IP6",
+				Hover: []string{
 					"Specify a static IPv6 address for the container, for example **fd46:db93:aa76:ac37::10**. Equivalent to the Podman `--ip6` option.",
 				},
 			},
 			{
-				label: "Label",
-				hover: []string{
+				Label: "Label",
+				Hover: []string{
 					"Set one or more OCI labels on the container. The format is a list of `key=value` items, similar to `Environment`.",
 					"",
 					"This key can be listed multiple times.",
@@ -397,35 +399,35 @@ $0
 					"Label=app=myapp",
 					"```",
 				},
-				macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=${1:key}:${2:value}\n$0",
 			},
 			{
-				label: "LogDriver",
-				hover: []string{
+				Label: "LogDriver",
+				Hover: []string{
 					"Set the log-driver used by Podman when running the container. Equivalent to the Podman `--log-driver` option.",
 				},
 			},
 			{
-				label: "LogOpt",
-				hover: []string{
+				Label: "LogOpt",
+				Hover: []string{
 					"Set the log-opt (logging options) used by Podman when running the container. Equivalent to the Podman `--log-opt` option. This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "Mask",
-				hover: []string{
+				Label: "Mask",
+				Hover: []string{
 					"Specify the paths to mask separated by a colon. `Mask=/path/1:/path/2`. A masked path cannot be accessed inside the container.",
 				},
 			},
 			{
-				label: "Memory",
-				hover: []string{
+				Label: "Memory",
+				Hover: []string{
 					"Specify the amount of memory for the container.",
 				},
 			},
 			{
-				label: "Mount",
-				hover: []string{
+				Label: "Mount",
+				Hover: []string{
 					"Attach a filesystem mount to the container. This is equivalent to the Podman `--mount` option, and generally has the form `type=TYPE,TYPE-SPECIFIC-OPTION[,...]`.",
 					"",
 					"Special cases:",
@@ -438,8 +440,8 @@ $0
 				},
 			},
 			{
-				label: "Network",
-				hover: []string{
+				Label: "Network",
+				Hover: []string{
 					"Specify a custom network for the container. This has the same format as the `--network` option to `podman run`. For example, use `host` to use the host network in the container, or `none` to not set up networking in the container.",
 					"",
 					"Special cases:",
@@ -451,22 +453,22 @@ $0
 				},
 			},
 			{
-				label: "NetworkAlias",
-				hover: []string{
+				Label: "NetworkAlias",
+				Hover: []string{
 					"Add a network-scoped alias for the container. This has the same format as the `--network-alias` option to `podman run`. Aliases can be used to group containers together in DNS resolution: for example, setting `NetworkAlias=web` on multiple containers will make a DNS query for `web` resolve to all the containers with that alias.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "NoNewPrivileges",
-				hover: []string{
+				Label: "NoNewPrivileges",
+				Hover: []string{
 					"If enabled, this disables the container processes from gaining additional privileges via things like setuid and file capabilities. Defaults to false.",
 				},
 			},
 			{
-				label: "Notify",
-				hover: []string{
+				Label: "Notify",
+				Hover: []string{
 					"By default, Podman is run in such a way that the systemd startup notify command is handled by the container runtime. In other words, the service is deemed started when the container runtime starts the child in the container. However, if the container application supports [sd_notify](https://www.freedesktop.org/software/systemd/man/sd_notify.html), then setting `Notify` to true passes the notification details to the container allowing it to notify of startup on its own.",
 					"",
 					"In addition, setting `Notify` to `healthy` will postpone startup notifications until such time as the container is marked healthy, as determined by Podman healthchecks. Note that this requires setting up a container healthcheck, see the `HealthCmd` option for more.",
@@ -475,22 +477,22 @@ $0
 				},
 			},
 			{
-				label: "PidsLimit",
-				hover: []string{
+				Label: "PidsLimit",
+				Hover: []string{
 					"Tune the container's pids limit. This is equivalent to the Podman `--pids-limit` option.",
 				},
 			},
 			{
-				label: "Pod",
-				hover: []string{
+				Label: "Pod",
+				Hover: []string{
 					"Specify a Quadlet `.pod` unit to link the container to. The value must take the form of `<name>.pod` and the `.pod` unit must exist.",
 					"",
 					"Quadlet will add all the necessary parameters to link between the container and the pod and between their corresponding services.",
 				},
 			},
 			{
-				label: "PodmanArgs",
-				hover: []string{
+				Label: "PodmanArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly to the end of the `podman run` command in the generated file (right before the image name in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -499,8 +501,8 @@ $0
 				},
 			},
 			{
-				label: "PublishPort",
-				hover: []string{
+				Label: "PublishPort",
+				Hover: []string{
 					"Exposes a port, or a range of ports (e.g. `50-59`), from the container to the host. Equivalent to the Podman `--publish` option. The format is similar to the Podman options, which is of the form `ip:hostPort:containerPort`, `ip::containerPort`, `hostPort:containerPort` or `containerPort`, where the number of host and container ports must be the same (in the case of a range).",
 					"",
 					"If the IP is set to 0.0.0.0 or not set at all, the port is bound on all IPv4 addresses on the host; use [::] for IPv6.",
@@ -509,14 +511,14 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
+				Macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
 			},
 			{
-				label: "Pull",
-				hover: []string{
+				Label: "Pull",
+				Hover: []string{
 					"Set the image pull policy. This is equivalent to the Podman `--pull` option",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"always",
 					"missing",
 					"never",
@@ -524,20 +526,20 @@ $0
 				},
 			},
 			{
-				label: "ReadOnly",
-				hover: []string{
+				Label: "ReadOnly",
+				Hover: []string{
 					"If enabled, makes the image read-only. Defaults to false.",
 				},
 			},
 			{
-				label: "ReadOnlyTmpfs",
-				hover: []string{
+				Label: "ReadOnlyTmpfs",
+				Hover: []string{
 					"If ReadOnly is set to `true`, mount a read-write tmpfs on /dev, /dev/shm, /run, /tmp, and /var/tmp. Defaults to false.",
 				},
 			},
 			{
-				label: "ReloadCmd",
-				hover: []string{
+				Label: "ReloadCmd",
+				Hover: []string{
 					"Add `ExecReload` line to the `Service` that runs ` podman exec` with this command in this container.",
 					"",
 					"In order to execute the reload run `systemctl reload <Service>`",
@@ -546,8 +548,8 @@ $0
 				},
 			},
 			{
-				label: "ReloadSignal",
-				hover: []string{
+				Label: "ReloadSignal",
+				Hover: []string{
 					"Add `ExecReload` line to the `Service` that runs `podman kill` with this signal which sends the signal to the main container process.",
 					"",
 					"In order to execute the reload run `systemctl reload <Service>`",
@@ -556,20 +558,20 @@ $0
 				},
 			},
 			{
-				label: "Retry",
-				hover: []string{
+				Label: "Retry",
+				Hover: []string{
 					"Number of times to retry the image pull when a HTTP error occurs. Equivalent to the Podman `--retry` option.",
 				},
 			},
 			{
-				label: "RetryDelay",
-				hover: []string{
+				Label: "RetryDelay",
+				Hover: []string{
 					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
 				},
 			},
 			{
-				label: "Rootfs",
-				hover: []string{
+				Label: "Rootfs",
+				Hover: []string{
 					"The rootfs to use for the container. Rootfs points to a directory on the system that contains the content to be run within the container. This option conflicts with the `Image` option.",
 					"",
 					"The format of the rootfs is the same as when passed to `podman run --rootfs`, so it supports overlay mounts as well.",
@@ -578,65 +580,65 @@ $0
 				},
 			},
 			{
-				label: "RunInit",
-				hover: []string{
+				Label: "RunInit",
+				Hover: []string{
 					"If enabled, the container has a minimal init process inside the container that forwards signals and reaps processes.",
 				},
 			},
 			{
-				label: "SeccompProfile",
-				hover: []string{
+				Label: "SeccompProfile",
+				Hover: []string{
 					"Set the seccomp profile to use in the container. If unset, the default podman profile is used. Set to either the pathname of a JSON file, or `unconfined` to disable the seccomp filters.",
 				},
 			},
 			{
-				label: "Secret",
-				hover: []string{
+				Label: "Secret",
+				Hover: []string{
 					"Use a Podman secret in the container either as a file or an environment variable. This is equivalent to the Podman `--secret` option and generally has the form `secret[,opt=opt ...]`",
 				},
-				macro: "Secret=${1:secret},type=${2:type},target=${3:target}\n$0",
+				Macro: "Secret=${1:secret},type=${2:type},target=${3:target}\n$0",
 			},
 			{
-				label: "SecurityLabelDisable",
-				hover: []string{
+				Label: "SecurityLabelDisable",
+				Hover: []string{
 					"Turn off label separation for the container.",
 				},
 			},
 			{
-				label: "SecurityLabelFileType",
-				hover: []string{
+				Label: "SecurityLabelFileType",
+				Hover: []string{
 					"Set the label file type for the container files.",
 				},
 			},
 			{
-				label: "SecurityLabelLevel",
-				hover: []string{
+				Label: "SecurityLabelLevel",
+				Hover: []string{
 					"Set the label process level for the container processes.",
 				},
 			},
 			{
-				label: "SecurityLabelNested",
-				hover: []string{
+				Label: "SecurityLabelNested",
+				Hover: []string{
 					"Allow SecurityLabels to function within the container. This allows separation of containers created within the container.",
 				},
 			},
 			{
-				label: "SecurityLabelType",
-				hover: []string{
+				Label: "SecurityLabelType",
+				Hover: []string{
 					"Set the label process type for the container processes.",
 				},
 			},
 			{
-				label: "ShmSize",
-				hover: []string{
+				Label: "ShmSize",
+				Hover: []string{
 					"Size of /dev/shm.",
 					"",
 					"This is equivalent to the Podman `--shm-size` option and generally has the form `number[unit]`",
 				},
 			},
 			{
-				label: "StartWithPod",
-				hover: []string{
+				Label: "StartWithPod",
+				Hover: []string{
 					"Start the container after the associated pod is created. Default to **true**.",
 					"",
 					"If `true`, container will be started/stopped/restarted alongside the pod.",
@@ -647,20 +649,20 @@ $0
 				},
 			},
 			{
-				label: "StopSignal",
-				hover: []string{
+				Label: "StopSignal",
+				Hover: []string{
 					"Signal to stop a container. Default is **SIGTERM**.",
 					"",
 					"This is equivalent to the Podman `--stop-signal` option",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"SIGTERM",
 					"SIGKILL",
 				},
 			},
 			{
-				label: "StopTimeout",
-				hover: []string{
+				Label: "StopTimeout",
+				Hover: []string{
 					"Seconds to wait before forcibly stopping the container.",
 					"",
 					"Note, this value should be lower than the actual systemd unit timeout to make sure the podman rm command is not killed by systemd.",
@@ -669,20 +671,20 @@ $0
 				},
 			},
 			{
-				label: "SubGIDMap",
-				hover: []string{
+				Label: "SubGIDMap",
+				Hover: []string{
 					"Run the container in a new user namespace using the map with name in the /etc/subgid file. Equivalent to the Podman `--subgidname` option.",
 				},
 			},
 			{
-				label: "SubUIDMap",
-				hover: []string{
+				Label: "SubUIDMap",
+				Hover: []string{
 					"Run the container in a new user namespace using the map with name in the /etc/subuid file. Equivalent to the Podman `--subuidname` option.",
 				},
 			},
 			{
-				label: "Sysctl",
-				hover: []string{
+				Label: "Sysctl",
+				Hover: []string{
 					"Configures namespaced kernel parameters for the container. The format is `Sysctl=name=value`.",
 					"",
 					"This is a space separated list of kernel parameters. This key can be listed multiple times.",
@@ -694,38 +696,38 @@ $0
 				},
 			},
 			{
-				label: "Timezone",
-				hover: []string{
+				Label: "Timezone",
+				Hover: []string{
 					"The timezone to run the container in.",
 				},
 			},
 			{
-				label: "Tmpfs",
-				hover: []string{
+				Label: "Tmpfs",
+				Hover: []string{
 					"Mount a tmpfs in the container. This is equivalent to the Podman `--tmpfs` option, and generally has the form `CONTAINER-DIR[:OPTIONS]`.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "UIDMap",
-				hover: []string{
+				Label: "UIDMap",
+				Hover: []string{
 					"Run the container in a new user namespace using the supplied UID mapping. Equivalent to the Podman `--uidmap` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "Ulimit",
-				hover: []string{
+				Label: "Ulimit",
+				Hover: []string{
 					"Ulimit options. Sets the ulimits values inside of the container.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "Unmask",
-				hover: []string{
+				Label: "Unmask",
+				Hover: []string{
 					"Specify the paths to unmask separated by a colon. unmask=ALL or /path/1:/path/2, or shell expanded paths (/proc/*):",
 					"",
 					"If set to `ALL`, Podman will unmask all the paths that are masked or made read-only by default.",
@@ -736,17 +738,17 @@ $0
 				},
 			},
 			{
-				label: "User",
-				hover: []string{
+				Label: "User",
+				Hover: []string{
 					"The (numeric) UID to run as inside the container. This does not need to match the UID on the host, which can be modified with `UserNS`, but if that is not specified, this UID is also used on the host.",
 				},
 			},
 			{
-				label: "UserNS",
-				hover: []string{
+				Label: "UserNS",
+				Hover: []string{
 					"Set the user namespace mode for the container. This is equivalent to the Podman `--userns` option and generally has the form `MODE[:OPTIONS,...]`.",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"auto",
 					"host",
 					"keep-id",
@@ -754,8 +756,8 @@ $0
 				},
 			},
 			{
-				label: "Volume",
-				hover: []string{
+				Label: "Volume",
+				Hover: []string{
 					"Mount a volume in the container. This is equivalent to the Podman `--volume` option, and generally has the form `[[SOURCE-VOLUME|HOST-DIR:]CONTAINER-DIR[:OPTIONS]]`.",
 					"",
 					"If `SOURCE-VOLUME` starts with `.`, Quadlet resolves the path relative to the location of the unit file.",
@@ -765,11 +767,11 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "Volume=${1:destination}:${2:source}\n$0",
+				Macro: "Volume=${1:destination}:${2:source}\n$0",
 			},
 			{
-				label: "WorkingDir",
-				hover: []string{
+				Label: "WorkingDir",
+				Hover: []string{
 					"Working directory inside the container.",
 					"",
 					"The default working directory for running binaries within a container is the root directory (/). The image developer can set a different default with the WORKDIR instruction. This option overrides the working directory by using the -w option.",
@@ -778,29 +780,29 @@ $0
 		},
 		"Pod": {
 			{
-				label: "AddHost",
-				hover: []string{
+				Label: "AddHost",
+				Hover: []string{
 					"Add  host-to-IP mapping to /etc/hosts. The format is `hostname:ip`.",
 					"",
 					"Equivalent to the Podman `--add-host` option. This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "ContainersConfModule",
-				hover: []string{
+				Label: "ContainersConfModule",
+				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "DNS",
-				hover: []string{
+				Label: "DNS",
+				Hover: []string{
 					"Set network-scoped DNS resolver/nameserver for containers in this pod.",
 					"",
 					"This key can be listed multiple times.",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"1.1.1.1",
 					"1.0.0.1",
 					"8.8.8.8",
@@ -810,44 +812,44 @@ $0
 				},
 			},
 			{
-				label: "DNSOption",
-				hover: []string{
+				Label: "DNSOption",
+				Hover: []string{
 					"Set custom DNS options.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "DNSSearch",
-				hover: []string{
+				Label: "DNSSearch",
+				Hover: []string{
 					"Set custom DNS search domains. Use **DNSSearch=.** to remove the search domain.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "ExitPolicy",
-				hover: []string{
+				Label: "ExitPolicy",
+				Hover: []string{
 					"Set the exit policy of the pod when the last container exits. Default for quadlets is **stop**.",
 					"",
 					"To keep the pod active, set `ExitPolicy=continue`.",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"stop",
 					"continue",
 				},
 			},
 			{
-				label: "GIDMap",
-				hover: []string{
+				Label: "GIDMap",
+				Hover: []string{
 					"Create the pod in a new user namespace using the supplied GID mapping. Equivalent to the Podman `--gidmap` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "GlobalArgs",
-				hover: []string{
+				Label: "GlobalArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `pod` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -856,8 +858,8 @@ $0
 				},
 			},
 			{
-				label: "HostName",
-				hover: []string{
+				Label: "HostName",
+				Hover: []string{
 					"Set the pod’s hostname inside all containers.",
 					"",
 					"The given hostname is also added to the /etc/hosts file using the container’s primary IP address (also see the `--add-host` option).",
@@ -866,29 +868,29 @@ $0
 				},
 			},
 			{
-				label: "IP",
-				hover: []string{
+				Label: "IP",
+				Hover: []string{
 					"Specify a static IPv4 address for the pod, for example **10.88.64.128**. Equivalent to the Podman `--ip` option.",
 				},
 			},
 			{
-				label: "IP6",
-				hover: []string{
+				Label: "IP6",
+				Hover: []string{
 					"Specify a static IPv6 address for the pod, for example **fd46:db93:aa76:ac37::10**. Equivalent to the Podman `--ip6` option.",
 				},
 			},
 			{
-				label: "Label",
-				hover: []string{
+				Label: "Label",
+				Hover: []string{
 					"Set one or more OCI labels on the pod. The format is a list of `key=value` items, similar to `Environment`.",
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=${1:key}:${2:value}\n$0",
 			},
 			{
-				label: "Network",
-				hover: []string{
+				Label: "Network",
+				Hover: []string{
 					"Specify a custom network for the pod. This has the same format as the `--network` option to `podman pod create`. For example, use `host` to use the host network in the pod, or `none` to not set up networking in the pod.",
 					"",
 					"Special case:",
@@ -900,16 +902,16 @@ $0
 				},
 			},
 			{
-				label: "NetworkAlias",
-				hover: []string{
+				Label: "NetworkAlias",
+				Hover: []string{
 					"Add a network-scoped alias for the pod. This has the same format as the `--network-alias` option to `podman pod create`. Aliases can be used to group containers together in DNS resolution: for example, setting `NetworkAlias=web` on multiple containers will make a DNS query for `web` resolve to all the containers with that alias.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "PodmanArgs",
-				hover: []string{
+				Label: "PodmanArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly to the end of the `podman pod create` command in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -918,16 +920,16 @@ $0
 				},
 			},
 			{
-				label: "PodName",
-				hover: []string{
+				Label: "PodName",
+				Hover: []string{
 					"The (optional) name of the Podman pod. If this is not specified, the default value is the same name as the unit, but with a `systemd-` prefix, i.e. a `$name.pod` file creates a `systemd-$name` Podman pod to avoid conflicts with user-managed pods.",
 					"",
 					"Please note that pods and containers cannot have the same name. So, if PodName is set, it must not conflict with any container.",
 				},
 			},
 			{
-				label: "PublishPort",
-				hover: []string{
+				Label: "PublishPort",
+				Hover: []string{
 					"Exposes a port, or a range of ports (e.g. `50-59`), from the pod to the host. Equivalent to the Podman `--publish` option. The format is similar to the Podman options, which is of the form `ip:hostPort:containerPort`, `ip::containerPort`, `hostPort:containerPort` or `containerPort`, where the number of host and container ports must be the same (in the case of a range).",
 					"",
 					"If the IP is set to 0.0.0.0 or not set at all, the port is bound on all IPv4 addresses on the host; use [::] for IPv6.",
@@ -938,48 +940,48 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
+				Macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
 			},
 			{
-				label: "ServiceName",
-				hover: []string{
+				Label: "ServiceName",
+				Hover: []string{
 					"By default, Quadlet will name the systemd service unit by appending `-pod` to the name of the Quadlet. Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
 					"",
 					"Note, the name should not include the `.service` file extension",
 				},
 			},
 			{
-				label: "ShmSize",
-				hover: []string{
+				Label: "ShmSize",
+				Hover: []string{
 					"Size of /dev/shm.",
 					"",
 					"This is equivalent to the Podman `--shm-size` option and generally has the form `number[unit]`",
 				},
 			},
 			{
-				label: "SubGIDMap",
-				hover: []string{
+				Label: "SubGIDMap",
+				Hover: []string{
 					"Create the pod in a new user namespace using the map with name in the /etc/subgid file. Equivalent to the Podman `--subgidname` option.",
 				},
 			},
 			{
-				label: "SubUIDMap",
-				hover: []string{
+				Label: "SubUIDMap",
+				Hover: []string{
 					"Create the pod in a new user namespace using the map with name in the /etc/subuid file. Equivalent to the Podman `--subuidname` option.",
 				},
 			},
 			{
-				label: "UIDMap",
-				hover: []string{
+				Label: "UIDMap",
+				Hover: []string{
 					"Create the pod in a new user namespace using the supplied UID mapping. Equivalent to the Podman `--uidmap` option.",
 				},
 			},
 			{
-				label: "UserNS",
-				hover: []string{
+				Label: "UserNS",
+				Hover: []string{
 					"Set the user namespace mode for the pod. This is equivalent to the Podman `--userns` option and generally has the form `MODE[:OPTIONS,...]`.",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"auto",
 					"host",
 					"keep-id",
@@ -987,8 +989,8 @@ $0
 				},
 			},
 			{
-				label: "Volume",
-				hover: []string{
+				Label: "Volume",
+				Hover: []string{
 					"Mount a volume in the pod. This is equivalent to the Podman `--volume` option, and generally has the form `[[SOURCE-VOLUME|HOST-DIR:]CONTAINER-DIR[:OPTIONS]]`.",
 					"",
 					"If `SOURCE-VOLUME` starts with `.`, Quadlet resolves the path relative to the location of the unit file.",
@@ -1000,39 +1002,39 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "Volume=${1:destination}:${2:source}\n$0",
+				Macro: "Volume=${1:destination}:${2:source}\n$0",
 			},
 		},
 		"Kube": {
 			{
-				label: "AutoUpdate",
-				hover: []string{
+				Label: "AutoUpdate",
+				Hover: []string{
 					"Indicates whether containers will be auto-updated ([podman-auto-update(1)](podman-auto-update.1.md)). AutoUpdate can be specified multiple times. The following values are supported:",
 					"- `registry`: Requires a fully-qualified image reference (e.g., quay.io/podman/stable:latest) to be used to create the container. This enforcement is necessary to know which images to actually check and pull. If an image ID was used, Podman does not know which image to check/pull anymore.",
 					"- `local`: Tells Podman to compare the image a container is using to the image with its raw name in local storage. If an image is updated locally, Podman simply restarts the systemd unit executing the Kubernetes Quadlet.",
 					"- `name/(local|registry)`: Tells Podman to perform the `local` or `registry` autoupdate on the specified container name.",
 				},
-				parameters: []string{"registry", "local"},
+				Parameters: []string{"registry", "local"},
 			},
 			{
-				label: "ConfigMap",
-				hover: []string{
+				Label: "ConfigMap",
+				Hover: []string{
 					"Pass the Kubernetes ConfigMap YAML path to `podman kube play` via the `--configmap` argument. Unlike the `configmap` argument, the value may contain only one path but it may be absolute or relative to the location of the unit file.",
 					"",
 					"This key may be used multiple times",
 				},
 			},
 			{
-				label: "ContainersConfModule",
-				hover: []string{
+				Label: "ContainersConfModule",
+				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "ExitCodePropagation",
-				hover: []string{
+				Label: "ExitCodePropagation",
+				Hover: []string{
 					"Control how the main PID of the systemd service should exit. The following values are supported:",
 					"- `all`: exit non-zero if all containers have failed (i.e., exited non-zero)",
 					" `any`: exit non-zero if any container has failed",
@@ -1042,8 +1044,8 @@ $0
 				},
 			},
 			{
-				label: "GlobalArgs",
-				hover: []string{
+				Label: "GlobalArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `kube` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1052,20 +1054,20 @@ $0
 				},
 			},
 			{
-				label: "KubeDownForce",
-				hover: []string{
+				Label: "KubeDownForce",
+				Hover: []string{
 					"Remove all resources, including volumes, when calling `podman kube down`. Equivalent to the Podman `--force` option.",
 				},
 			},
 			{
-				label: "LogDriver",
-				hover: []string{
+				Label: "LogDriver",
+				Hover: []string{
 					"Set the log-driver Podman uses when running the container. Equivalent to the Podman `--log-driver` option.",
 				},
 			},
 			{
-				label: "Network",
-				hover: []string{
+				Label: "Network",
+				Hover: []string{
 					"Specify a custom network for the container. This has the same format as the `--network` option to `podman kube play`. For example, use `host` to use the host network in the container, or `none` to not set up networking in the container.",
 					"",
 					"Special case:",
@@ -1075,8 +1077,8 @@ $0
 				},
 			},
 			{
-				label: "PodmanArgs",
-				hover: []string{
+				Label: "PodmanArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly to the end of the `podman kube play` command in the generated file (right before the path to the yaml file in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1085,8 +1087,8 @@ $0
 				},
 			},
 			{
-				label: "PublishPort",
-				hover: []string{
+				Label: "PublishPort",
+				Hover: []string{
 					"Exposes a port, or a range of ports (e.g. `50-59`), from the container to the host. Equivalent to the `podman kube play`'s `--publish` option. The format is similar to the Podman options, which is of the form `ip:hostPort:containerPort`, `ip::containerPort`, `hostPort:containerPort` or `containerPort`, where the number of host and container ports must be the same (in the case of a range).",
 					"",
 					"If the IP is set to 0.0.0.0 or not set at all, the port is bound on all IPv4 addresses on the host; use [::] for IPv6.",
@@ -1095,22 +1097,22 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
+				Macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
 			},
 			{
-				label: "SetWorkingDirectory",
-				hover: []string{
+				Label: "SetWorkingDirectory",
+				Hover: []string{
 					"Set the `WorkingDirectory` field of the `Service` group of the Systemd service unit file. Used to allow `podman kube play` to correctly resolve relative paths. Supported values are `yaml` and `unit` to set the working directory to that of the YAML or Quadlet Unit file respectively.",
 					"",
 					"Alternatively, users can explicitly set the `WorkingDirectory` field of the `Service` group in the `.kube` file. Please note that if the `WorkingDirectory` field of the `Service` group is set, Quadlet will not set it even if `SetWorkingDirectory` is set",
 				},
 			},
 			{
-				label: "UserNS",
-				hover: []string{
+				Label: "UserNS",
+				Hover: []string{
 					"Set the user namespace mode for the container. This is equivalent to the Podman `--userns` option and generally has the form `MODE[:OPTIONS,...]`.",
 				},
-				parameters: []string{
+				Parameters: []string{
 					"auto",
 					"host",
 					"keep-id",
@@ -1118,49 +1120,49 @@ $0
 				},
 			},
 			{
-				label: "Yaml",
-				hover: []string{
+				Label: "Yaml",
+				Hover: []string{
 					"The path, absolute or relative to the location of the unit file, to the Kubernetes YAML file to use.",
 				},
 			},
 		},
 		"Network": {
 			{
-				label: "ContainersConfModule",
-				hover: []string{
+				Label: "ContainersConfModule",
+				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "DisableDNS",
-				hover: []string{
+				Label: "DisableDNS",
+				Hover: []string{
 					"If enabled, disables the DNS plugin for this network.",
 					"",
 					"This is equivalent to the Podman `--disable-dns` option",
 				},
 			},
 			{
-				label: "DNS",
-				hover: []string{
+				Label: "DNS",
+				Hover: []string{
 					"Set network-scoped DNS resolver/nameserver for containers in this network.",
 					"",
 					"This key can be listed multiple times.",
 				},
-				parameters: []string{"1.1.1.1", "8.8.8.8"},
+				Parameters: []string{"1.1.1.1", "8.8.8.8"},
 			},
 			{
-				label: "Driver",
-				hover: []string{
+				Label: "Driver",
+				Hover: []string{
 					"Driver to manage the network. Currently `bridge`, `macvlan` and `ipvlan` are supported.",
 					"",
 					"This is equivalent to the Podman `--driver` option",
 				},
 			},
 			{
-				label: "Gateway",
-				hover: []string{
+				Label: "Gateway",
+				Hover: []string{
 					"Define a gateway for the subnet. If you want to provide a gateway address, you must also provide a subnet option.",
 					"",
 					"This is equivalent to the Podman `--gateway` option",
@@ -1169,8 +1171,8 @@ $0
 				},
 			},
 			{
-				label: "GlobalArgs",
-				hover: []string{
+				Label: "GlobalArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `network` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1179,32 +1181,32 @@ $0
 				},
 			},
 			{
-				label: "InterfaceName",
-				hover: []string{
+				Label: "InterfaceName",
+				Hover: []string{
 					"This option maps the *network_interface* option in the network config, see **podman network inspect**. Depending on the driver, this can have different effects; for `bridge`, it uses the bridge interface name. For `macvlan` and `ipvlan`, it is the parent device on the host. It is the same as `--opt parent=...`.",
 					"",
 					"This is equivalent to the Podman `--interface-name` option.",
 				},
 			},
 			{
-				label: "Internal",
-				hover: []string{
+				Label: "Internal",
+				Hover: []string{
 					"Restrict external access of this network.",
 					"",
 					"This is equivalent to the Podman `--internal` option",
 				},
 			},
 			{
-				label: "IPAMDriver",
-				hover: []string{
+				Label: "IPAMDriver",
+				Hover: []string{
 					"Set the ipam driver (IP Address Management Driver) for the network. Currently `host-local`, `dhcp` and `none` are supported.",
 					"",
 					"This is equivalent to the Podman `--ipam-driver` option",
 				},
 			},
 			{
-				label: "IPRange",
-				hover: []string{
+				Label: "IPRange",
+				Hover: []string{
 					"Allocate container IP from a range. The range must be a either a complete subnet in CIDR notation or be in the `<startIP>-<endIP>` syntax which allows for a more flexible range compared to the CIDR subnet. The ip-range option must be used with a subnet option.",
 					"",
 					"This is equivalent to the Podman `--ip-range` option",
@@ -1213,45 +1215,45 @@ $0
 				},
 			},
 			{
-				label: "IPv6",
-				hover: []string{
+				Label: "IPv6",
+				Hover: []string{
 					"Enable IPv6 (Dual Stack) networking.",
 					"",
 					"This is equivalent to the Podman `--ipv6` option",
 				},
 			},
 			{
-				label: "Label",
-				hover: []string{
+				Label: "Label",
+				Hover: []string{
 					"Set one or more OCI labels on the network. The format is a list of `key=value` items, similar to `Environment`.",
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=${1:key}:${2:value}\n$0",
 			},
 			{
-				label: "NetworkDeleteOnStop",
-				hover: []string{
+				Label: "NetworkDeleteOnStop",
+				Hover: []string{
 					"When set to `true` the network is deleted when the service is stopped",
 				},
 			},
 			{
-				label: "NetworkName",
-				hover: []string{
+				Label: "NetworkName",
+				Hover: []string{
 					"The (optional) name of the Podman network. If this is not specified, the default value is the same name as the unit, but with a `systemd-` prefix, i.e. a `$name.network` file creates a `systemd-$name` Podman network to avoid conflicts with user-managed network.",
 				},
 			},
 			{
-				label: "Options",
-				hover: []string{
+				Label: "Options",
+				Hover: []string{
 					"Set driver specific options.",
 					"",
 					"This is equivalent to the Podman `--opt` option",
 				},
 			},
 			{
-				label: "PodmanArgs",
-				hover: []string{
+				Label: "PodmanArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly to the end of the `podman network create` command in the generated file (right before the name of the network in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1260,8 +1262,8 @@ $0
 				},
 			},
 			{
-				label: "Subnet",
-				hover: []string{
+				Label: "Subnet",
+				Hover: []string{
 					"The subnet in CIDR notation.",
 					"",
 					"This is equivalent to the Podman `--subnet` option",
@@ -1272,36 +1274,36 @@ $0
 		},
 		"Volume": {
 			{
-				label: "ContainersConfModule",
-				hover: []string{
+				Label: "ContainersConfModule",
+				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
 					"",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "Copy",
-				hover: []string{
+				Label: "Copy",
+				Hover: []string{
 					"If enabled, the content of the image located at the mountpoint of the volume is copied into the volume on the first run.",
 				},
 			},
 			{
-				label: "Device",
-				hover: []string{
+				Label: "Device",
+				Hover: []string{
 					"The path of a device which is mounted for the volume.",
 				},
 			},
 			{
-				label: "Driver",
-				hover: []string{
+				Label: "Driver",
+				Hover: []string{
 					"Specify the volume driver name. When set to `image`, the `Image` key must also be set.",
 					"",
 					"This is equivalent to the Podman `--driver` option.",
 				},
 			},
 			{
-				label: "GlobalArgs",
-				hover: []string{
+				Label: "GlobalArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `volume` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1310,14 +1312,14 @@ $0
 				},
 			},
 			{
-				label: "Group",
-				hover: []string{
+				Label: "Group",
+				Hover: []string{
 					"The host (numeric) GID, or group name to use as the group for the volume",
 				},
 			},
 			{
-				label: "Image",
-				hover: []string{
+				Label: "Image",
+				Hover: []string{
 					"Specifies the image the volume is based on when `Driver` is set to the `image`. It is recommended to use a fully qualified image name rather than a short name, both for performance and robustness reasons.",
 					"",
 					"The format of the name is the same as when passed to `podman pull`. So, it supports using `:tag` or digests to guarantee the specific image version.",
@@ -1327,23 +1329,23 @@ $0
 				},
 			},
 			{
-				label: "Label",
-				hover: []string{
+				Label: "Label",
+				Hover: []string{
 					"Set one or more OCI labels on the volume. The format is a list of `key=value` items, similar to `Environment`.",
 					"",
 					"This key can be listed multiple times.",
 				},
-				macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=${1:key}:${2:value}\n$0",
 			},
 			{
-				label: "Options",
-				hover: []string{
+				Label: "Options",
+				Hover: []string{
 					"The mount options to use for a filesystem as used by the **mount(8)** command `-o` option.",
 				},
 			},
 			{
-				label: "PodmanArgs",
-				hover: []string{
+				Label: "PodmanArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly to the end of the `podman volume create` command in the generated file (right before the name of the volume in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1352,70 +1354,70 @@ $0
 				},
 			},
 			{
-				label: "Type",
-				hover: []string{
+				Label: "Type",
+				Hover: []string{
 					"The filesystem type of `Device` as used by the **mount(8)** commands `-t` option.",
 				},
 			},
 			{
-				label: "User",
-				hover: []string{
+				Label: "User",
+				Hover: []string{
 					"The host (numeric) UID, or user name to use as the owner for the volume",
 				},
 			},
 			{
-				label: "VolumeName",
-				hover: []string{
+				Label: "VolumeName",
+				Hover: []string{
 					"The (optional) name of the Podman volume. If this is not specified, the default value is the same name as the unit, but with a `systemd-` prefix, i.e. a `$name.volume` file creates a `systemd-$name` Podman volume to avoid conflicts with user-managed volumes.",
 				},
 			},
 		},
 		"Image": {
 			{
-				label: "AllTags",
-				hover: []string{
+				Label: "AllTags",
+				Hover: []string{
 					"All tagged images in the repository are pulled.",
 					"This is equivalent to the Podman `--all-tags` option.",
 				},
 			},
 			{
-				label: "Arch",
-				hover: []string{
+				Label: "Arch",
+				Hover: []string{
 					"Override the architecture, defaults to hosts, of the image to be pulled.",
 					"This is equivalent to the Podman `--arch` option.",
 				},
 			},
 			{
-				label: "AuthFile",
-				hover: []string{
+				Label: "AuthFile",
+				Hover: []string{
 					"Path of the authentication file.",
 					"This is equivalent to the Podman `--authfile` option.",
 				},
 			},
 			{
-				label: "CertDir",
-				hover: []string{
+				Label: "CertDir",
+				Hover: []string{
 					"Use certificates at path (*.crt, *.cert, *.key) to connect to the registry.",
 					"This is equivalent to the Podman `--cert-dir` option.",
 				},
 			},
 			{
-				label: "ContainersConfModule",
-				hover: []string{
+				Label: "ContainersConfModule",
+				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
 					"This key can be listed multiple times.",
 				},
 			},
 			{
-				label: "Creds",
-				hover: []string{
+				Label: "Creds",
+				Hover: []string{
 					"The `[username[:password]]` to use to authenticate with the registry, if required.",
 					"This is equivalent to the Podman `--creds` option.",
 				},
 			},
 			{
-				label: "DecryptionKey",
-				hover: []string{
+				Label: "DecryptionKey",
+				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `image` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1424,16 +1426,16 @@ $0
 				},
 			},
 			{
-				label: "Image",
-				hover: []string{
+				Label: "Image",
+				Hover: []string{
 					"The image to pull. It is recommended to use a fully qualified image name rather than a short name, both for performance and robustness reasons.",
 					"",
 					"The format of the name is the same as when passed to `podman pull`. So, it supports using `:tag` or digests to guarantee the specific image version.",
 				},
 			},
 			{
-				label: "ImageTag",
-				hover: []string{
+				Label: "ImageTag",
+				Hover: []string{
 					"Actual FQIN of the referenced `Image`. Only meaningful when source is a file or directory archive.",
 					"",
 					"For example, an image saved into a `docker-archive` with the following Podman command:",
@@ -1446,15 +1448,15 @@ $0
 				},
 			},
 			{
-				label: "OS",
-				hover: []string{
+				Label: "OS",
+				Hover: []string{
 					"Override the OS, defaults to hosts, of the image to be pulled.",
 					"This is equivalent to the Podman `--os` option.",
 				},
 			},
 			{
-				label: "PodmanArgs",
-				hover: []string{
+				Label: "PodmanArgs",
+				Hover: []string{
 					"This key contains a list of arguments passed directly to the end of the `podman image pull` command in the generated file (right before the image name in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
 					"",
 					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
@@ -1463,34 +1465,34 @@ $0
 				},
 			},
 			{
-				label: "Policy",
-				hover: []string{
+				Label: "Policy",
+				Hover: []string{
 					"The pull policy to use when pulling the image.",
 					"This is equivalent to the Podman `--policy` option.",
 				},
 			},
 			{
-				label: "Retry",
-				hover: []string{
+				Label: "Retry",
+				Hover: []string{
 					"Number of times to retry the image pull when a HTTP error occurs. Equivalent to the Podman `--retry` option.",
 				},
 			},
 			{
-				label: "RetryDelay",
-				hover: []string{
+				Label: "RetryDelay",
+				Hover: []string{
 					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
 				},
 			},
 			{
-				label: "TLSVerify",
-				hover: []string{
+				Label: "TLSVerify",
+				Hover: []string{
 					"Require HTTPS and verification of certificates when contacting registries.",
 					"This is equivalent to the Podman `--tls-verify` option.",
 				},
 			},
 			{
-				label: "Variant",
-				hover: []string{
+				Label: "Variant",
+				Hover: []string{
 					"Override the default architecture variant of the container image.",
 					"This is equivalent to the Podman `--variant` option.",
 				},

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/onlyati/quadlet-lsp/internal/syntax"
 	_ "github.com/tliron/commonlog/simple"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -49,6 +50,23 @@ func Start() {
 		TextDocumentDidOpen: func(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
 			documents.add(uri, params.TextDocument.Text)
+
+			// Check syntax when file is open
+			checker := syntax.NewSyntaxChecker(documents.read(uri))
+
+			diags := checker.RunAll()
+			if len(diags) > 0 {
+				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+					URI:         protocol.DocumentUri(uri),
+					Diagnostics: diags,
+				})
+			} else {
+				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+					URI:         protocol.DocumentUri(uri),
+					Diagnostics: []protocol.Diagnostic{},
+				})
+			}
+
 			return nil
 		},
 		TextDocumentDidChange: func(ctx *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
@@ -64,6 +82,23 @@ func Start() {
 				}
 				documents.add(uri, text)
 			}
+
+			// Check syntax when file is changed
+			checker := syntax.NewSyntaxChecker(documents.read(uri))
+
+			diags := checker.RunAll()
+			if len(diags) > 0 {
+				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+					URI:         protocol.DocumentUri(uri),
+					Diagnostics: diags,
+				})
+			} else {
+				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+					URI:         protocol.DocumentUri(uri),
+					Diagnostics: []protocol.Diagnostic{},
+				})
+			}
+
 			return nil
 		},
 		TextDocumentDidClose: func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
@@ -72,10 +107,8 @@ func Start() {
 			return nil
 		},
 
-		// For future use
-		TextDocumentDidSave: func(context *glsp.Context, params *protocol.DidSaveTextDocumentParams) error {
-			return nil
-		},
+		// Whenever a save happen, perform a syntax checking
+		TextDocumentDidSave: SyntaxCheckOnSave,
 	}
 
 	server := server.NewServer(&handler, lsName, false)
