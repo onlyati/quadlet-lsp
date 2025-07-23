@@ -131,3 +131,42 @@ func findLineStartWith(prefix string) ([]protocol.Location, error) {
 
 	return locations, nil
 }
+
+func findImageName(lines []string, lineNumber protocol.UInteger) string {
+	// First looking for `Image=value` value
+	// First looing for reverse, people usually define image first then parameters
+	imageName := ""
+	for i := lineNumber; i > 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(line, "Image=") {
+			tmp := strings.Split(line, "=")
+			if len(tmp) != 2 {
+				break
+			}
+			imageName = tmp[1]
+		}
+		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+			// We've reached the start of section, try in other direction
+			break
+		}
+	}
+
+	// Check rest of the file for `Image=`
+	if imageName == "" {
+		for i := lineNumber; int(i) < len(lines); i++ {
+			line := strings.TrimSpace(lines[i])
+			if strings.HasPrefix(line, "Image=") {
+				tmp := strings.Split(line, "=")
+				if len(tmp) != 2 {
+					break
+				}
+				imageName = tmp[1]
+			}
+			if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+				// We've reached the start of another section
+				break
+			}
+		}
+	}
+	return imageName
+}
