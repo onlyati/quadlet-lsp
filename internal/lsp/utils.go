@@ -18,6 +18,7 @@ type Commander interface {
 
 type CommandExecutor struct{}
 
+// This method execute an OS command and return with its output
 func (c CommandExecutor) Run(name string, args ...string) ([]string, error) {
 	output := []string{}
 	cmd := exec.Command(name, args...)
@@ -40,6 +41,7 @@ func (c CommandExecutor) Run(name string, args ...string) ([]string, error) {
 	return output, nil
 }
 
+// List quadlet files from the current work directory based on extenstion
 func listQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 	dirs := []protocol.CompletionItem{}
 
@@ -63,6 +65,8 @@ func listQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 	return dirs, nil
 }
 
+// This function looking for that the cursor currently in which section.
+// Sections are like `[Container]`, `[Unit]`, and so on.
 func findSection(lines []string, lineNumber protocol.UInteger) string {
 	section := ""
 	for i := lineNumber; ; i-- {
@@ -79,10 +83,14 @@ func findSection(lines []string, lineNumber protocol.UInteger) string {
 	return section
 }
 
+// I did not find better solution, probably not nice but works
 func returnAsStringPtr(s string) *string {
 	return &s
 }
 
+// Walk through on each file in a directory and looking for lines
+// that starts with the specified parameter. Used, for example, when
+// try to find references for a quadlet file.
 func findLineStartWith(prefix string) ([]protocol.Location, error) {
 	var locations []protocol.Location
 
@@ -132,6 +140,7 @@ func findLineStartWith(prefix string) ([]protocol.Location, error) {
 	return locations, nil
 }
 
+// Recognize that what image is used in the specific quadlet.
 func findImageName(lines []string, lineNumber protocol.UInteger) string {
 	// First looking for `Image=value` value
 	// First looing for reverse, people usually define image first then parameters
