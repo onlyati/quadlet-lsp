@@ -1,6 +1,8 @@
 package lsp
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -130,12 +132,6 @@ func listNewMacros(lines []string, lineNumber protocol.UInteger) []protocol.Comp
 func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInteger, charPos protocol.UInteger) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
-	section := findSection(lines, lineNumber)
-
-	if section == "" {
-		return completionItems
-	}
-
 	property := strings.Split(lines[lineNumber], "=")[0]
 
 	if property == "Image" {
@@ -189,6 +185,25 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 		return networks
 	}
 
+	if property == "PublishPort" {
+		ports, err := listPublishedPorts(
+			c,
+			lines,
+			lineNumber,
+		)
+		if err != nil {
+			fmt.Printf("failed to list ports: %s", err.Error())
+			return completionItems
+		}
+		return ports
+	}
+
+	section := findSection(lines, lineNumber)
+
+	if section == "" {
+		return completionItems
+	}
+
 	for _, p := range propertiesMap[section] {
 		if property == p.label {
 			for _, parm := range p.parameters {
@@ -201,6 +216,98 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 	}
 
 	return completionItems
+}
+
+// If user at the `PublihsPort=` line, and typting the exposed port number
+// provide suggestions based on image inspect what ports can be exposed.
+func listPublishedPorts(c Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
+	var completionItems []protocol.CompletionItem
+
+	// Let's find out that we need to provide any complation at all
+	colons := strings.Count(lines[lineNumber], ":")
+	tmp := strings.Split(lines[lineNumber], ":")
+
+	// We need complation in two cases:
+	// ExposedPorts=127.0.0.1:420:69
+	// ExposedPorts=420:69
+	if colons == 0 {
+		return completionItems, nil
+	}
+	if colons == 1 {
+		// Check if first part is an IP address
+		if strings.Count(tmp[0], ".") > 0 {
+			return completionItems, nil
+		}
+	}
+
+	// First looking for `Image=value` value
+	// First looing for reverse, people usually define image first then parameters
+	imageName := ""
+	for i := lineNumber; i > 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(line, "Image=") {
+			tmp := strings.Split(line, "=")
+			if len(tmp) != 2 {
+				return nil, errors.New("seems invalid value at `Image=` line")
+			}
+			imageName = tmp[1]
+		}
+		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+			// We've reached the start of section, try in other direction
+			break
+		}
+	}
+
+	// Check rest of the file for `Image=`
+	if imageName == "" {
+		for i := lineNumber; int(i) < len(lines); i++ {
+			line := strings.TrimSpace(lines[i])
+			if strings.HasPrefix(line, "Image=") {
+				tmp := strings.Split(line, "=")
+				if len(tmp) != 2 {
+					return nil, errors.New("seems invalid value at `Image=` line")
+				}
+				imageName = tmp[1]
+			}
+			if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+				// We've reached the start of another section
+				break
+			}
+		}
+	}
+
+	// We've found something, let's check it
+	if imageName != "" {
+		output, err := c.Run(
+			"podman",
+			"image", "inspect", imageName,
+		)
+		if err != nil {
+			return nil, err
+		}
+		inspectJSON := strings.Join(output, "")
+		var data []map[string]any
+		json.Unmarshal([]byte(inspectJSON), &data)
+
+		config, ok := data[0]["Config"].(map[string]any)
+		if !ok {
+			return nil, err
+		}
+
+		exposedPorts, ok := config["ExposedPorts"].(map[string]any)
+		if !ok {
+			return nil, err
+		}
+
+		for port := range exposedPorts {
+			tmp := strings.Split(port, "/")
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label: tmp[0],
+			})
+		}
+	}
+
+	return completionItems, nil
 }
 
 func listNetworks(c Commander) ([]protocol.CompletionItem, error) {
