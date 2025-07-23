@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 // This function handles the completion event that is received.
 func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
-	executor := CommandExecutor{}
+	executor := utils.CommandExecutor{}
 	uri := string(params.TextDocument.URI)
 	text := documents.read(uri)
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
@@ -42,7 +44,7 @@ func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (a
 // section header like `[Network]`.
 func listSectionCompletions() []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
-	for k := range propertiesMap {
+	for k := range data.PropertiesMap {
 		completionItems = append(completionItems, protocol.CompletionItem{
 			Label: k,
 		})
@@ -64,11 +66,11 @@ func listPropertyCompletions(lines []string, lineNumber protocol.UInteger) []pro
 		insertFormat := protocol.InsertTextFormatSnippet
 		itemKind := protocol.CompletionItemKindSnippet
 
-		for k, category := range categoryProperty {
+		for k, category := range data.CategoryProperty {
 			completionItems = append(completionItems, protocol.CompletionItem{
 				Label:            k,
-				Detail:           category.details,
-				InsertText:       category.insertText,
+				Detail:           category.Details,
+				InsertText:       category.InsertText,
 				InsertTextFormat: &insertFormat,
 				Kind:             &itemKind,
 			})
@@ -79,12 +81,12 @@ func listPropertyCompletions(lines []string, lineNumber protocol.UInteger) []pro
 
 	// It is a line where the '=' is not present, so probably just
 	// want to type something, let give a hint.
-	for _, prop := range propertiesMap[section] {
+	for _, prop := range data.PropertiesMap[section] {
 		completionItems = append(completionItems, protocol.CompletionItem{
-			Label: prop.label + "=",
+			Label: prop.Label + "=",
 			Documentation: protocol.MarkupContent{
 				Kind:  protocol.MarkupKindMarkdown,
-				Value: "**" + prop.label + "**\n\n" + strings.Join(prop.hover, "\n"),
+				Value: "**" + prop.Label + "**\n\n" + strings.Join(prop.Hover, "\n"),
 			},
 		})
 	}
@@ -116,18 +118,18 @@ func listNewMacros(lines []string, lineNumber protocol.UInteger) []protocol.Comp
 	startChar := 0
 	endChar := len("new." + propName)
 
-	for _, p := range propertiesMap[section] {
-		if strings.HasPrefix(p.label, propName) && p.macro != "" {
+	for _, p := range data.PropertiesMap[section] {
+		if strings.HasPrefix(p.Label, propName) && p.Macro != "" {
 			textEdit := protocol.TextEdit{
 				Range: protocol.Range{
 					Start: protocol.Position{Line: lineNumber, Character: uint32(startChar)},
 					End:   protocol.Position{Line: lineNumber, Character: uint32(endChar)},
 				},
-				NewText: p.macro,
+				NewText: p.Macro,
 			}
 
 			completionItems = append(completionItems, protocol.CompletionItem{
-				Label:            "new." + p.label,
+				Label:            "new." + p.Label,
 				Kind:             &itemKind,
 				TextEdit:         &textEdit,
 				InsertTextFormat: &insertFormat,
@@ -140,7 +142,7 @@ func listNewMacros(lines []string, lineNumber protocol.UInteger) []protocol.Comp
 
 // This function run when there is already an '=' sign in the
 // line of the cursor. This provide dynamic and static completions.
-func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInteger, charPos protocol.UInteger) []protocol.CompletionItem {
+func listPropertyParameter(c utils.Commander, lines []string, lineNumber protocol.UInteger, charPos protocol.UInteger) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
 	property := strings.Split(lines[lineNumber], "=")[0]
@@ -183,7 +185,7 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 
 	// Looking for *.pod files
 	if property == "Pod" {
-		pods, err := listQuadletFiles("*.pod")
+		pods, err := utils.ListQuadletFiles("*.pod")
 		if err != nil {
 			fmt.Printf("failed to list pods: %s", err.Error())
 			return completionItems
@@ -236,9 +238,9 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 	}
 
 	// Generic static suggestions based on `properties.go` file
-	for _, p := range propertiesMap[section] {
-		if property == p.label {
-			for _, parm := range p.parameters {
+	for _, p := range data.PropertiesMap[section] {
+		if property == p.Label {
+			for _, parm := range p.Parameters {
 				completionItems = append(completionItems, protocol.CompletionItem{
 					Label: parm,
 				})
@@ -252,7 +254,7 @@ func listPropertyParameter(c Commander, lines []string, lineNumber protocol.UInt
 
 // If somebody type `UserNS=keep-id:`, then check if image has any user
 // defined, and provide its id for uid and gid as well
-func listUserIdFromImage(c Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
+func listUserIdFromImage(c utils.Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	imageName := findImageName(lines, lineNumber)
@@ -293,7 +295,7 @@ func listUserIdFromImage(c Commander, lines []string, lineNumber protocol.UInteg
 
 // If user at the `PublihsPort=` line, and typting the exposed port number
 // provide suggestions based on image inspect what ports can be exposed.
-func listPublishedPorts(c Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
+func listPublishedPorts(c utils.Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	// Let's find out that we need to provide any complation at all
@@ -352,7 +354,7 @@ func listPublishedPorts(c Commander, lines []string, lineNumber protocol.UIntege
 }
 
 // List *.network files and looking for out put `podman network ls`.
-func listNetworks(c Commander) ([]protocol.CompletionItem, error) {
+func listNetworks(c utils.Commander) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	// List networks from podman
@@ -370,7 +372,7 @@ func listNetworks(c Commander) ([]protocol.CompletionItem, error) {
 	}
 
 	// List *.network files
-	volFiles, err := listQuadletFiles("*.network")
+	volFiles, err := utils.ListQuadletFiles("*.network")
 	if err != nil {
 		return nil, err
 	}
@@ -379,7 +381,7 @@ func listNetworks(c Commander) ([]protocol.CompletionItem, error) {
 }
 
 // List *.volume files and looking for `podman volume ls`.
-func listVolumes(c Commander, line string) ([]protocol.CompletionItem, error) {
+func listVolumes(c utils.Commander, line string) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	props := strings.Split(line, "=")[1]
@@ -414,7 +416,7 @@ func listVolumes(c Commander, line string) ([]protocol.CompletionItem, error) {
 	}
 
 	// List *.volume files
-	volFiles, err := listQuadletFiles("*.volume")
+	volFiles, err := utils.ListQuadletFiles("*.volume")
 	if err != nil {
 		return nil, err
 	}
@@ -424,7 +426,7 @@ func listVolumes(c Commander, line string) ([]protocol.CompletionItem, error) {
 }
 
 // Looking for `podman secret ls`
-func listSecrets(c Commander, line string) ([]protocol.CompletionItem, error) {
+func listSecrets(c utils.Commander, line string) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	props := strings.Split(line, "=")[1]
@@ -462,7 +464,7 @@ func listSecrets(c Commander, line string) ([]protocol.CompletionItem, error) {
 }
 
 // List *.images files and `podman images`
-func listImages(c Commander) ([]protocol.CompletionItem, error) {
+func listImages(c utils.Commander) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	output, err := c.Run(
@@ -478,7 +480,7 @@ func listImages(c Commander) ([]protocol.CompletionItem, error) {
 		})
 	}
 
-	files, err := listQuadletFiles("*.image")
+	files, err := utils.ListQuadletFiles("*.image")
 	if err != nil {
 		return completionItems, err
 	}
