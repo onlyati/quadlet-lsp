@@ -10,7 +10,7 @@ func SyntaxCheckOnSave(context *glsp.Context, params *protocol.DidSaveTextDocume
 	uri := string(params.TextDocument.URI)
 	text := documents.read(uri)
 
-	checker := syntax.NewSyntaxChecker(text)
+	checker := syntax.NewSyntaxChecker(text, uri)
 
 	// Run all syntax checker rule
 	diags := checker.RunAll()

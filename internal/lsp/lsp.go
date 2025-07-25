@@ -52,7 +52,7 @@ func Start() {
 			documents.add(uri, params.TextDocument.Text)
 
 			// Check syntax when file is open
-			checker := syntax.NewSyntaxChecker(documents.read(uri))
+			checker := syntax.NewSyntaxChecker(documents.read(uri), uri)
 
 			diags := checker.RunAll()
 			if len(diags) > 0 {
@@ -84,7 +84,7 @@ func Start() {
 			}
 
 			// Check syntax when file is changed
-			checker := syntax.NewSyntaxChecker(documents.read(uri))
+			checker := syntax.NewSyntaxChecker(documents.read(uri), uri)
 
 			diags := checker.RunAll()
 			if len(diags) > 0 {
