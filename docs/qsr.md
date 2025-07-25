@@ -1,0 +1,1 @@
+# Quadlet syntax rules
