@@ -5,7 +5,7 @@ import (
 )
 
 func TestQSR001_WithValidSection(t *testing.T) {
-	s := NewSyntaxChecker("[Container]\nName=app")
+	s := NewSyntaxChecker("[Container]\nName=app", "test.container")
 
 	diags := qsr001(s)
 
@@ -15,7 +15,7 @@ func TestQSR001_WithValidSection(t *testing.T) {
 }
 
 func TestQSR001_WithoutValidSection(t *testing.T) {
-	s := NewSyntaxChecker("Name=app\nExec=run.sh")
+	s := NewSyntaxChecker("Name=app\nExec=run.sh", "test.container")
 
 	diags := qsr001(s)
 

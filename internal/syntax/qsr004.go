@@ -11,6 +11,10 @@ import (
 func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
+	if !strings.HasSuffix(s.uri, ".container") {
+		return diags
+	}
+
 	findings := utils.FindItems(
 		s.documentText,
 		"Container",

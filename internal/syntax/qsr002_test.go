@@ -5,7 +5,7 @@ import (
 )
 
 func TestQSR002_UnfinishedLine(t *testing.T) {
-	s := NewSyntaxChecker("Name=\nExec=run.sh")
+	s := NewSyntaxChecker("Name=\nExec=run.sh", "test.container")
 	diags := qsr002(s)
 
 	if len(diags) != 1 {
@@ -25,7 +25,7 @@ func TestQSR002_UnfinishedLine(t *testing.T) {
 }
 
 func TestQSR002_CompleteLinesOnly(t *testing.T) {
-	s := NewSyntaxChecker("Name=web\nExec=run.sh")
+	s := NewSyntaxChecker("Name=web\nExec=run.sh", "test.container")
 	diags := qsr002(s)
 
 	if len(diags) != 0 {
@@ -34,7 +34,7 @@ func TestQSR002_CompleteLinesOnly(t *testing.T) {
 }
 
 func TestQSR002_EqualInValue(t *testing.T) {
-	s := NewSyntaxChecker("Env=FOO=bar")
+	s := NewSyntaxChecker("Env=FOO=bar", "test.container")
 	diags := qsr002(s)
 
 	if len(diags) != 0 {
