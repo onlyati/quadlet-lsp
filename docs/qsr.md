@@ -6,6 +6,7 @@
 - [`QSR002` - Unfinished line](#qsr002---unfinished-line)
 - [`QSR003` - Invalid property](#qsr003---invalid-property)
 - [`QSR004` - Image name is not fully qualified](#qsr004---image-name-is-not-fully-qualified)
+- [`QSR005` - Invalid value of AutoUpdate](#qsr005---invalid-value-of-autoupdate)
 
 <!-- tocstop -->
 
@@ -81,3 +82,13 @@ Use fully qualified image name instead:
 Image=docker.io/library/debian:bookworm-slim
 
 ```
+
+## `QSR005` - Invalid value of AutoUpdate
+
+**Message**
+
+> Invalid value of AutoUpdate: _%value%_
+
+**Explanation**
+
+The `AutoUpdate` can only have `local` and `registry` values.
