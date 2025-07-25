@@ -8,6 +8,7 @@ import (
 
 type SyntaxChecker struct {
 	documentText string
+	uri          string
 	hintDiag     protocol.DiagnosticSeverity
 	infoDiag     protocol.DiagnosticSeverity
 	warnDiag     protocol.DiagnosticSeverity
@@ -15,9 +16,10 @@ type SyntaxChecker struct {
 	checks       []func(SyntaxChecker) []protocol.Diagnostic
 }
 
-func NewSyntaxChecker(documentText string) SyntaxChecker {
+func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 	return SyntaxChecker{
 		documentText: documentText,
+		uri:          uri,
 		hintDiag:     protocol.DiagnosticSeverityHint,
 		infoDiag:     protocol.DiagnosticSeverityInformation,
 		warnDiag:     protocol.DiagnosticSeverityWarning,
