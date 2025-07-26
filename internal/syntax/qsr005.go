@@ -2,7 +2,6 @@ package syntax
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -12,18 +11,16 @@ import (
 func qsr005(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
-	if !strings.HasSuffix(s.uri, ".container") && strings.HasSuffix(s.uri, ".kube") {
-		return diags
+	allowedFiles := []string{"container", "kube"}
+	var findings []utils.QuadletLine
+
+	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
+		findings = utils.FindItems(
+			s.documentText,
+			c,
+			"AutoUpdate",
+		)
 	}
-
-	tmp := strings.Split(s.uri, ".")
-	section := utils.FirstCharacterToUpper(tmp[len(tmp)-1])
-
-	findings := utils.FindItems(
-		s.documentText,
-		section,
-		"AutoUpdate",
-	)
 
 	if len(findings) > 0 {
 		for _, f := range findings {
