@@ -3,10 +3,15 @@ package lsp
 import (
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/data"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+// It is a very basic implementation. It is checking which section is,
+// like `[Volume]`, `[Container]`, etc. then looking for the property that is
+// in the current line. Then gather the document based on that and send the
+// markdown response back.
 func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := string(params.TextDocument.URI)
 	text := documents.read(uri)
@@ -20,12 +25,12 @@ func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.H
 
 	property := strings.Split(lines[editorLine], "=")[0]
 
-	for _, item := range propertiesMap[section] {
-		if property == item.label {
+	for _, item := range data.PropertiesMap[section] {
+		if property == item.Label {
 			return &protocol.Hover{
 				Contents: protocol.MarkupContent{
 					Kind:  protocol.MarkupKindMarkdown,
-					Value: "**" + item.label + "**\n\n" + strings.Join(item.hover, "\n"),
+					Value: "**" + item.Label + "**\n\n" + strings.Join(item.Hover, "\n"),
 				},
 			}, nil
 		}

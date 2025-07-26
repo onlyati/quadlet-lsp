@@ -8,6 +8,8 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+// The go reference feature scan all file in the current directory
+// and looking for when the current file is used.
 func textReferences(
 	context *glsp.Context,
 	params *protocol.ReferenceParams,
@@ -23,6 +25,8 @@ func textReferences(
 	pathParts := strings.Split(uri, string(os.PathSeparator))
 	currentFileName := pathParts[len(pathParts)-1]
 
+	// It only work when user cursor in the line of the section title
+	// Probably there is a cleaner way, but it works
 	keywords := map[string]string{
 		"[Volume]":  "Volume",
 		"[Network]": "Network",

@@ -1,13 +1,18 @@
 package lsp
 
 import (
+	"errors"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+// If there is a link for a file, e.g.: `Volume=something.volume`,
+// it looking for this file in the current work directory then send
+// the URI back to the editor.
 func textDefinition(
 	context *glsp.Context,
 	params *protocol.DefinitionParams,
@@ -26,6 +31,9 @@ func textDefinition(
 		return nil, nil
 	}
 
+	// Depends on which line the cursor stand (what is before '=')
+	// looking for different file extension, then find the file.
+	// Probably there is a cleaner way, but it works.
 	keywords := map[string]string{
 		"Volume":  "*.volume",
 		"Pod":     "*.pod",
@@ -40,30 +48,25 @@ func textDefinition(
 	return location, nil
 }
 
+// Just check if file exists
 func findQuadlets(mask, value string) (protocol.Location, error) {
 	var location protocol.Location
-
-	currDir, err := os.Getwd()
-	if err != nil {
-		return location, err
-	}
-
-	files, err := listQuadletFiles(mask)
-	if err != nil {
-		return location, err
-	}
 
 	if mask == "*.volume" {
 		volParts := strings.Split(value, ":")
 		value = volParts[0]
 	}
 
-	for _, file := range files {
-		if value == file.Label {
-			return protocol.Location{
-				URI: protocol.DocumentUri("file://" + currDir + string(os.PathSeparator) + file.Label),
-			}, nil
-		}
+	currDir, err := os.Getwd()
+	if err != nil {
+		return location, err
+	}
+	defPath := path.Join(currDir, value)
+
+	if _, err := os.Stat(defPath); !errors.Is(err, os.ErrNotExist) {
+		return protocol.Location{
+			URI: protocol.DocumentUri("file://" + defPath),
+		}, nil
 	}
 
 	return location, nil

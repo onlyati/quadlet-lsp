@@ -2,67 +2,15 @@ package lsp
 
 import (
 	"bufio"
-	"bytes"
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-type Commander interface {
-	Run(name string, args ...string) ([]string, error)
-}
-
-type CommandExecutor struct{}
-
-func (c CommandExecutor) Run(name string, args ...string) ([]string, error) {
-	output := []string{}
-	cmd := exec.Command(name, args...)
-
-	var out bytes.Buffer
-	cmd.Stdout = &out
-
-	err := cmd.Run()
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute podman: %w", err)
-	}
-
-	// Split output by newlines and filter out empty lines
-	for line := range strings.SplitSeq(out.String(), "\n") {
-		trimmed := strings.TrimSpace(line)
-		if trimmed != "" {
-			output = append(output, trimmed)
-		}
-	}
-	return output, nil
-}
-
-func listQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
-	dirs := []protocol.CompletionItem{}
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	cwd = filepath.Join(cwd, ext)
-	files, err := filepath.Glob(cwd)
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range files {
-		chunks := strings.Split(file, string(os.PathSeparator))
-		dirs = append(dirs, protocol.CompletionItem{
-			Label:         chunks[len(chunks)-1],
-			Documentation: "From work directory: " + cwd,
-		})
-	}
-
-	return dirs, nil
-}
-
+// This function looking for that the cursor currently in which section.
+// Sections are like `[Container]`, `[Unit]`, and so on.
 func findSection(lines []string, lineNumber protocol.UInteger) string {
 	section := ""
 	for i := lineNumber; ; i-- {
@@ -79,10 +27,9 @@ func findSection(lines []string, lineNumber protocol.UInteger) string {
 	return section
 }
 
-func returnAsStringPtr(s string) *string {
-	return &s
-}
-
+// Walk through on each file in a directory and looking for lines
+// that starts with the specified parameter. Used, for example, when
+// try to find references for a quadlet file.
 func findLineStartWith(prefix string) ([]protocol.Location, error) {
 	var locations []protocol.Location
 
@@ -130,4 +77,44 @@ func findLineStartWith(prefix string) ([]protocol.Location, error) {
 	}
 
 	return locations, nil
+}
+
+// Recognize that what image is used in the specific quadlet.
+func findImageName(lines []string, lineNumber protocol.UInteger) string {
+	// First looking for `Image=value` value
+	// First looing for reverse, people usually define image first then parameters
+	imageName := ""
+	for i := lineNumber; i > 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(line, "Image=") {
+			tmp := strings.Split(line, "=")
+			if len(tmp) != 2 {
+				break
+			}
+			imageName = tmp[1]
+		}
+		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+			// We've reached the start of section, try in other direction
+			break
+		}
+	}
+
+	// Check rest of the file for `Image=`
+	if imageName == "" {
+		for i := lineNumber; int(i) < len(lines); i++ {
+			line := strings.TrimSpace(lines[i])
+			if strings.HasPrefix(line, "Image=") {
+				tmp := strings.Split(line, "=")
+				if len(tmp) != 2 {
+					break
+				}
+				imageName = tmp[1]
+			}
+			if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+				// We've reached the start of another section
+				break
+			}
+		}
+	}
+	return imageName
 }
