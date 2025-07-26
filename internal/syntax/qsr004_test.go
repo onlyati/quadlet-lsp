@@ -11,6 +11,15 @@ func TestQSR004_Valid(t *testing.T) {
 	}
 }
 
+func TestQSR004_ValidWithImage(t *testing.T) {
+	s := NewSyntaxChecker("[Container]\nImage=db.image", "test.container")
+	diags := qsr004(s)
+
+	if len(diags) != 0 {
+		t.Errorf("Expected no diagnostics, got %d", len(diags))
+	}
+}
+
 func TestQSR004_Invalid(t *testing.T) {
 	s := NewSyntaxChecker("[Container]\nImage=library/debian:bookworm-slim", "test.container")
 	diags := qsr004(s)

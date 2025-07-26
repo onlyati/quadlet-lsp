@@ -21,12 +21,15 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 		"Image",
 	)
 
-	for _, findind := range findings {
-		if strings.Count(findind.Value, "/") != 2 {
+	for _, finding := range findings {
+		if strings.HasSuffix(finding.Value, ".image") || strings.HasSuffix(finding.Value, ".build") {
+			continue
+		}
+		if strings.Count(finding.Value, "/") != 2 {
 			diags = append(diags, protocol.Diagnostic{
 				Range: protocol.Range{
-					Start: protocol.Position{Line: findind.LineNumber, Character: 0},
-					End:   protocol.Position{Line: findind.LineNumber, Character: findind.Length},
+					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
+					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
 				Severity: &s.warnDiag,
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr004"),
