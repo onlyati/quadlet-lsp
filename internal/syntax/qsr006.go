@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"slices"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -19,17 +18,16 @@ func qsr006(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "volume"}
-	tmp := strings.Split(s.uri, ".")
-	ext := tmp[len(tmp)-1]
-	if !slices.Contains(allowedFiles, ext) {
-		return diags
+	var findings []utils.QuadletLine
+
+	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
+		findings = utils.FindItems(
+			s.documentText,
+			c,
+			"Image",
+		)
 	}
 
-	findings := utils.FindItems(
-		s.documentText,
-		utils.FirstCharacterToUpper(ext),
-		"Image",
-	)
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Printf("failed to detect cwd: %s", err.Error())

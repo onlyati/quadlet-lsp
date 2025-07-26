@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"slices"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -13,17 +12,15 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "image", "volume"}
-	tmp := strings.Split(s.uri, ".")
-	ext := tmp[len(tmp)-1]
-	if !slices.Contains(allowedFiles, ext) {
-		return diags
-	}
+	var findings []utils.QuadletLine
 
-	findings := utils.FindItems(
-		s.documentText,
-		utils.FirstCharacterToUpper(ext),
-		"Image",
-	)
+	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
+		findings = utils.FindItems(
+			s.documentText,
+			c,
+			"Image",
+		)
+	}
 
 	for _, finding := range findings {
 		if strings.HasSuffix(finding.Value, ".image") || strings.HasSuffix(finding.Value, ".build") {
