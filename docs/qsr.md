@@ -9,6 +9,7 @@
 - [`QSR005` - Invalid value of AutoUpdate](#qsr005---invalid-value-of-autoupdate)
 - [`QSR006` - Image file does not exists](#qsr006---image-file-does-not-exists)
 - [`QSR007` - Invalid format of Environment variable](#qsr007---invalid-format-of-environment-variable)
+- [`QSR008` - Invalid format of Annotation](#qsr008---invalid-format-of-annotation)
 
 <!-- tocstop -->
 
@@ -123,4 +124,23 @@ Examples:
 Environment=FOO=BAR   <-- Correct
 Environment=FOO       <-- Incorrect
 Environment=FOO = BAR <-- Incorrect
+```
+
+## `QSR008` - Invalid format of Annotation
+
+**Message**
+
+> Invalid format of Annotation specification
+
+**Explanation**
+
+Annotation must be specified as key-value pairs without having space before or
+after the `=` sign.
+
+Examples:
+
+```ini
+Annotation=FOO=BAR   <-- Correct
+Annotation=FOO       <-- Incorrect
+Annotation=FOO = BAR <-- Incorrect
 ```
