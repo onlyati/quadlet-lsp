@@ -62,6 +62,16 @@ Description=${1:description}
 $0
 `),
 		},
+		"newImage": {
+			Details: utils.ReturnAsStringPtr("define new image"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
+Description=${1:description}
+
+[Image]
+Image=${2:image}
+$0
+`),
+		},
 	}
 
 	PropertiesMap = map[string][]PropertyMapItem{
