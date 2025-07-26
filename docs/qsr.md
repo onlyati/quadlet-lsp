@@ -7,6 +7,7 @@
 - [`QSR003` - Invalid property](#qsr003---invalid-property)
 - [`QSR004` - Image name is not fully qualified](#qsr004---image-name-is-not-fully-qualified)
 - [`QSR005` - Invalid value of AutoUpdate](#qsr005---invalid-value-of-autoupdate)
+- [`QSR006` - Image file does not exists](#qsr006---image-file-does-not-exists)
 
 <!-- tocstop -->
 
@@ -92,3 +93,14 @@ Image=docker.io/library/debian:bookworm-slim
 **Explanation**
 
 The `AutoUpdate` can only have `local` and `registry` values.
+
+## `QSR006` - Image file does not exists
+
+**Message**
+
+> Image file does not exists: _%name%_
+
+**Explanation**
+
+The specified `*.image` or `*.build` file does not exists that is used in the
+`Image=` line.
