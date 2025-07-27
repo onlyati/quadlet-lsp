@@ -14,6 +14,7 @@
 - [`QSR010` - Incorrect format of PublishPort](#qsr010---incorrect-format-of-publishport)
 - [`QSR011` - Port is not exposed in image](#qsr011---port-is-not-exposed-in-image)
 - [`QSR013` - Volume file does not exists](#qsr013---volume-file-does-not-exists)
+- [`QSR014` - Network file does not exists](#qsr014---network-file-does-not-exists)
 
 <!-- tocstop -->
 
@@ -205,3 +206,14 @@ analyze those images.
 
 The defined file, e.g.: `Volume=data.volume:/data`, does not exists in the
 current working directory.
+
+## `QSR014` - Network file does not exists
+
+**Message**
+
+> Network file does not exists: _%network_file%_
+
+**Explanation**
+
+The defined file, e.g.: `Network=my.network`, does not exists in the current
+working directory.
