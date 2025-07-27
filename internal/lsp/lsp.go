@@ -3,8 +3,11 @@ package lsp
 import (
 	"fmt"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	_ "github.com/tliron/commonlog/simple"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -16,6 +19,7 @@ const lsName = "quadlet"
 var (
 	version   = "0.2.0"
 	handler   protocol.Handler
+	config    utils.QuadletConfig
 	documents = newDocuments()
 )
 
@@ -117,6 +121,27 @@ func Start() {
 }
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, error) {
+	// Read and parse configuration
+	workspaceDir := *params.RootURI
+
+	if len(params.WorkspaceFolders) > 0 {
+		workspaceDir = params.WorkspaceFolders[0].URI
+	}
+
+	workspaceDir, _ = strings.CutPrefix(workspaceDir, "file://")
+
+	cfg, err := utils.LoadConfig(workspaceDir)
+	if err != nil {
+		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+			Type:    protocol.MessageTypeLog,
+			Message: "Failed to read .quadletrc.json file, goes with defaults",
+		})
+	}
+	config = cfg
+
+	startFileWatcher(context, path.Join(workspaceDir, ".quadletrc.json"))
+
+	// Setup server
 	capabilities := handler.CreateServerCapabilities()
 
 	capabilities.CompletionProvider = &protocol.CompletionOptions{
@@ -134,6 +159,32 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 }
 
 func initialized(context *glsp.Context, params *protocol.InitializedParams) error {
+	// Detect Podman version if necesarry
+	defPodman := utils.PodmanVersion{}
+	if config.Podman != defPodman {
+		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+			Type:    protocol.MessageTypeLog,
+			Message: fmt.Sprintf("Podman version is overriden from config: %v", config.Podman),
+		})
+		return nil
+	}
+
+	c := utils.CommandExecutor{}
+	pVersion, err := utils.NewPodmanVersion(c)
+	if err != nil {
+		config.Podman = utils.PodmanVersion{Version: 99, Release: 99, Minor: 99}
+		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+			Type:    protocol.MessageTypeWarning,
+			Message: "Failed to fetch Podman version, assumes it is the latest",
+		})
+	} else {
+		config.Podman = pVersion
+		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+			Type:    protocol.MessageTypeLog,
+			Message: fmt.Sprintf("Detected Podman version: %v", config.Podman),
+		})
+	}
+
 	return nil
 }
 

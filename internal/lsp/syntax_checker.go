@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
+	_ "github.com/tliron/commonlog/simple"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
