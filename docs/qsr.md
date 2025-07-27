@@ -16,6 +16,8 @@
 - [`QSR013` - Volume file does not exists](#qsr013---volume-file-does-not-exists)
 - [`QSR014` - Network file does not exists](#qsr014---network-file-does-not-exists)
 - [`QSR017` - Pod file does not exists](#qsr017---pod-file-does-not-exists)
+- [`QSR018` - Container cannot publish port with pod](#qsr018---container-cannot-publish-port-with-pod)
+- [`QSR019` - Container cannot have network with pod](#qsr019---container-cannot-have-network-with-pod)
 
 <!-- tocstop -->
 
@@ -229,3 +231,31 @@ working directory.
 
 The defined file, e.g.: `Pod=my.pod`, does not exists in the current working
 directory.
+
+## `QSR018` - Container cannot publish port with pod
+
+**Message**
+
+> Container cannot have PublishPort because belongs to a pod: _%pod_file%_
+
+**Explanation**
+
+A Pod in Podman shares a network namespace across all containers inside it. The
+pod is the unit that binds to the host network (e.g., 127.0.0.1:8080), not the
+individual containers.
+
+Each container in the pod uses 127.0.0.1 to reach other containers in the same
+pod.
+
+## `QSR019` - Container cannot have network with pod
+
+**Message**
+
+> Container cannot have Network because belongs to a pod: _%pod_file%_
+
+**Explanation**
+
+When you create a pod, it gets a single network namespace that all containers in
+the pod share. So: Containers in the same pod communicate over localhost
+(127.0.0.1). You assign the network (e.g. --network) when creating the pod, not
+per container.
