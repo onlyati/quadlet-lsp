@@ -22,7 +22,7 @@ func qsr002(s SyntaxChecker) []protocol.Diagnostic {
 					Start: protocol.Position{Line: lineNum, Character: 0},
 					End:   protocol.Position{Line: lineNum, Character: uint32(len(line))},
 				},
-				Severity: &s.errDiag,
+				Severity: &errDiag,
 				Message:  "Line is unfinished",
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr002"),
 			})

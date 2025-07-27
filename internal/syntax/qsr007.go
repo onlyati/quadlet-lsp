@@ -47,7 +47,7 @@ func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
 				Message:  "Invalid format of Environment variable specification",
-				Severity: &s.errDiag,
+				Severity: &errDiag,
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
 			})
 			continue
