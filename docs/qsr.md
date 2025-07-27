@@ -15,6 +15,7 @@
 - [`QSR011` - Port is not exposed in image](#qsr011---port-is-not-exposed-in-image)
 - [`QSR013` - Volume file does not exists](#qsr013---volume-file-does-not-exists)
 - [`QSR014` - Network file does not exists](#qsr014---network-file-does-not-exists)
+- [`QSR017` - Pod file does not exists](#qsr017---pod-file-does-not-exists)
 
 <!-- tocstop -->
 
@@ -217,3 +218,14 @@ current working directory.
 
 The defined file, e.g.: `Network=my.network`, does not exists in the current
 working directory.
+
+## `QSR017` - Pod file does not exists
+
+**Message**
+
+> Pod file does not exists: _%pod_file%_
+
+**Explanation**
+
+The defined file, e.g.: `Pod=my.pod`, does not exists in the current working
+directory.
