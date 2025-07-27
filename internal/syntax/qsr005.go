@@ -30,7 +30,7 @@ func qsr005(s SyntaxChecker) []protocol.Diagnostic {
 						Start: protocol.Position{Line: f.LineNumber, Character: 0},
 						End:   protocol.Position{Line: f.LineNumber, Character: f.Length},
 					},
-					Severity: &s.errDiag,
+					Severity: &errDiag,
 					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr005"),
 					Message:  fmt.Sprintf("Invalid value of AutoUpdate: %s", f.Value),
 				})

@@ -61,7 +61,7 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 					Start: protocol.Position{Line: lineNum - 1, Character: 0},
 					End:   protocol.Position{Line: lineNum - 1, Character: uint32(len(line) - 1)},
 				},
-				Severity: &s.errDiag,
+				Severity: &errDiag,
 				Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, tmp[0]),
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
 			})

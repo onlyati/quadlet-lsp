@@ -32,7 +32,7 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
 					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
-				Severity: &s.warnDiag,
+				Severity: &warnDiag,
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr004"),
 				Message:  "Image name is not fully qualified",
 			})

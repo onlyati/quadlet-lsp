@@ -48,7 +48,7 @@ func qsr006(s SyntaxChecker) []protocol.Diagnostic {
 					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
 					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
-				Severity: &s.errDiag,
+				Severity: &errDiag,
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr006"),
 				Message:  fmt.Sprintf("Image file does not exists: %s", finding.Value),
 			})

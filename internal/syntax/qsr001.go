@@ -32,7 +32,7 @@ func qsr001(s SyntaxChecker) []protocol.Diagnostic {
 			Start: protocol.Position{Line: 0, Character: 0},
 			End:   protocol.Position{Line: 0, Character: 0},
 		},
-		Severity: &s.errDiag,
+		Severity: &errDiag,
 		Message:  fmt.Sprintf("Missing any of these sections: %v", units),
 		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr001"),
 	}
