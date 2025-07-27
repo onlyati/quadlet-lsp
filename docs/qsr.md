@@ -12,6 +12,7 @@
 - [`QSR008` - Invalid format of Annotation](#qsr008---invalid-format-of-annotation)
 - [`QSR009` - Invalid format of Label](#qsr009---invalid-format-of-label)
 - [`QSR010` - Incorrect format of PublishPort](#qsr010---incorrect-format-of-publishport)
+- [`QSR011` - Port is not exposed in image](#qsr011---port-is-not-exposed-in-image)
 
 <!-- tocstop -->
 
@@ -180,3 +181,15 @@ Depends on the `reason` text:
   `PublishPort=ip:xxx:xxx` format
 - `not a number`: Instead of port number, text is provided
 - `port must be between [0;65535]`: Invalid port number is used
+
+## `QSR011` - Port is not exposed in image
+
+**Message**
+
+> Port is not exposed in the image, exposed ports: %port_list%
+
+**Explanation**
+
+Port is used in container or pod that is not exposed by the image. In case of
+pod, first it discover which other container files are linked for the pod and
+analyze those images.
