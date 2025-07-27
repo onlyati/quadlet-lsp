@@ -33,6 +33,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			qsr006,
 			qsr007,
 			qsr008,
+			qsr009,
 		},
 	}
 }

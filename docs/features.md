@@ -61,7 +61,6 @@ snippets. Currently supported new templates:
 - `new.PublishPort`
 - `new.Secret`
 - `new.Volume`
-- `new.Image`
 
 <img src="assets/new_env_demo.gif" style="width: 100%;"/>
 
