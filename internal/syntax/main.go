@@ -3,6 +3,7 @@ package syntax
 import (
 	"sync"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -17,6 +18,7 @@ type SyntaxChecker struct {
 	documentText string
 	uri          string
 	checks       []func(SyntaxChecker) []protocol.Diagnostic
+	commander    utils.Commander
 }
 
 func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
@@ -34,7 +36,9 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			qsr008,
 			qsr009,
 			qsr010,
+			qsr011,
 		},
+		commander: utils.CommandExecutor{},
 	}
 }
 
