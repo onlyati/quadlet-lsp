@@ -37,6 +37,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			qsr009,
 			qsr010,
 			qsr011,
+			qsr013,
 		},
 		commander: utils.CommandExecutor{},
 	}
