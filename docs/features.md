@@ -76,7 +76,7 @@ Language server provide some dynamic completion:
 - List created networks and `*.network` files at `Network=`
 - Gather and list `uid` and `gid` from image if `UserNS=keep-id:` is specified
 - Gather exposed ports from image and provide them when `PublishPort` is
-  specified
+  specified. In case of pod, it gather all images exposed ports.
 
 <img src="assets/din_comp_demo.gif" style="width: 100%;"/>
 

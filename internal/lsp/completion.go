@@ -33,7 +33,13 @@ func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (a
 	// Check if property already written and cursor after a '='
 	// Then provides some options, depends what is the name of property
 	if strings.Contains(lines[editorLine], "=") {
-		return listPropertyParameter(executor, lines, editorLine, charPos), nil
+		return listPropertyParameter(
+			executor,
+			lines,
+			editorLine,
+			charPos,
+			uri,
+		), nil
 	}
 
 	// Looking for possible properties in different sections
@@ -142,7 +148,7 @@ func listNewMacros(lines []string, lineNumber protocol.UInteger) []protocol.Comp
 
 // This function run when there is already an '=' sign in the
 // line of the cursor. This provide dynamic and static completions.
-func listPropertyParameter(c utils.Commander, lines []string, lineNumber protocol.UInteger, charPos protocol.UInteger) []protocol.CompletionItem {
+func listPropertyParameter(c utils.Commander, lines []string, lineNumber protocol.UInteger, charPos protocol.UInteger, uri string) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
 	property := strings.Split(lines[lineNumber], "=")[0]
@@ -209,6 +215,7 @@ func listPropertyParameter(c utils.Commander, lines []string, lineNumber protoco
 			c,
 			lines,
 			lineNumber,
+			uri,
 		)
 		if err != nil {
 			fmt.Printf("failed to list ports: %s", err.Error())
@@ -295,7 +302,7 @@ func listUserIdFromImage(c utils.Commander, lines []string, lineNumber protocol.
 
 // If user at the `PublihsPort=` line, and typting the exposed port number
 // provide suggestions based on image inspect what ports can be exposed.
-func listPublishedPorts(c utils.Commander, lines []string, lineNumber protocol.UInteger) ([]protocol.CompletionItem, error) {
+func listPublishedPorts(c utils.Commander, lines []string, lineNumber protocol.UInteger, uri string) ([]protocol.CompletionItem, error) {
 	var completionItems []protocol.CompletionItem
 
 	// Let's find out that we need to provide any complation at all
@@ -315,39 +322,12 @@ func listPublishedPorts(c utils.Commander, lines []string, lineNumber protocol.U
 		}
 	}
 
-	// First looking for `Image=value` value
-	// First looing for reverse, people usually define image first then parameters
-	imageName := findImageName(lines, lineNumber)
-
-	// We've found something, let's check it
-	if imageName != "" {
-		output, err := c.Run(
-			"podman",
-			"image", "inspect", imageName,
-		)
-		if err != nil {
-			return nil, err
-		}
-		inspectJSON := strings.Join(output, "")
-		var data []map[string]any
-		json.Unmarshal([]byte(inspectJSON), &data)
-
-		config, ok := data[0]["Config"].(map[string]any)
-		if !ok {
-			return nil, err
-		}
-
-		exposedPorts, ok := config["ExposedPorts"].(map[string]any)
-		if !ok {
-			return nil, err
-		}
-
-		for port := range exposedPorts {
-			tmp := strings.Split(port, "/")
-			completionItems = append(completionItems, protocol.CompletionItem{
-				Label: tmp[0],
-			})
-		}
+	// Now gather ports
+	ports := utils.FindImageExposedPorts(c, uri)
+	for _, port := range ports {
+		completionItems = append(completionItems, protocol.CompletionItem{
+			Label: port,
+		})
 	}
 
 	return completionItems, nil
