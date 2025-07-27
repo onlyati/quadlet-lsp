@@ -11,6 +11,7 @@
 - [`QSR007` - Invalid format of Environment variable](#qsr007---invalid-format-of-environment-variable)
 - [`QSR008` - Invalid format of Annotation](#qsr008---invalid-format-of-annotation)
 - [`QSR009` - Invalid format of Label](#qsr009---invalid-format-of-label)
+- [`QSR010` - Incorrect format of PublishPort](#qsr010---incorrect-format-of-publishport)
 
 <!-- tocstop -->
 
@@ -164,3 +165,18 @@ Label=FOO=BAR   <-- Correct
 Label=FOO       <-- Incorrect
 Label=FOO = BAR <-- Incorrect
 ```
+
+## `QSR010` - Incorrect format of PublishPort
+
+**Message**
+
+> Incorrect format of PublishPort: _%reason%_
+
+**Explanation**
+
+Depends on the `reason` text:
+
+- `invalid format`: Line must have `PublishPort=xxx:xxx` or
+  `PublishPort=ip:xxx:xxx` format
+- `not a number`: Instead of port number, text is provided
+- `port must be between [0;65535]`: Invalid port number is used

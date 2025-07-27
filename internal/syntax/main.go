@@ -6,13 +6,16 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+var (
+	hintDiag = protocol.DiagnosticSeverityHint
+	infoDiag = protocol.DiagnosticSeverityInformation
+	warnDiag = protocol.DiagnosticSeverityWarning
+	errDiag  = protocol.DiagnosticSeverityError
+)
+
 type SyntaxChecker struct {
 	documentText string
 	uri          string
-	hintDiag     protocol.DiagnosticSeverity
-	infoDiag     protocol.DiagnosticSeverity
-	warnDiag     protocol.DiagnosticSeverity
-	errDiag      protocol.DiagnosticSeverity
 	checks       []func(SyntaxChecker) []protocol.Diagnostic
 }
 
@@ -20,10 +23,6 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 	return SyntaxChecker{
 		documentText: documentText,
 		uri:          uri,
-		hintDiag:     protocol.DiagnosticSeverityHint,
-		infoDiag:     protocol.DiagnosticSeverityInformation,
-		warnDiag:     protocol.DiagnosticSeverityWarning,
-		errDiag:      protocol.DiagnosticSeverityError,
 		checks: []func(SyntaxChecker) []protocol.Diagnostic{
 			qsr001,
 			qsr002,
@@ -34,6 +33,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			qsr007,
 			qsr008,
 			qsr009,
+			qsr010,
 		},
 	}
 }
