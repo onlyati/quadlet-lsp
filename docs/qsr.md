@@ -10,6 +10,7 @@
 - [`QSR006` - Image file does not exists](#qsr006---image-file-does-not-exists)
 - [`QSR007` - Invalid format of Environment variable](#qsr007---invalid-format-of-environment-variable)
 - [`QSR008` - Invalid format of Annotation](#qsr008---invalid-format-of-annotation)
+- [`QSR009` - Invalid format of Label](#qsr009---invalid-format-of-label)
 
 <!-- tocstop -->
 
@@ -143,4 +144,23 @@ Examples:
 Annotation=FOO=BAR   <-- Correct
 Annotation=FOO       <-- Incorrect
 Annotation=FOO = BAR <-- Incorrect
+```
+
+## `QSR009` - Invalid format of Label
+
+**Message**
+
+> Invalid format of Label specification
+
+**Explanation**
+
+Label must be specified as key-value pairs without having space before or after
+the `=` sign.
+
+Examples:
+
+```ini
+Label=FOO=BAR   <-- Correct
+Label=FOO       <-- Incorrect
+Label=FOO = BAR <-- Incorrect
 ```
