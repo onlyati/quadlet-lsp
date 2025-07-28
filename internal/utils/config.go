@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -35,7 +34,6 @@ func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
 	}
 
 	if config.Podman, err = ParseVersion(config.PodmanVersion); err != nil {
-		log.Printf("Podman parse error: %v", err.Error())
 		// try to discover podman version from the machine
 		c := CommandExecutor{}
 		pVersion, err := NewPodmanVersion(c)
