@@ -1254,6 +1254,7 @@ $0
 				Hover: []string{
 					"When set to `true` the network is deleted when the service is stopped",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "NetworkName",
