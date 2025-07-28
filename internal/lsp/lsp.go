@@ -142,6 +142,12 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 		Type:    protocol.MessageTypeInfo,
 		Message: fmt.Sprintf("Detected Podman target version: %v", config.Podman),
 	})
+	if !config.Podman.IsSupported() {
+		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+			Type:    protocol.MessageTypeWarning,
+			Message: "The specified or found Podman version is not fully supported (>= 5.4.0)",
+		})
+	}
 
 	startFileWatcher(
 		context,
