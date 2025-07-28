@@ -15,7 +15,7 @@ import (
 func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
 	executor := utils.CommandExecutor{}
 	uri := string(params.TextDocument.URI)
-	text := documents.read(uri)
+	text := documents.Read(uri)
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	editorLine := params.Position.Line
 	charPos := params.Position.Character

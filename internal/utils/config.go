@@ -10,10 +10,11 @@ import (
 )
 
 type QuadletConfig struct {
+	Mu            sync.RWMutex  `json:"-"`
 	Disable       []string      `json:"disable"`
 	PodmanVersion string        `json:"podmanVersion"`
 	Podman        PodmanVersion `json:"-"`
-	Mu            sync.RWMutex  `json:"-"`
+	WorkspaceRoot string        `json:"-"`
 }
 
 func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
@@ -43,6 +44,7 @@ func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
 		}
 		config.Podman = pVersion
 	}
+	config.WorkspaceRoot = workspaceRoot
 
 	return &config, nil
 }
