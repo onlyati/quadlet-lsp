@@ -11,6 +11,11 @@ import (
 
 // Checking for invalid properties
 func qsr003(s SyntaxChecker) []protocol.Diagnostic {
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod"}
+	if c := canFileBeApplied(s.uri, allowedFiles); c == "" {
+		return []protocol.Diagnostic{}
+	}
+
 	var diags []protocol.Diagnostic
 
 	lineNum := uint32(0)
