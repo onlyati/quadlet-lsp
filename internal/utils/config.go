@@ -2,33 +2,47 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path"
+	"strings"
+	"sync"
 )
 
 type QuadletConfig struct {
 	Disable       []string      `json:"disable"`
 	PodmanVersion string        `json:"podmanVersion"`
 	Podman        PodmanVersion `json:"-"`
+	Mu            sync.RWMutex  `json:"-"`
 }
 
-func LoadConfig(workspaceRoot string) (QuadletConfig, error) {
-	configPath := path.Join(workspaceRoot, ".quadletrc.json")
+func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
+	configPath := workspaceRoot
+	if !strings.HasSuffix(workspaceRoot, ".quadletrc.json") {
+		configPath = path.Join(workspaceRoot, ".quadletrc.json")
+	}
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return QuadletConfig{}, err
+		return nil, err
 	}
 
 	var config QuadletConfig
 	err = json.Unmarshal(data, &config)
 	if err != nil {
-		return QuadletConfig{}, err
+		return nil, err
 	}
 
 	if config.Podman, err = ParseVersion(config.PodmanVersion); err != nil {
-		return QuadletConfig{}, err
+		log.Printf("Podman parse error: %v", err.Error())
+		// try to discover podman version from the machine
+		c := CommandExecutor{}
+		pVersion, err := NewPodmanVersion(c)
+		if err != nil {
+			return nil, err
+		}
+		config.Podman = pVersion
 	}
 
-	return config, nil
+	return &config, nil
 }
