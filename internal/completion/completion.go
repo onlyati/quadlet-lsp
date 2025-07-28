@@ -37,7 +37,6 @@ func NewCompletion(
 
 func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.CompletionItem {
 	s.config = config
-	var completionItems []protocol.CompletionItem
 
 	// Section suggestions, things that are between '[]'
 	if isItSectionLine(s.text[s.line]) {
@@ -54,5 +53,12 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 		return listPropertyCompletions(s)
 	}
 
-	return completionItems
+	// File is probably empty let's suggest some new file template
+	if isItNewQuadlet(s) {
+		return listNewQuadletTemplates(s)
+	}
+
+	// If this point is reached, then user probably type something
+	// at the beginning of a file, let's suggest some property
+	return listNewProperties(s)
 }
