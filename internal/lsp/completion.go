@@ -85,9 +85,16 @@ func listPropertyCompletions(lines []string, lineNumber protocol.UInteger) []pro
 		return completionItems
 	}
 
+	config.Mu.RLock()
+	podmanVer := config.Podman
+	config.Mu.RUnlock()
+
 	// It is a line where the '=' is not present, so probably just
 	// want to type something, let give a hint.
 	for _, prop := range data.PropertiesMap[section] {
+		if !podmanVer.GreaterOrEqual(prop.MinVersion) {
+			continue
+		}
 		completionItems = append(completionItems, protocol.CompletionItem{
 			Label: prop.Label + "=",
 			Documentation: protocol.MarkupContent{
@@ -244,9 +251,17 @@ func listPropertyParameter(c utils.Commander, lines []string, lineNumber protoco
 		return completionItems
 	}
 
+	config.Mu.RLock()
+	podmanVer := config.Podman
+	config.Mu.RUnlock()
+
 	// Generic static suggestions based on `properties.go` file
 	for _, p := range data.PropertiesMap[section] {
 		if property == p.Label {
+			if !podmanVer.GreaterOrEqual(p.MinVersion) {
+				continue
+			}
+
 			for _, parm := range p.Parameters {
 				completionItems = append(completionItems, protocol.CompletionItem{
 					Label: parm,

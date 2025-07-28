@@ -7,6 +7,7 @@ type PropertyMapItem struct {
 	Hover      []string
 	Parameters []string
 	Macro      string
+	MinVersion utils.PodmanVersion
 }
 
 type CategoryPropertyItem struct {
@@ -434,6 +435,7 @@ $0
 				Hover: []string{
 					"Specify the amount of memory for the container.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "Mount",
@@ -556,6 +558,7 @@ $0
 					"",
 					"Mutually exclusive with `ReloadSignal`",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "ReloadSignal",
@@ -566,18 +569,21 @@ $0
 					"",
 					"Mutually exclusive with `ReloadCmd`",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "Retry",
 				Hover: []string{
 					"Number of times to retry the image pull when a HTTP error occurs. Equivalent to the Podman `--retry` option.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "RetryDelay",
 				Hover: []string{
 					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "Rootfs",
@@ -876,6 +882,7 @@ $0
 					"",
 					"Equivalent to the Podman `--hostname` option. This key can be listed multiple times.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "IP",
@@ -967,6 +974,7 @@ $0
 					"",
 					"This is equivalent to the Podman `--shm-size` option and generally has the form `number[unit]`",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 4, 0),
 			},
 			{
 				Label: "SubGIDMap",
@@ -1486,12 +1494,14 @@ $0
 				Hover: []string{
 					"Number of times to retry the image pull when a HTTP error occurs. Equivalent to the Podman `--retry` option.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "RetryDelay",
 				Hover: []string{
 					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
 			{
 				Label: "TLSVerify",

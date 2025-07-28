@@ -33,7 +33,7 @@ func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig, 
 					if event.Op&fsnotify.Rename != 0 {
 
 						// Wait a moment to let the file be recreated
-						time.Sleep(100 * time.Millisecond)
+						time.Sleep(200 * time.Millisecond)
 
 						err := watcher.Remove(path)
 						if err != nil {
@@ -53,29 +53,30 @@ func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig, 
 							continue
 						}
 						cfg.Mu.Lock()
-						needSyntaxCheck := slices.Compare(cfg.Disable, tmpCfg.Disable)
+						needSyntaxCheck := slices.Compare(cfg.Disable, tmpCfg.Disable) != 0 || cfg.Podman != tmpCfg.Podman
 
 						cfg.Disable = tmpCfg.Disable
 						cfg.PodmanVersion = tmpCfg.PodmanVersion
 						cfg.Podman = tmpCfg.Podman
 
+						cfg.Mu.Unlock()
+
 						ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
 							Type:    protocol.MessageTypeInfo,
-							Message: fmt.Sprintf("config has been reloaded, Podman version target: %v", config.Podman),
+							Message: fmt.Sprintf("config has been reloaded, Podman version target: %v", tmpCfg.Podman),
 						})
 
-						if !cfg.Podman.IsSupported() {
+						if !tmpCfg.Podman.IsSupported() {
 							ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
 								Type:    protocol.MessageTypeWarning,
 								Message: "The specified or found Podman version is not fully supported (>= 5.4.0)",
 							})
 						}
 
-						if needSyntaxCheck != 0 {
+						if needSyntaxCheck {
 							CheckAllOpenFileForSyntax(ctx, docs)
 						}
 
-						cfg.Mu.Unlock()
 					}
 				}
 

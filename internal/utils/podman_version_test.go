@@ -44,11 +44,11 @@ func TestPodmanVersionGreateThan(t *testing.T) {
 		Minor:   2,
 	}
 
-	if !p.GreaterThan(utils.PodmanVersion{Version: 5, Release: 4, Minor: 0}) {
+	if p.GreaterOrEqual(utils.PodmanVersion{Version: 5, Release: 4, Minor: 0}) == false {
 		t.Fatal("failed test case 1")
 	}
 
-	if p.GreaterThan(utils.PodmanVersion{Version: 5, Release: 5, Minor: 2}) {
+	if p.GreaterOrEqual(utils.PodmanVersion{Version: 5, Release: 5, Minor: 0}) == true {
 		t.Fatal("failed test case 2")
 	}
 }
