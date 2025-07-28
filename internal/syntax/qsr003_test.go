@@ -8,6 +8,9 @@ import (
 
 func TestQSR003_ValidProperties(t *testing.T) {
 	s := NewSyntaxChecker("[Container]\nContainerName=app\nExec=run.sh\nUser=root", "test.container")
+	s.config = &utils.QuadletConfig{
+		Podman: utils.BuildPodmanVersion(5, 5, 2),
+	}
 	diags := qsr003(s)
 
 	if len(diags) != 0 {
@@ -17,6 +20,9 @@ func TestQSR003_ValidProperties(t *testing.T) {
 
 func TestQSR003_InvalidProperty(t *testing.T) {
 	s := NewSyntaxChecker("[Container]\nContainerName=app\nFoobar=yes\nExec=run.sh", "test.container")
+	s.config = &utils.QuadletConfig{
+		Podman: utils.BuildPodmanVersion(5, 5, 2),
+	}
 	diags := qsr003(s)
 
 	if len(diags) != 1 {
@@ -37,6 +43,9 @@ func TestQSR003_InvalidProperty(t *testing.T) {
 
 func TestQSR003_UnknownSection(t *testing.T) {
 	s := NewSyntaxChecker("[Unit]\nDescription=42", "test.container")
+	s.config = &utils.QuadletConfig{
+		Podman: utils.BuildPodmanVersion(5, 5, 2),
+	}
 	diags := qsr003(s)
 
 	if len(diags) != 0 {
