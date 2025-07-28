@@ -36,3 +36,19 @@ func TestNewPodmanVersion(t *testing.T) {
 		t.Fatalf("Exptected: '%v', but got '%v'", expected, result)
 	}
 }
+
+func TestPodmanVersionGreateThan(t *testing.T) {
+	p := utils.PodmanVersion{
+		Version: 5,
+		Release: 4,
+		Minor:   2,
+	}
+
+	if !p.GreaterThan(utils.PodmanVersion{Version: 5, Release: 4, Minor: 0}) {
+		t.Fatal("failed test case 1")
+	}
+
+	if p.GreaterThan(utils.PodmanVersion{Version: 5, Release: 5, Minor: 2}) {
+		t.Fatal("failed test case 2")
+	}
+}
