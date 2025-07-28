@@ -523,7 +523,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
+				Macro: "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
 			},
 			{
 				Label: "Pull",
@@ -957,7 +957,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
+				Macro: "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
 			},
 			{
 				Label: "ServiceName",
@@ -1115,7 +1115,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "PublishPort=${1:interface}:{2:exposed}:${3:source}\n$0",
+				Macro: "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
 			},
 			{
 				Label: "SetWorkingDirectory",

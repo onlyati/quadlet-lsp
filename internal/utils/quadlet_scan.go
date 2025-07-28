@@ -186,3 +186,21 @@ func FindImageExposedPorts(c Commander, name string) []string {
 
 	return ports
 }
+
+// This function looking for that the cursor currently in which section.
+// Sections are like `[Container]`, `[Unit]`, and so on.
+func FindSection(lines []string, lineNumber uint32) string {
+	section := ""
+	for i := lineNumber; ; i-- {
+		line := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+			section = strings.Trim(line, "[]")
+			break
+		}
+
+		if i == 0 {
+			break
+		}
+	}
+	return section
+}
