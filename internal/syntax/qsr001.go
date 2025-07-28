@@ -11,6 +11,11 @@ import (
 
 // Checking for section headers.
 func qsr001(s SyntaxChecker) []protocol.Diagnostic {
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod"}
+	if c := canFileBeApplied(s.uri, allowedFiles); c == "" {
+		return []protocol.Diagnostic{}
+	}
+
 	units := []string{
 		"[Image]",
 		"[Container]",

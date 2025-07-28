@@ -2,6 +2,8 @@ package lsp
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -29,9 +31,14 @@ func Start() {
 	// I've made a simple `version` subcommand, so it is easy
 	// to verify which version is downloaded and need to download newer one
 	args := os.Args
-	if len(args) == 2 {
+	if len(args) >= 2 {
 		if args[1] == "version" {
 			fmt.Println(version)
+			return
+		}
+
+		if args[1] == "check" {
+			runCLI(args)
 			return
 		}
 	}
@@ -179,4 +186,83 @@ func initialized(context *glsp.Context, params *protocol.InitializedParams) erro
 
 func shutdown(context *glsp.Context) error {
 	return nil
+}
+
+func runCLI(args []string) {
+	log.SetOutput(ioutil.Discard)
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("failed to read current working directory: %s", err.Error())
+		os.Exit(1)
+	}
+
+	checkCfg, err := utils.LoadConfig(cwd)
+	if err != nil {
+		fmt.Printf("failed to load config: %s", err.Error())
+		os.Exit(1)
+	}
+
+	workEntity := cwd
+	if len(args) == 3 {
+		workEntity = args[2]
+	}
+	stat, err := os.Stat(workEntity)
+	if err != nil {
+		fmt.Printf("failed to stat info: %s", err.Error())
+		os.Exit(1)
+	}
+	diags := map[string][]protocol.Diagnostic{}
+
+	if stat.IsDir() {
+		files, err := os.ReadDir(workEntity)
+		if err != nil {
+			fmt.Printf("failed to list files in directory: %s", err.Error())
+			os.Exit(1)
+		}
+
+		for _, file := range files {
+			if file.IsDir() {
+				continue
+			}
+			filePath := path.Join(cwd, file.Name())
+			f, err := os.ReadFile(filePath)
+			if err != nil {
+				fmt.Printf("failed to read file: %s", err.Error())
+				os.Exit(1)
+			}
+			s := syntax.NewSyntaxChecker(string(f), file.Name())
+			tmpDiags := s.RunAll(checkCfg)
+			diags[file.Name()] = tmpDiags
+		}
+	} else {
+		f, err := os.ReadFile(workEntity)
+		if err != nil {
+			fmt.Printf("failed to read file: %s", err.Error())
+			os.Exit(1)
+		}
+		s := syntax.NewSyntaxChecker(string(f), workEntity)
+		tmpDiags := s.RunAll(checkCfg)
+		diags[workEntity] = tmpDiags
+
+	}
+
+	found := false
+	for f, fDiags := range diags {
+		for _, diag := range fDiags {
+			found = true
+			fmt.Printf(
+				"%-20s, %s, %02d.%03d-%02d.%03d, %s\n",
+				f,
+				*diag.Source,
+				diag.Range.Start.Line, diag.Range.Start.Character,
+				diag.Range.End.Line, diag.Range.End.Character,
+				diag.Message,
+			)
+		}
+	}
+
+	if found {
+		os.Exit(4)
+	}
 }
