@@ -2,6 +2,7 @@
 
 <!-- toc -->
 
+- [Syntax checking](#syntax-checking)
 - [Hover menu](#hover-menu)
 - [Completion](#completion)
     * [Starter template](#starter-template)
@@ -25,6 +26,11 @@ Features below are implemented to support following file extensions:
 >
 > Only Quadlet part has features in the files below. The generic systemd related
 > parts are not covered.
+
+## Syntax checking
+
+The language server performs syntax checking over the files. For more details,
+check the [description of Quadlet Syntax Rules](./qsr.md).
 
 ## Hover menu
 
