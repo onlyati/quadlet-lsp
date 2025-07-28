@@ -2,7 +2,7 @@ package lsp
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -189,7 +189,7 @@ func shutdown(context *glsp.Context) error {
 }
 
 func runCLI(args []string) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	cwd, err := os.Getwd()
 	if err != nil {
