@@ -55,24 +55,6 @@ func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 	return completionItems
 }
 
-func propertyListPods(s Completion) []protocol.CompletionItem {
-	var completionItems []protocol.CompletionItem
-
-	return completionItems
-}
-
-func propertyListNetworks(s Completion) []protocol.CompletionItem {
-	var completionItems []protocol.CompletionItem
-
-	return completionItems
-}
-
-func propertyListPorts(s Completion) []protocol.CompletionItem {
-	var completionItems []protocol.CompletionItem
-
-	return completionItems
-}
-
 func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
