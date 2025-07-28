@@ -12,6 +12,14 @@ type PodmanVersion struct {
 	Minor   int
 }
 
+func BuildPodmanVersion(version, release, minor int) PodmanVersion {
+	return PodmanVersion{
+		Version: version,
+		Release: release,
+		Minor:   minor,
+	}
+}
+
 func NewPodmanVersion(c Commander) (PodmanVersion, error) {
 	output, err := c.Run("podman", "version")
 	if err != nil {
@@ -59,21 +67,15 @@ func ParseVersion(raw string) (PodmanVersion, error) {
 }
 
 func (p PodmanVersion) IsSupported() bool {
-	return p.GreaterThan(PodmanVersion{Version: 5, Release: 4, Minor: 0})
+	return p.GreaterOrEqual(PodmanVersion{Version: 5, Release: 4, Minor: 0})
 }
 
-func (p PodmanVersion) GreaterThan(other PodmanVersion) bool {
-	if p.Version > other.Version {
-		return true
+func (p PodmanVersion) GreaterOrEqual(other PodmanVersion) bool {
+	if p.Version != other.Version {
+		return p.Version > other.Version
 	}
-
-	if p.Release > other.Release {
-		return true
+	if p.Release != other.Release {
+		return p.Release > other.Release
 	}
-
-	if p.Minor > other.Minor {
-		return true
-	}
-
-	return false
+	return p.Minor >= other.Minor
 }

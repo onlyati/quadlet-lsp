@@ -20,6 +20,7 @@ type SyntaxChecker struct {
 	uri          string
 	checks       []rule
 	commander    utils.Commander
+	config       *utils.QuadletConfig
 }
 
 type rule struct {
@@ -54,6 +55,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 }
 
 func (s SyntaxChecker) RunAll(config *utils.QuadletConfig) []protocol.Diagnostic {
+	s.config = config
 	var wg sync.WaitGroup
 	diagChan := make(chan []protocol.Diagnostic, len(s.checks))
 

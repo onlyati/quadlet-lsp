@@ -23,6 +23,10 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 	props := []data.PropertyMapItem{}
 	lines := strings.SplitSeq(s.documentText, "\n")
 
+	s.config.Mu.RLock()
+	podmanVersion := s.config.Podman
+	s.config.Mu.RUnlock()
+
 	for line := range lines {
 		lineNum++
 		line = strings.TrimSpace(line)
@@ -50,7 +54,7 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 
 			found := false
 			for _, prop := range props {
-				if tmp[0] == prop.Label {
+				if tmp[0] == prop.Label && podmanVersion.GreaterOrEqual(prop.MinVersion) {
 					found = true
 					break
 				}

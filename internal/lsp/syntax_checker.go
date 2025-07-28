@@ -32,6 +32,10 @@ func SyntaxCheckOnSave(context *glsp.Context, params *protocol.DidSaveTextDocume
 }
 
 func CheckAllOpenFileForSyntax(context *glsp.Context, d *utils.Documents) {
+	context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+		Type:    protocol.MessageTypeInfo,
+		Message: "Check syntax of all open files",
+	})
 	files := d.ListFileNames()
 
 	for _, file := range files {
