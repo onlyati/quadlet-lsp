@@ -44,6 +44,13 @@ func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig) 
 						}
 
 						tmpCfg, err := utils.LoadConfig(path)
+						if err != nil {
+							ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+								Type:    protocol.MessageTypeError,
+								Message: fmt.Sprintf("Failed to load config: %v", err),
+							})
+							continue
+						}
 						cfg.Mu.Lock()
 						cfg.Disable = tmpCfg.Disable
 						cfg.PodmanVersion = tmpCfg.PodmanVersion

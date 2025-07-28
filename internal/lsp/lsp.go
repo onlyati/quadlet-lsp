@@ -58,7 +58,7 @@ func Start() {
 			// Check syntax when file is open
 			checker := syntax.NewSyntaxChecker(documents.read(uri), uri)
 
-			diags := checker.RunAll()
+			diags := checker.RunAll(config)
 			if len(diags) > 0 {
 				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
 					URI:         protocol.DocumentUri(uri),
@@ -90,7 +90,7 @@ func Start() {
 			// Check syntax when file is changed
 			checker := syntax.NewSyntaxChecker(documents.read(uri), uri)
 
-			diags := checker.RunAll()
+			diags := checker.RunAll(config)
 			if len(diags) > 0 {
 				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
 					URI:         protocol.DocumentUri(uri),
