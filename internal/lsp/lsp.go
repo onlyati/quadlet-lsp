@@ -19,7 +19,7 @@ const lsName = "quadlet"
 var (
 	version   = "0.2.0"
 	handler   protocol.Handler
-	config    utils.QuadletConfig
+	config    *utils.QuadletConfig
 	documents = newDocuments()
 )
 
@@ -138,8 +138,16 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 		})
 	}
 	config = cfg
+	context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+		Type:    protocol.MessageTypeInfo,
+		Message: fmt.Sprintf("Detected Podman target version: %v", config.Podman),
+	})
 
-	startFileWatcher(context, path.Join(workspaceDir, ".quadletrc.json"))
+	startFileWatcher(
+		context,
+		path.Join(workspaceDir, ".quadletrc.json"),
+		config,
+	)
 
 	// Setup server
 	capabilities := handler.CreateServerCapabilities()
@@ -159,32 +167,6 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 }
 
 func initialized(context *glsp.Context, params *protocol.InitializedParams) error {
-	// Detect Podman version if necesarry
-	defPodman := utils.PodmanVersion{}
-	if config.Podman != defPodman {
-		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-			Type:    protocol.MessageTypeLog,
-			Message: fmt.Sprintf("Podman version is overriden from config: %v", config.Podman),
-		})
-		return nil
-	}
-
-	c := utils.CommandExecutor{}
-	pVersion, err := utils.NewPodmanVersion(c)
-	if err != nil {
-		config.Podman = utils.PodmanVersion{Version: 99, Release: 99, Minor: 99}
-		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-			Type:    protocol.MessageTypeWarning,
-			Message: "Failed to fetch Podman version, assumes it is the latest",
-		})
-	} else {
-		config.Podman = pVersion
-		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-			Type:    protocol.MessageTypeLog,
-			Message: fmt.Sprintf("Detected Podman version: %v", config.Podman),
-		})
-	}
-
 	return nil
 }
 

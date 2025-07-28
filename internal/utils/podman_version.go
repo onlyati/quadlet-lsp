@@ -57,3 +57,23 @@ func ParseVersion(raw string) (PodmanVersion, error) {
 		Minor:   minor,
 	}, nil
 }
+
+func (p PodmanVersion) IsSupported() bool {
+	return p.GreaterThan(PodmanVersion{Version: 5, Release: 4, Minor: 0})
+}
+
+func (p PodmanVersion) GreaterThan(other PodmanVersion) bool {
+	if p.Version > other.Version {
+		return true
+	}
+
+	if p.Release > other.Release {
+		return true
+	}
+
+	if p.Minor > other.Minor {
+		return true
+	}
+
+	return false
+}
