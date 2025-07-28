@@ -20,7 +20,7 @@ var (
 	version   = "0.2.0"
 	handler   protocol.Handler
 	config    *utils.QuadletConfig
-	documents = newDocuments()
+	documents = utils.NewDocuments()
 )
 
 // Entry point of the language server
@@ -53,10 +53,10 @@ func Start() {
 		// like looking for references.
 		TextDocumentDidOpen: func(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			documents.add(uri, params.TextDocument.Text)
+			documents.Add(uri, params.TextDocument.Text)
 
 			// Check syntax when file is open
-			checker := syntax.NewSyntaxChecker(documents.read(uri), uri)
+			checker := syntax.NewSyntaxChecker(documents.Read(uri), uri)
 
 			diags := checker.RunAll(config)
 			if len(diags) > 0 {
@@ -75,7 +75,7 @@ func Start() {
 		},
 		TextDocumentDidChange: func(ctx *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			if text, ok := documents.checkUri(uri); ok {
+			if text, ok := documents.CheckUri(uri); ok {
 				for _, change := range params.ContentChanges {
 					if change_, ok := change.(protocol.TextDocumentContentChangeEvent); ok {
 						startIndex, endIndex := change_.Range.IndexesIn(text)
@@ -84,11 +84,11 @@ func Start() {
 						text = change_.Text
 					}
 				}
-				documents.add(uri, text)
+				documents.Add(uri, text)
 			}
 
 			// Check syntax when file is changed
-			checker := syntax.NewSyntaxChecker(documents.read(uri), uri)
+			checker := syntax.NewSyntaxChecker(documents.Read(uri), uri)
 
 			diags := checker.RunAll(config)
 			if len(diags) > 0 {
@@ -107,7 +107,7 @@ func Start() {
 		},
 		TextDocumentDidClose: func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			documents.delete(uri)
+			documents.Delete(uri)
 			return nil
 		},
 
@@ -147,6 +147,7 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 		context,
 		path.Join(workspaceDir, ".quadletrc.json"),
 		config,
+		&documents,
 	)
 
 	// Setup server
