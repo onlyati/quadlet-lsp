@@ -19,6 +19,38 @@ For a more details overview, with visual examples see the
 
 <img src="docs/assets/overall_demo.gif" style="width: 100%;"/>
 
+## Usage with Neovim
+
+There is a plugin made for this language server:
+
+- [Repository](example.com) TODO
+
+## Usage with VS Code
+
+There is a simple VS Code extension to use it:
+
+- [MarketPlace](https://marketplace.visualstudio.com/items?itemName=onlyati.quadlet-lsp)
+- [Repository](https://github.com/onlyati/quadlet-lsp-vscode-extension)
+
+## Alternate usage
+
+This binary can be used as a CLI syntax checker for Quadlet files. This can be
+useful, for example in CI/CD pipeline to verify Quadlets before packaging and
+later deploying.
+
+Same rule applied for CLI that is also applied for editor syntax checking. The
+`.quadletrc.json` file is also used on same way.
+
+Example for usage, that monitor the current working directory:
+
+```bash
+$ quadlet-lsp check .
+nc-db.container     , quadlet-lsp.qsr003, 09.000-09.010, Invalid property is found: Container.Memory
+nc-app.container    , quadlet-lsp.qsr003, 08.000-08.010, Invalid property is found: Container.Memory
+$ echo $?
+4
+```
+
 ## Get the executable
 
 ### Download the latest version
