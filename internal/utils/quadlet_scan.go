@@ -72,7 +72,7 @@ func findImageInContainerUnit(f []byte) []string {
 			}
 			lines := FindItems(
 				string(f),
-				"[Build]",
+				"Image",
 				"Image",
 			)
 
@@ -162,6 +162,11 @@ func FindImageExposedPorts(c Commander, name string) []string {
 		if err != nil {
 			log.Printf("failed to inspect image: %+v", err.Error())
 			return ports
+		}
+
+		if len(output) == 0 {
+			log.Println("image is not pulled")
+			continue
 		}
 
 		inspectJSON := strings.Join(output, "")
