@@ -3,6 +3,7 @@ package lsp
 import (
 	"fmt"
 	"log"
+	"slices"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -11,7 +12,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig) {
+func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig, docs *utils.Documents) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Println("failed to create watcher:", err)
@@ -52,6 +53,8 @@ func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig) 
 							continue
 						}
 						cfg.Mu.Lock()
+						needSyntaxCheck := slices.Compare(cfg.Disable, tmpCfg.Disable)
+
 						cfg.Disable = tmpCfg.Disable
 						cfg.PodmanVersion = tmpCfg.PodmanVersion
 						cfg.Podman = tmpCfg.Podman
@@ -66,6 +69,10 @@ func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig) 
 								Type:    protocol.MessageTypeWarning,
 								Message: "The specified or found Podman version is not fully supported (>= 5.4.0)",
 							})
+						}
+
+						if needSyntaxCheck != 0 {
+							CheckAllOpenFileForSyntax(ctx, docs)
 						}
 
 						cfg.Mu.Unlock()
