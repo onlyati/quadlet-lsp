@@ -14,7 +14,7 @@ func SyntaxCheckOnSave(context *glsp.Context, params *protocol.DidSaveTextDocume
 	checker := syntax.NewSyntaxChecker(text, uri)
 
 	// Run all syntax checker rule
-	diags := checker.RunAll()
+	diags := checker.RunAll(config)
 	if len(diags) > 0 {
 		context.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
 			URI:         protocol.DocumentUri(uri),

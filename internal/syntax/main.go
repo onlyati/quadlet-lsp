@@ -1,6 +1,7 @@
 package syntax
 
 import (
+	"slices"
 	"sync"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -17,49 +18,59 @@ var (
 type SyntaxChecker struct {
 	documentText string
 	uri          string
-	checks       []func(SyntaxChecker) []protocol.Diagnostic
+	checks       []rule
 	commander    utils.Commander
+}
+
+type rule struct {
+	name string
+	fn   func(SyntaxChecker) []protocol.Diagnostic
 }
 
 func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 	return SyntaxChecker{
 		documentText: documentText,
 		uri:          uri,
-		checks: []func(SyntaxChecker) []protocol.Diagnostic{
-			qsr001,
-			qsr002,
-			qsr003,
-			qsr004,
-			qsr005,
-			qsr006,
-			qsr007,
-			qsr008,
-			qsr009,
-			qsr010,
-			qsr011,
-			qsr013,
-			qsr014,
-			qsr017,
-			qsr018,
-			qsr019,
+		checks: []rule{
+			{"qsr001", qsr001},
+			{"qsr002", qsr002},
+			{"qsr003", qsr003},
+			{"qsr004", qsr004},
+			{"qsr005", qsr005},
+			{"qsr006", qsr006},
+			{"qsr007", qsr007},
+			{"qsr008", qsr008},
+			{"qsr009", qsr009},
+			{"qsr010", qsr010},
+			{"qsr011", qsr011},
+			{"qsr013", qsr013},
+			{"qsr014", qsr014},
+			{"qsr017", qsr017},
+			{"qsr018", qsr018},
+			{"qsr019", qsr019},
 		},
 		commander: utils.CommandExecutor{},
 	}
 }
 
-func (s SyntaxChecker) RunAll() []protocol.Diagnostic {
+func (s SyntaxChecker) RunAll(config *utils.QuadletConfig) []protocol.Diagnostic {
 	var wg sync.WaitGroup
 	diagChan := make(chan []protocol.Diagnostic, len(s.checks))
 
-	for _, fn := range s.checks {
+	for _, check := range s.checks {
+		// Check if rule is disabled
+		if slices.Contains(config.Disable, check.name) {
+			continue
+		}
+
 		wg.Add(1)
 		go func(rule func(SyntaxChecker) []protocol.Diagnostic) {
 			defer wg.Done()
-			result := fn(s)
+			result := check.fn(s)
 			if result != nil {
 				diagChan <- result
 			}
-		}(fn)
+		}(check.fn)
 	}
 
 	wg.Wait()
