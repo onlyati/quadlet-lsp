@@ -42,6 +42,7 @@ func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 		return nil
 	}
 	inspectJSON := strings.Join(output, "")
+	log.Println(inspectJSON)
 	var data []map[string]any
 	json.Unmarshal([]byte(inspectJSON), &data)
 
