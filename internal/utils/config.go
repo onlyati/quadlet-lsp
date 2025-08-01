@@ -22,15 +22,13 @@ func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
 		configPath = path.Join(workspaceRoot, ".quadletrc.json")
 	}
 
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		return nil, err
-	}
-
 	var config QuadletConfig
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		return nil, err
+	data, err := os.ReadFile(configPath)
+	if err == nil {
+		err = json.Unmarshal(data, &config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if config.Podman, err = ParseVersion(config.PodmanVersion); err != nil {
