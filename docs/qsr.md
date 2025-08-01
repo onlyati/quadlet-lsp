@@ -18,6 +18,7 @@
 - [`QSR013` - Volume file does not exists](#qsr013---volume-file-does-not-exists)
 - [`QSR014` - Network file does not exists](#qsr014---network-file-does-not-exists)
 - [`QSR015` - Invalid format of Volume specification](#qsr015---invalid-format-of-volume-specification)
+- [`QSR016` - Invalid value of UserNS specification](#qsr016---invalid-value-of-userns-specification)
 - [`QSR017` - Pod file does not exists](#qsr017---pod-file-does-not-exists)
 - [`QSR018` - Container cannot publish port with pod](#qsr018---container-cannot-publish-port-with-pod)
 - [`QSR019` - Container cannot have network with pod](#qsr019---container-cannot-have-network-with-pod)
@@ -274,6 +275,22 @@ Depends on the `reason`:
 
 - `container directory is not absolute`: Container directory must be absolute
 - `'%flag%' is unkown`: Not existing flag is used
+
+## `QSR016` - Invalid value of UserNS specification
+
+**Message**
+
+> Invalid value of UserNS: allowed values: _%reason%_
+
+**Explanation**
+
+Depends on the values of `reason`:
+
+- `%opt% has no paramerets`: Only `keep-id` can have further parameters
+- `[uid gid] allowed but found %opt%`: Uses `keep-id` with other parameters than
+  `uid` or `gid`
+- `allowed values: [auto host keep-id nomap] but found %opt%`: Using invalid
+  value of `UserNS`
 
 ## `QSR017` - Pod file does not exists
 
