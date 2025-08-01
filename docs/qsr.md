@@ -17,6 +17,7 @@
 - [`QSR012` - Invalid format of secret specification](#qsr012---invalid-format-of-secret-specification)
 - [`QSR013` - Volume file does not exists](#qsr013---volume-file-does-not-exists)
 - [`QSR014` - Network file does not exists](#qsr014---network-file-does-not-exists)
+- [`QSR015` - Invalid format of Volume specification](#qsr015---invalid-format-of-volume-specification)
 - [`QSR017` - Pod file does not exists](#qsr017---pod-file-does-not-exists)
 - [`QSR018` - Container cannot publish port with pod](#qsr018---container-cannot-publish-port-with-pod)
 - [`QSR019` - Container cannot have network with pod](#qsr019---container-cannot-have-network-with-pod)
@@ -233,10 +234,10 @@ analyze those images.
 
 Depends on `reason` text:
 
-- `_%opt%_ has no value`: Invalid option
+- `%opt% has no value`: Invalid option
 - `'type' can be either 'mount' or 'env'`: Target is specified but with invalid
   value
-- `'_%opt%_ only allowed if type=mount`: Using `uid`, `gid` or `mode` meanwhile
+- `'%opt%' only allowed if type=mount`: Using `uid`, `gid` or `mode` meanwhile
   not `type=env` is set
 
 ## `QSR013` - Volume file does not exists
@@ -260,6 +261,19 @@ current working directory.
 
 The defined file, e.g.: `Network=my.network`, does not exists in the current
 working directory.
+
+## `QSR015` - Invalid format of Volume specification
+
+**Message**
+
+> Invalid format of Volume specification: _%reason%_
+
+**Explanation**
+
+Depends on the `reason`:
+
+- `container directory is not absolute`: Container directory must be absolute
+- `'%flag%' is unkown`: Not existing flag is used
 
 ## `QSR017` - Pod file does not exists
 
