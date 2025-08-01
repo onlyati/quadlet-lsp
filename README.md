@@ -23,7 +23,7 @@ For a more details overview, with visual examples see the
 
 There is a plugin made for this language server:
 
-- [Repository](example.com) TODO
+- [Repository](https://github.com/onlyati/quadlet-lsp.nvim)
 
 ## Usage with VS Code
 
