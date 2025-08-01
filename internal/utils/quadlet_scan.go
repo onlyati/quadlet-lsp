@@ -13,6 +13,7 @@ type QuadletLine struct {
 	Length     uint32
 	Property   string
 	Value      string
+	RawLine    string
 }
 
 // This function scanning the passed text and
@@ -23,8 +24,8 @@ func FindItems(text, section, property string) []QuadletLine {
 	section = "[" + section + "]"
 	inSection := false
 
-	for i, line := range strings.Split(text, "\n") {
-		line = strings.TrimSpace(line)
+	for i, rawLine := range strings.Split(text, "\n") {
+		line := strings.TrimSpace(rawLine)
 
 		if inSection && strings.Contains(line, "=") {
 			tmp := strings.SplitN(line, "=", 2)
@@ -35,6 +36,7 @@ func FindItems(text, section, property string) []QuadletLine {
 						Length:     uint32(len(line)),
 						Property:   tmp[0],
 						Value:      tmp[1],
+						RawLine:    rawLine,
 					})
 				}
 			}

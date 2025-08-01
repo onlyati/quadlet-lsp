@@ -44,6 +44,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			{"qsr009", qsr009},
 			{"qsr010", qsr010},
 			{"qsr011", qsr011},
+			{"qsr012", qsr012},
 			{"qsr013", qsr013},
 			{"qsr014", qsr014},
 			{"qsr017", qsr017},

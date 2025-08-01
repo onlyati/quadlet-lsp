@@ -14,6 +14,7 @@
 - [`QSR009` - Invalid format of Label](#qsr009---invalid-format-of-label)
 - [`QSR010` - Incorrect format of PublishPort](#qsr010---incorrect-format-of-publishport)
 - [`QSR011` - Port is not exposed in image](#qsr011---port-is-not-exposed-in-image)
+- [`QSR012` - Invalid format of secret specification](#qsr012---invalid-format-of-secret-specification)
 - [`QSR013` - Volume file does not exists](#qsr013---volume-file-does-not-exists)
 - [`QSR014` - Network file does not exists](#qsr014---network-file-does-not-exists)
 - [`QSR017` - Pod file does not exists](#qsr017---pod-file-does-not-exists)
@@ -221,6 +222,22 @@ Depends on the `reason` text:
 Port is used in container or pod that is not exposed by the image. In case of
 pod, first it discover which other container files are linked for the pod and
 analyze those images.
+
+## `QSR012` - Invalid format of secret specification
+
+**Message**
+
+> Invalid format of secret specification: _%reason%_
+
+**Explanation**
+
+Depends on `reason` text:
+
+- `_%opt%_ has no value`: Invalid option
+- `'type' can be either 'mount' or 'env'`: Target is specified but with invalid
+  value
+- `'_%opt%_ only allowed if type=mount`: Using `uid`, `gid` or `mode` meanwhile
+  not `type=env` is set
 
 ## `QSR013` - Volume file does not exists
 
