@@ -16,7 +16,7 @@ type QuadletConfig struct {
 	WorkspaceRoot string        `json:"-"`
 }
 
-func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
+func LoadConfig(workspaceRoot string, c Commander) (*QuadletConfig, error) {
 	configPath := workspaceRoot
 	if !strings.HasSuffix(workspaceRoot, ".quadletrc.json") {
 		configPath = path.Join(workspaceRoot, ".quadletrc.json")
@@ -31,16 +31,16 @@ func LoadConfig(workspaceRoot string) (*QuadletConfig, error) {
 		}
 	}
 
+	config.WorkspaceRoot = workspaceRoot
 	if config.Podman, err = ParseVersion(config.PodmanVersion); err != nil {
 		// try to discover podman version from the machine
-		c := CommandExecutor{}
 		pVersion, err := NewPodmanVersion(c)
 		if err != nil {
-			return nil, err
+			config.Podman = BuildPodmanVersion(5, 4, 0)
+			return &config, err
 		}
 		config.Podman = pVersion
 	}
-	config.WorkspaceRoot = workspaceRoot
 
 	return &config, nil
 }

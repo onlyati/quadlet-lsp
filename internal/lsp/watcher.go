@@ -44,7 +44,7 @@ func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig, 
 							log.Println("error re-adding watcher:", err)
 						}
 
-						tmpCfg, err := utils.LoadConfig(path)
+						tmpCfg, err := utils.LoadConfig(path, utils.CommandExecutor{})
 						if err != nil {
 							ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
 								Type:    protocol.MessageTypeError,

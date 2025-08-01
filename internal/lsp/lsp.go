@@ -19,7 +19,7 @@ import (
 const lsName = "quadlet"
 
 var (
-	version   = "0.2.1"
+	version   = "alpha-0.2.2"
 	handler   protocol.Handler
 	config    *utils.QuadletConfig
 	documents = utils.NewDocuments()
@@ -137,7 +137,7 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 
 	workspaceDir, _ = strings.CutPrefix(workspaceDir, "file://")
 
-	cfg, err := utils.LoadConfig(workspaceDir)
+	cfg, err := utils.LoadConfig(workspaceDir, utils.CommandExecutor{})
 	if err != nil {
 		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
 			Type:    protocol.MessageTypeLog,
@@ -197,7 +197,7 @@ func runCLI(args []string) {
 		os.Exit(1)
 	}
 
-	checkCfg, err := utils.LoadConfig(cwd)
+	checkCfg, err := utils.LoadConfig(cwd, utils.CommandExecutor{})
 	if err != nil {
 		fmt.Printf("failed to load config: %s", err.Error())
 		os.Exit(1)
