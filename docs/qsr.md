@@ -145,19 +145,27 @@ The specified `*.image` or `*.build` file does not exists that is used in the
 
 **Message**
 
-> Invalid format of Environment variable specification
+> Invalid format: _%reason%_
 
 **Explanation**
 
-Environment variable must be specified as key-value pairs without having space
-before or after the `=` sign.
+Environment variables are represented as key-value pairs. If you need to assign
+a value containing spaces or the equals sign to a variable, put quotes around
+the whole assignment. Variable expansion is not performed inside the strings and
+the "$" character has no special meaning.
 
-Examples:
+This option may be specified more than once, in which case all listed variables
+will be set. If the same variable is listed twice, the later setting will
+override the earlier setting. If the empty string is assigned to this option,
+the list of environment variables is reset, all prior assignments have no
+effect.
+
+Correct examples:
 
 ```ini
-Environment=FOO=BAR   <-- Correct
-Environment=FOO       <-- Incorrect
-Environment=FOO = BAR <-- Incorrect
+Environment=FOO=BAR "MyVar=MyValue" 'foo=bar'
+Environment=FOO=
+Environment='fooVariable=barValue'
 ```
 
 ## `QSR008` - Invalid format of Annotation

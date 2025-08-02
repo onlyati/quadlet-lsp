@@ -7,7 +7,10 @@ import (
 )
 
 func TestQSR003_ValidProperties(t *testing.T) {
-	s := NewSyntaxChecker("[Container]\nContainerName=app\nExec=run.sh\nUser=root", "test.container")
+	s := NewSyntaxChecker(
+		"[Container]\nContainerName=app\nExec=run.sh\n# Something=comment\nUser=root",
+		"test.container",
+	)
 	s.config = &utils.QuadletConfig{
 		Podman: utils.BuildPodmanVersion(5, 5, 2),
 	}

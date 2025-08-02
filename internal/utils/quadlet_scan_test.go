@@ -16,6 +16,7 @@ AutoUpdate=registry
 Environment=ENV1=VALUE1
 Volume=dev-db-volume:/app:rw
 Environment=ENV2=VALUE2
+# Environment=ENV3=VALUE3
 
 [Service]
 Restart=on-failure

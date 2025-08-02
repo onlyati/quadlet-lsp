@@ -31,6 +31,11 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 		lineNum++
 		line = strings.TrimSpace(line)
 
+		// Skip emptry or comment lines
+		if len(line) == 0 || strings.HasPrefix(line, "#") {
+			continue
+		}
+
 		// Read the current section
 		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
 			tSection := line[1 : len(line)-1]
