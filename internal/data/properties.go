@@ -113,7 +113,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Annotation=${1:key}=${2:value}\n$0",
+				Macro: "Annotation=\"${1:key}=${2:value}\"\n$0",
 			},
 			{
 				Label: "AutoUpdate",
@@ -216,7 +216,7 @@ $0
 					"Environment=APP_USERNAME=appuser",
 					"```",
 				},
-				Macro: "Environment=${1:name}=${2:value}\n$0",
+				Macro: "Environment=\"${1:name}=${2:value}\"\n$0",
 			},
 			{
 				Label: "EnvironmentFile",
@@ -410,7 +410,7 @@ $0
 					"Label=app=myapp",
 					"```",
 				},
-				Macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
 			},
 			{
 				Label: "LogDriver",
@@ -903,7 +903,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
 			},
 			{
 				Label: "Network",
@@ -1247,7 +1247,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
 			},
 			{
 				Label: "NetworkDeleteOnStop",
@@ -1354,7 +1354,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=${1:key}:${2:value}\n$0",
+				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
 			},
 			{
 				Label: "Options",
