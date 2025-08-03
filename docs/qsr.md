@@ -22,6 +22,7 @@
 - [`QSR017` - Pod file does not exists](#qsr017---pod-file-does-not-exists)
 - [`QSR018` - Container cannot publish port with pod](#qsr018---container-cannot-publish-port-with-pod)
 - [`QSR019` - Container cannot have network with pod](#qsr019---container-cannot-have-network-with-pod)
+- [`QSR020` - Naming of unit is invalid](#qsr020---naming-of-unit-is-invalid)
 
 <!-- tocstop -->
 
@@ -354,3 +355,16 @@ When you create a pod, it gets a single network namespace that all containers in
 the pod share. So: Containers in the same pod communicate over localhost
 (127.0.0.1). You assign the network (e.g. --network) when creating the pod, not
 per container.
+
+## `QSR020` - Naming of unit is invalid
+
+**Message**
+
+> Invalid name of unit: _%name%_
+
+**Explanation**
+
+Container, Volume, Pod and Network naming must match with
+`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$` regular expression. The specified name at
+`ContainerName`, `VolumeName`, `PodName` or `Networkname` does not match with
+the expression.

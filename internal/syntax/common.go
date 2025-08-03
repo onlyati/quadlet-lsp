@@ -18,6 +18,9 @@ var quotedKV = regexp.MustCompile(`^"([A-Za-z_][A-Za-z0-9_]*)=(.*)"$`)
 // regex for quoted 'key=value'
 var aposthropeKV = regexp.MustCompile(`^'([A-Za-z_][A-Za-z0-9_]*)=(.*)'$`)
 
+// regex for name convention, like ContainerName, PodName, VolumeName, NetworkName
+var namingConvention = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`)
+
 // Function checking what is the extenstion in the URI
 // and return if it is on the allowed array list.
 // Return with the extension (with high capitalized first character)
