@@ -53,6 +53,10 @@ func TestQSR007_InvalidUnfinished(t *testing.T) {
 			t.Fatalf("Exptected 1 diagnosis, but got %d at %s", len(diags), s.uri)
 		}
 
+		if *diags[0].Source != "quadlet-lsp.qsr007" {
+			t.Fatalf("Exptected quadlet-lsp.qsr007 source but got %s", *diags[0].Source)
+		}
+
 		if diags[0].Message != "Invalid format: bad delimiter usage at FOO" {
 			t.Fatalf("Got unexpected error message: '%s' at %s", diags[0].Message, s.uri)
 		}

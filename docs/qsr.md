@@ -172,38 +172,54 @@ Environment='fooVariable=barValue'
 
 **Message**
 
-> Invalid format of Annotation specification
+> Invalid format: _%reason%_
 
 **Explanation**
 
-Annotation must be specified as key-value pairs without having space before or
-after the `=` sign.
+Annotation variables are represented as key-value pairs. If you need to assign a
+value containing spaces or the equals sign to a variable, put quotes around the
+whole assignment. Variable expansion is not performed inside the strings and the
+"$" character has no special meaning.
 
-Examples:
+This option may be specified more than once, in which case all listed variables
+will be set. If the same variable is listed twice, the later setting will
+override the earlier setting. If the empty string is assigned to this option,
+the list of environment variables is reset, all prior assignments have no
+effect.
+
+Correct examples:
 
 ```ini
-Annotation=FOO=BAR   <-- Correct
-Annotation=FOO       <-- Incorrect
-Annotation=FOO = BAR <-- Incorrect
+Annotation=FOO=BAR "MyVar=MyValue" 'foo=bar'
+Annotation=FOO=
+Annotation='fooVariable=barValue'
 ```
 
 ## `QSR009` - Invalid format of Label
 
 **Message**
 
-> Invalid format of Label specification
+> Invalid format: _%reason%_
 
 **Explanation**
 
-Label must be specified as key-value pairs without having space before or after
-the `=` sign.
+Label variables are represented as key-value pairs. If you need to assign a
+value containing spaces or the equals sign to a variable, put quotes around the
+whole assignment. Variable expansion is not performed inside the strings and the
+"$" character has no special meaning.
 
-Examples:
+This option may be specified more than once, in which case all listed variables
+will be set. If the same variable is listed twice, the later setting will
+override the earlier setting. If the empty string is assigned to this option,
+the list of environment variables is reset, all prior assignments have no
+effect.
+
+Correct examples:
 
 ```ini
-Label=FOO=BAR   <-- Correct
-Label=FOO       <-- Incorrect
-Label=FOO = BAR <-- Incorrect
+Label=FOO=BAR "MyVar=MyValue" 'foo=bar'
+Label=FOO=
+Label='fooVariable=barValue'
 ```
 
 ## `QSR010` - Incorrect format of PublishPort
