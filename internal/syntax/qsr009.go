@@ -1,7 +1,7 @@
 package syntax
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -23,32 +23,33 @@ func qsr009(s SyntaxChecker) []protocol.Diagnostic {
 	}
 
 	for _, finding := range findings {
-		index := strings.Index(finding.Value, "=")
-
-		// Check if '=' is missing
-		cond1 := index == -1
-
-		// Cannot be space before or after the '=' sign
-		cond2 := false
-		if !cond1 {
-			cond2 = finding.Value[index-1] == ' '
-
-			if len(finding.Value)-1 > index {
-				cond2 = cond2 || finding.Value[index+1] == ' '
-			}
-		}
-
-		cond3 := index == len(finding.Value)-1
-
-		if cond1 || cond2 || cond3 {
+		tokens, err := splitQuoted(finding.Value)
+		if err != nil {
 			diags = append(diags, protocol.Diagnostic{
 				Range: protocol.Range{
 					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
 					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
-				Message:  "Invalid format of Label specification",
 				Severity: &errDiag,
 				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr009"),
+				Message:  fmt.Sprintf("Invalid format: %s", err.Error()),
+			})
+			continue
+		}
+
+		for _, token := range tokens {
+			if quotedKV.MatchString(token) || unquotedKV.MatchString(token) || aposthropeKV.MatchString(token) {
+				continue
+			}
+
+			diags = append(diags, protocol.Diagnostic{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
+					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
+				},
+				Severity: &errDiag,
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr009"),
+				Message:  fmt.Sprintf("Invalid format: bad delimiter usage at %s", token),
 			})
 		}
 	}

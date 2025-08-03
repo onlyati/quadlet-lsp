@@ -31,7 +31,7 @@ func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
 				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr020"),
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
 				Message:  fmt.Sprintf("Invalid format: %s", err.Error()),
 			})
 			continue
@@ -48,7 +48,7 @@ func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
 				},
 				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr020"),
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
 				Message:  fmt.Sprintf("Invalid format: bad delimiter usage at %s", token),
 			})
 		}
