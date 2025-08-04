@@ -86,6 +86,146 @@ $0
 	}
 
 	PropertiesMap = map[string][]PropertyMapItem{
+		"Install": {
+			{
+				Label: "Alias",
+				Hover: []string{
+					"A space-separated list of additional names this unit shall be installed under. The names listed here must have the same suffix (i.e. type) as the unit filename. This option may be specified more than once, in which case all listed names are used. At installation time, systemctl enable will create symlinks from these names to the unit filename. Note that not all unit types support such alias names, and this setting is not supported for them. Specifically, mount, slice, swap, and automount units do not support aliasing.",
+				},
+			},
+			{
+				Label: "WantedBy",
+				Hover: []string{
+					"This option may be used more than once, or a space-separated list of unit names may be given. A symbolic link is created in the .wants/, .requires/, or .upholds/ directory of each of the listed units when this unit is installed by systemctl enable. This has the effect of a dependency of type Wants=, Requires=, or Upholds= being added from the listed unit to the current unit. See the description of the mentioned dependency types in the [Unit] section for details.",
+					"",
+					"In case of template units listing non template units, the listing unit must have DefaultInstance= set, or systemctl enable must be called with an instance name. The instance (default or specified) will be added to the .wants/, .requires/, or .upholds/ list of the listed unit. For example, WantedBy=getty.target in a service getty@.service will result in systemctl enable getty@tty2.service creating a getty.target.wants/getty@tty2.service link to getty@.service. This also applies to listing specific instances of templated units: this specific instance will gain the dependency. A template unit may also list a template unit, in which case a generic dependency will be added where each instance of the listing unit will have a dependency on an instance of the listed template with the same instance value. For example, WantedBy=container@.target in a service monitor@.service will result in systemctl enable monitor@.service creating a container@.target.wants/monitor@.service link to monitor@.service, which applies to all instances of container@.target.",
+				},
+			},
+			{
+				Label: "RequiredBy",
+				Hover: []string{
+					"This option may be used more than once, or a space-separated list of unit names may be given. A symbolic link is created in the .wants/, .requires/, or .upholds/ directory of each of the listed units when this unit is installed by systemctl enable. This has the effect of a dependency of type Wants=, Requires=, or Upholds= being added from the listed unit to the current unit. See the description of the mentioned dependency types in the [Unit] section for details.",
+					"",
+					"In case of template units listing non template units, the listing unit must have DefaultInstance= set, or systemctl enable must be called with an instance name. The instance (default or specified) will be added to the .wants/, .requires/, or .upholds/ list of the listed unit. For example, WantedBy=getty.target in a service getty@.service will result in systemctl enable getty@tty2.service creating a getty.target.wants/getty@tty2.service link to getty@.service. This also applies to listing specific instances of templated units: this specific instance will gain the dependency. A template unit may also list a template unit, in which case a generic dependency will be added where each instance of the listing unit will have a dependency on an instance of the listed template with the same instance value. For example, WantedBy=container@.target in a service monitor@.service will result in systemctl enable monitor@.service creating a container@.target.wants/monitor@.service link to monitor@.service, which applies to all instances of container@.target.",
+				},
+			},
+			{
+				Label: "UpheldBy",
+				Hover: []string{
+					"This option may be used more than once, or a space-separated list of unit names may be given. A symbolic link is created in the .wants/, .requires/, or .upholds/ directory of each of the listed units when this unit is installed by systemctl enable. This has the effect of a dependency of type Wants=, Requires=, or Upholds= being added from the listed unit to the current unit. See the description of the mentioned dependency types in the [Unit] section for details.",
+					"",
+					"In case of template units listing non template units, the listing unit must have DefaultInstance= set, or systemctl enable must be called with an instance name. The instance (default or specified) will be added to the .wants/, .requires/, or .upholds/ list of the listed unit. For example, WantedBy=getty.target in a service getty@.service will result in systemctl enable getty@tty2.service creating a getty.target.wants/getty@tty2.service link to getty@.service. This also applies to listing specific instances of templated units: this specific instance will gain the dependency. A template unit may also list a template unit, in which case a generic dependency will be added where each instance of the listing unit will have a dependency on an instance of the listed template with the same instance value. For example, WantedBy=container@.target in a service monitor@.service will result in systemctl enable monitor@.service creating a container@.target.wants/monitor@.service link to monitor@.service, which applies to all instances of container@.target.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
+			},
+		},
+		"Unit": {
+			{
+				Label: "Description",
+				Hover: []string{
+					"Description about the unit",
+				},
+			},
+			{
+				Label: "Wants",
+				Hover: []string{
+					"Configures (weak) requirement dependencies on other units. This option may be specified more than once or multiple space-separated units may be specified in one option in which case dependencies for all listed names will be created. Dependencies of this type may also be configured outside of the unit configuration file by adding a symlink to a .wants/ directory accompanying the unit file. For details, see above.",
+					"",
+					"Units listed in this option will be started if the configuring unit is. However, if the listed units fail to start or cannot be added to the transaction, this has no impact on the validity of the transaction as a whole, and this unit will still be started. This is the recommended way to hook the start-up of one unit to the start-up of another unit.",
+					"",
+					"Note that requirement dependencies do not influence the order in which services are started or stopped. This has to be configured independently with the After= or Before= options. If unit foo.service pulls in unit bar.service as configured with Wants= and no ordering is configured with After= or Before=, then both units will be started simultaneously and without any delay between them if foo.service is activated.",
+				},
+			},
+			{
+				Label: "Requires",
+				Hover: []string{
+					"imilar to Wants=, but declares a stronger requirement dependency. Dependencies of this type may also be configured by adding a symlink to a .requires/ directory accompanying the unit file.",
+					"",
+					"If this unit gets activated, the units listed will be activated as well. If one of the other units fails to activate, and an ordering dependency After= on the failing unit is set, this unit will not be started. Besides, with or without specifying After=, this unit will be stopped (or restarted) if one of the other units is explicitly stopped (or restarted).",
+					"",
+					"Often, it is a better choice to use Wants= instead of Requires= in order to achieve a system that is more robust when dealing with failing services.",
+					"",
+					"Note that this dependency type does not imply that the other unit always has to be in active state when this unit is running. Specifically: failing condition checks (such as ConditionPathExists=, ConditionPathIsSymbolicLink=, … — see below) do not cause the start job of a unit with a Requires= dependency on it to fail. Also, some unit types may deactivate on their own (for example, a service process may decide to exit cleanly, or a device may be unplugged by the user), which is not propagated to units having a Requires= dependency. Use the BindsTo= dependency type together with After= to ensure that a unit may never be in active state without a specific other unit also in active state (see below).",
+				},
+			},
+			{
+				Label: "Requisite",
+				Hover: []string{
+					"Similar to Requires=. However, if the units listed here are not started already, they will not be started and the starting of this unit will fail immediately. Requisite= does not imply an ordering dependency, even if both units are started in the same transaction. Hence this setting should usually be combined with After=, to ensure this unit is not started before the other unit.",
+					"",
+					"When Requisite=b.service is used on a.service, this dependency will show as RequisiteOf=a.service in property listing of b.service. RequisiteOf= dependency cannot be specified directly.",
+				},
+			},
+			{
+				Label: "BindsTo",
+				Hover: []string{
+					"Configures requirement dependencies, very similar in style to Requires=. However, this dependency type is stronger: in addition to the effect of Requires= it declares that if the unit bound to is stopped, this unit will be stopped too. This means a unit bound to another unit that suddenly enters inactive state will be stopped too. Units can suddenly, unexpectedly enter inactive state for different reasons: the main process of a service unit might terminate on its own choice, the backing device of a device unit might be unplugged or the mount point of a mount unit might be unmounted without involvement of the system and service manager.",
+					"",
+					"When used in conjunction with After= on the same unit the behaviour of BindsTo= is even stronger. In this case, the unit bound to strictly has to be in active state for this unit to also be in active state. This not only means a unit bound to another unit that suddenly enters inactive state, but also one that is bound to another unit that gets skipped due to an unmet condition check (such as ConditionPathExists=, ConditionPathIsSymbolicLink=, … — see below) will be stopped, should it be running. Hence, in many cases it is best to combine BindsTo= with After=.",
+					"",
+					"When BindsTo=b.service is used on a.service, this dependency will show as BoundBy=a.service in property listing of b.service. BoundBy= dependency cannot be specified directly.",
+				},
+			},
+			{
+				Label: "PartOf",
+				Hover: []string{
+					"Configures dependencies similar to Requires=, but limited to stopping and restarting of units. When systemd stops or restarts the units listed here, the action is propagated to this unit. Note that this is a one-way dependency — changes to this unit do not affect the listed units.",
+					"",
+					"When PartOf=b.service is used on a.service, this dependency will show as ConsistsOf=a.service in property listing of b.service. ConsistsOf= dependency cannot be specified directly.",
+				},
+			},
+			{
+				Label: "Upholds",
+				Hover: []string{
+					"Configures dependencies similar to Wants=, but as long as this unit is up, all units listed in Upholds= are started whenever found to be inactive or failed, and no job is queued for them. While a Wants= dependency on another unit has a one-time effect when this units started, a Upholds= dependency on it has a continuous effect, constantly restarting the unit if necessary. This is an alternative to the Restart= setting of service units, to ensure they are kept running whatever happens. The restart happens without delay, and usual per-unit rate-limit applies.",
+					"",
+					"When Upholds=b.service is used on a.service, this dependency will show as UpheldBy=a.service in the property listing of b.service.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
+			},
+			{
+				Label: "Conflicts",
+				Hover: []string{
+					"A space-separated list of unit names. Configures negative requirement dependencies. If a unit has a Conflicts= setting on another unit, starting the former will stop the latter and vice versa.",
+					"",
+					"Note that this setting does not imply an ordering dependency, similarly to the Wants= and Requires= dependencies described above. This means that to ensure that the conflicting unit is stopped before the other unit is started, an After= or Before= dependency must be declared. It does not matter which of the two ordering dependencies is used, because stop jobs are always ordered before start jobs, see the discussion in Before=/After= below.",
+					"",
+					"If unit A that conflicts with unit B is scheduled to be started at the same time as B, the transaction will either fail (in case both are required parts of the transaction) or be modified to be fixed (in case one or both jobs are not a required part of the transaction). In the latter case, the job that is not required will be removed, or in case both are not required, the unit that conflicts will be started and the unit that is conflicted is stopped.",
+				},
+			},
+			{
+				Label: "Before",
+				Hover: []string{
+					"Before/After",
+					"",
+					"These two settings expect a space-separated list of unit names. They may be specified more than once, in which case dependencies for all listed names are created.",
+					"",
+					"Those two settings configure ordering dependencies between units. If unit foo.service contains the setting Before=bar.service and both units are being started, bar.service's start-up is delayed until foo.service has finished starting up. After= is the inverse of Before=, i.e. while Before= ensures that the configured unit is started before the listed unit begins starting up, After= ensures the opposite, that the listed unit is fully started up before the configured unit is started.",
+					"",
+					"When two units with an ordering dependency between them are shut down, the inverse of the start-up order is applied. I.e. if a unit is configured with After= on another unit, the former is stopped before the latter if both are shut down. Given two units with any ordering dependency between them, if one unit is shut down and the other is started up, the shutdown is ordered before the start-up. It does not matter if the ordering dependency is After= or Before=, in this case. It also does not matter which of the two is shut down, as long as one is shut down and the other is started up; the shutdown is ordered before the start-up in all cases. If two units have no ordering dependencies between them, they are shut down or started up simultaneously, and no ordering takes place. It depends on the unit type when precisely a unit has finished starting up. Most importantly, for service units start-up is considered completed for the purpose of Before=/After= when all its configured start-up commands have been invoked and they either failed or reported start-up success. Note that this includes ExecStartPost= (or ExecStopPost= for the shutdown case).",
+					"",
+					"Note that those settings are independent of and orthogonal to the requirement dependencies as configured by Requires=, Wants=, Requisite=, or BindsTo=. It is a common pattern to include a unit name in both the After= and Wants= options, in which case the unit listed will be started before the unit that is configured with these options.",
+					"",
+					"Note that Before= dependencies on device units have no effect and are not supported. Devices generally become available as a result of an external hotplug event, and systemd creates the corresponding device unit without delay.",
+				},
+			},
+			{
+				Label: "After",
+				Hover: []string{
+					"Before/After",
+					"",
+					"These two settings expect a space-separated list of unit names. They may be specified more than once, in which case dependencies for all listed names are created.",
+					"",
+					"Those two settings configure ordering dependencies between units. If unit foo.service contains the setting Before=bar.service and both units are being started, bar.service's start-up is delayed until foo.service has finished starting up. After= is the inverse of Before=, i.e. while Before= ensures that the configured unit is started before the listed unit begins starting up, After= ensures the opposite, that the listed unit is fully started up before the configured unit is started.",
+					"",
+					"When two units with an ordering dependency between them are shut down, the inverse of the start-up order is applied. I.e. if a unit is configured with After= on another unit, the former is stopped before the latter if both are shut down. Given two units with any ordering dependency between them, if one unit is shut down and the other is started up, the shutdown is ordered before the start-up. It does not matter if the ordering dependency is After= or Before=, in this case. It also does not matter which of the two is shut down, as long as one is shut down and the other is started up; the shutdown is ordered before the start-up in all cases. If two units have no ordering dependencies between them, they are shut down or started up simultaneously, and no ordering takes place. It depends on the unit type when precisely a unit has finished starting up. Most importantly, for service units start-up is considered completed for the purpose of Before=/After= when all its configured start-up commands have been invoked and they either failed or reported start-up success. Note that this includes ExecStartPost= (or ExecStopPost= for the shutdown case).",
+					"",
+					"Note that those settings are independent of and orthogonal to the requirement dependencies as configured by Requires=, Wants=, Requisite=, or BindsTo=. It is a common pattern to include a unit name in both the After= and Wants= options, in which case the unit listed will be started before the unit that is configured with these options.",
+					"",
+					"Note that Before= dependencies on device units have no effect and are not supported. Devices generally become available as a result of an external hotplug event, and systemd creates the corresponding device unit without delay.",
+				},
+			},
+		},
 		"Container": {
 			{
 				Label: "AddCapability",
