@@ -854,6 +854,7 @@ $0
 					"stop",
 					"continue",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 6, 0),
 			},
 			{
 				Label: "GIDMap",
@@ -903,7 +904,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
+				Macro:      "Label=\"${1:key}=${2:value}\"\n$0",
+				MinVersion: utils.BuildPodmanVersion(5, 6, 0),
 			},
 			{
 				Label: "Network",
@@ -1205,6 +1207,7 @@ $0
 					"",
 					"This is equivalent to the Podman `--interface-name` option.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 6, 0),
 			},
 			{
 				Label: "Internal",
@@ -1489,6 +1492,7 @@ $0
 					"The pull policy to use when pulling the image.",
 					"This is equivalent to the Podman `--policy` option.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 6, 0),
 			},
 			{
 				Label: "Retry",
