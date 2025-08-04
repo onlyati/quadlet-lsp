@@ -12,6 +12,7 @@ func TestSection_Valid(t *testing.T) {
 		"Volume",
 		"Image",
 		"Container",
+		"Build",
 	}
 
 	diags := listSections(Completion{})
