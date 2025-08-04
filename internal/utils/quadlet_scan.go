@@ -5,7 +5,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+
+	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 type QuadletLine struct {
@@ -14,6 +17,57 @@ type QuadletLine struct {
 	Property   string
 	Value      string
 	RawLine    string
+}
+
+type ScanProperty struct {
+	Property string
+	Section  string
+}
+
+func ScanQadlet(
+	text string,
+	podmanVer PodmanVersion,
+	properties map[ScanProperty]struct{},
+	action func(q QuadletLine, p PodmanVersion) *protocol.Diagnostic,
+) []protocol.Diagnostic {
+	var returnValue []protocol.Diagnostic
+
+	currentSection := ""
+	sectionRegexp := regexp.MustCompile(`^\[([A-Za-z0-9_.-]+)\]$`)
+
+	for i, rawLine := range strings.Split(text, "\n") {
+		line := strings.TrimSpace(rawLine)
+
+		if currentSection != "" && strings.Contains(line, "=") {
+			lineArray := strings.SplitN(line, "=", 2)
+			if len(lineArray) > 1 {
+				_, found := properties[ScanProperty{
+					Property: lineArray[0],
+					Section:  currentSection,
+				}]
+
+				if found {
+					diag := action(QuadletLine{
+						LineNumber: uint32(i),
+						Length:     uint32(len(line)),
+						Property:   lineArray[0],
+						Value:      lineArray[1],
+						RawLine:    rawLine,
+					}, podmanVer)
+					if diag != nil {
+						returnValue = append(returnValue, *diag)
+					}
+				}
+			}
+		}
+
+		if sectionRegexp.MatchString(line) {
+			currentSection = line
+			continue
+		}
+	}
+
+	return returnValue
 }
 
 // This function scanning the passed text and

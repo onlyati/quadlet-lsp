@@ -23,6 +23,7 @@
 - [`QSR018` - Container cannot publish port with pod](#qsr018---container-cannot-publish-port-with-pod)
 - [`QSR019` - Container cannot have network with pod](#qsr019---container-cannot-have-network-with-pod)
 - [`QSR020` - Naming of unit is invalid](#qsr020---naming-of-unit-is-invalid)
+- [`QSR021` - Unit points to not a systemd unit](#qsr021---unit-points-to-not-a-systemd-unit)
 
 <!-- tocstop -->
 
@@ -368,3 +369,35 @@ Container, Volume, Pod and Network naming must match with
 `^[a-zA-Z0-9][a-zA-Z0-9_.-]*$` regular expression. The specified name at
 `ContainerName`, `VolumeName`, `PodName` or `Networkname` does not match with
 the expression.
+
+## `QSR021` - Unit points to not a systemd unit
+
+Quadlet will automatically translate dependencies, specified in the keys
+`Wants`, `Requires`, `Requisite`, `BindsTo`, `PartOf`, `Upholds`, `Conflicts`,
+`Before` and `After` of the `[Unit]` section, between different Quadlet units.
+
+But this is true only after `5.5.0` version. This rule gives error if dependency
+not translated and version if before `5.5.0`.
+
+For example the `fedora.container` unit below specifies a dependency on the
+`basic.container` unit.
+
+```ini
+[Unit]
+After=basic.container
+Requires=basic.container
+
+[Container]
+Image=registry.fedoraproject.org/fedora:41
+```
+
+Before `5.5.0` version, file above should look:
+
+```ini
+[Unit]
+After=basic-container.service
+Requires=basic-container.service
+
+[Container]
+Image=registry.fedoraproject.org/fedora:41
+```
