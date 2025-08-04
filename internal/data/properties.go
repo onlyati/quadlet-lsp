@@ -73,6 +73,16 @@ Image=${2:image}
 $0
 `),
 		},
+		"newBuild": {
+			Details: utils.ReturnAsStringPtr("define new build"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
+Description=${1:description}
+
+[Build]
+File=${2:file}
+$0
+`),
+		},
 	}
 
 	PropertiesMap = map[string][]PropertyMapItem{
@@ -1520,6 +1530,239 @@ $0
 				Hover: []string{
 					"Override the default architecture variant of the container image.",
 					"This is equivalent to the Podman `--variant` option.",
+				},
+			},
+		},
+		"Build": {
+			{
+				Label: "Annotation",
+				Hover: []string{
+					"Set one or more OCI annotations on the container. The format is a list of key=value items, similar to Environment.",
+					"",
+					"This key can be listed multiple times.",
+				},
+				Macro: "Annotation=\"${1:key}=${2:value}\"\n$0",
+			},
+			{
+				Label: "Arch",
+				Hover: []string{
+					"Override the architecture, defaults to hosts', of the image to be built.",
+					"",
+					"This is equivalent to the `--arch` option of `podman build`.",
+				},
+			},
+			{
+				Label: "AuthFile",
+				Hover: []string{
+					"Path of the authentication file.",
+					"",
+					"This is equivalent to the `--authfile` option of `podman build`.",
+				},
+			},
+			{
+				Label: "ContainersConfModule",
+				Hover: []string{
+					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
+					"",
+					"This key can be listed multiple times.",
+				},
+			},
+			{
+				Label: "DNS",
+				Hover: []string{
+					"Set network-scoped DNS resolver/nameserver for the build container.",
+					"",
+					"This key can be listed multiple times.",
+					"",
+					"This is equivalent to the `--dns` option of `podman build`.",
+				},
+				Parameters: []string{"1.1.1.1", "8.8.8.8"},
+			},
+			{
+				Label: "DNSOption",
+				Hover: []string{
+					"Set custom DNS options.",
+					"",
+					"This key can be listed multiple times.",
+				},
+			},
+			{
+				Label: "DNSSearch",
+				Hover: []string{
+					"Set custom DNS search domains. Use **DNSSearch=.** to remove the search domain.",
+					"",
+					"This key can be listed multiple times.",
+				},
+			},
+			{
+				Label: "Environment",
+				Hover: []string{
+					"Set an environment variable in the container. This uses the same format as services in systemd and can be listed multiple times.",
+					"",
+					"For example:",
+					"```systemd",
+					"Environment=APP_USERNAME=appuser",
+					"```",
+				},
+				Macro: "Environment=\"${1:name}=${2:value}\"\n$0",
+			},
+			{
+				Label: "File",
+				Hover: []string{
+					"Specifies a Containerfile which contains instructions for building the image. A URL starting with `http(s)://` allows you to specify a remote Containerfile to be downloaded. Note that for a given relative path to a Containerfile, or when using a `http(s)://` URL, you also must set `SetWorkingDirectory=` in order for `podman build` to find a valid context directory for the resources specified in the Containerfile.",
+					"",
+					"Note that setting a `File=` field is mandatory for a `.build` file, unless `SetWorkingDirectory` (or a `WorkingDirectory` in the `Service` group) has also been set.",
+					"",
+					"This is equivalent to the `--file` option of `podman build`.",
+				},
+			},
+			{
+				Label: "ForceRM",
+				Hover: []string{
+					"Always remove intermediate containers after a build, even if the build fails (default true).",
+					"",
+					"This is equivalent to the `--force-rm` option of `podman build`.",
+				},
+			},
+			{
+				Label: "GlobalArgs",
+				Hover: []string{
+					"This key contains a list of arguments passed directly between `podman` and `build` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
+					"",
+					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
+					"",
+					"This key can be listed multiple times.",
+				},
+			},
+			{
+				Label: "GroupAdd",
+				Hover: []string{
+					"Assign additional groups to the primary user running within the container process. Also supports the `keep-groups` special flag.",
+					"",
+					"This is equivalent to the `--group-add` option of `podman build`.",
+				},
+			},
+			{
+				Label: "ImageTag",
+				Hover: []string{
+					"Specifies the name which is assigned to the resulting image if the build process completes successfully.",
+					"",
+					"This is equivalent to the `--tag` option of `podman build`.",
+					"",
+					"This key can be listed multiple times. The first instance will be used as the name of the created artifact when the `.build` file is referenced by another Quadlet unit.",
+				},
+			},
+			{
+				Label: "Label",
+				Hover: []string{
+					"Set one or more OCI labels on the volume. The format is a list of `key=value` items, similar to `Environment`.",
+					"",
+					"This key can be listed multiple times.",
+				},
+				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
+			},
+			{
+				Label: "Network",
+
+				Hover: []string{
+					"Sets the configuration for network namespaces when handling RUN instructions. This has the same format as the `--network` option to `podman build`. For example, use `host` to use the host network, or `none` to not set up networking.",
+					"",
+					"Special case:",
+					"",
+					"* If the `name` of the network ends with `.network`, Quadlet will look for the corresponding `.network` Quadlet unit. If found, Quadlet will use the name of the Network set in the Unit, otherwise, `systemd-$name` is used. The generated systemd service contains a dependency on the service unit generated for that `.network` unit, or on `$name-network.service` if the `.network` unit is not found. Note: the corresponding `.network` file must exist.",
+					"",
+					"This key can be listed multiple times.",
+				},
+			},
+			{
+				Label: "PodmanArgs",
+				Hover: []string{
+					"This key contains a list of arguments passed directly to the end of the `podman build` command in the generated file (right before the image name in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
+					"",
+					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
+					"",
+					"This key can be listed multiple times.",
+				},
+			},
+			{
+				Label: "Pull",
+				Hover: []string{
+					"Set the image pull policy.",
+					"",
+					"This is equivalent to the `--pull` option of `podman build`.",
+				},
+			},
+			{
+				Label: "Retry",
+				Hover: []string{
+					"Number of times to retry the image pull when a HTTP error occurs. Equivalent to the Podman `--retry` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
+			},
+			{
+				Label: "RetryDelay",
+				Hover: []string{
+					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
+			},
+			{
+				Label: "Secret",
+				Hover: []string{
+					"Pass secret information used in Containerfile build stages in a safe way.",
+					"",
+					"This is equivalent to the `--secret` option of `podman build` and generally has the form `secret[,opt=opt ...]`.",
+				},
+			},
+			{
+				Label: "SetWorkingDirectory",
+				Hover: []string{
+					"Provide context (a working directory) to `podman build`. Supported values are a path, a URL, or the special keys `file` or `unit` to set the context directory to the parent directory of the file from the `File=` key or to that of the Quadlet `.build` unit file, respectively. This allows Quadlet to resolve relative paths.",
+					"",
+					"When using one of the special keys (`file` or `unit`), the `WorkingDirectory` field of the `Service` group of the Systemd service unit will also be set to accordingly. Alternatively, users can explicitly set the `WorkingDirectory` field of the `Service` group in the `.build` file. Please note that if the `WorkingDirectory` field of the `Service` group is set by the user, Quadlet will not overwrite it even if `SetWorkingDirectory` is set to `file` or `unit`.",
+					"",
+					"By providing a URL to `SetWorkingDirectory=` you can instruct `podman build` to clone a Git repository or download an archive file extracted to a temporary location by `podman build` as build context. Note that in this case, the `WorkingDirectory` of the Systemd service unit is left untouched by Quadlet.",
+					"",
+					"Note that providing context directory is mandatory for a `.build` file, unless a `File=` key has also been provided.",
+				},
+			},
+			{
+				Label: "Target",
+				Hover: []string{
+					"Set the target build stage to build. Commands in the Containerfile after the target stage are skipped.",
+					"",
+					"This is equivalent to the `--target` option of `podman build`.",
+				},
+			},
+			{
+				Label: "TLSVerify",
+				Hover: []string{
+					"Require HTTPS and verification of certificates when contacting registries.",
+					"",
+					"This is equivalent to the `--tls-verify` option of `podman build`.",
+				},
+			},
+			{
+				Label: "Variant",
+				Hover: []string{
+					"Override the default architecture variant of the container image to be built.",
+					"",
+					"This is equivalent to the `--variant` option of `podman build`.",
+				},
+			},
+			{
+				Label: "Volume",
+				Hover: []string{
+					"Mount a volume to containers when executing RUN instructions during the build. This is equivalent to the `--volume` option of `podman build`, and generally has the form",
+					"`[[SOURCE-VOLUME|HOST-DIR:]CONTAINER-DIR[:OPTIONS]]`.",
+					"",
+					"If `SOURCE-VOLUME` starts with `.`, Quadlet resolves the path relative to the location of the unit file.",
+					"",
+					"Special case:",
+					"",
+					"* If `SOURCE-VOLUME` ends with `.volume`, Quadlet will look for the corresponding `.volume` Quadlet unit. If found, Quadlet will use the name of the Volume set in the Unit, otherwise, `systemd-$name` is used. The generated systemd service contains a dependency on the service unit generated for that `.volume` unit, or on `$name-volume.service` if the `.volume` unit is not found. Note: the corresponding `.volume` file must exist.",
+					"",
+					"This key can be listed multiple times.",
 				},
 			},
 		},
