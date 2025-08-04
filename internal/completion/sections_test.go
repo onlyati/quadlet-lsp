@@ -8,11 +8,13 @@ func TestSection_Valid(t *testing.T) {
 	expected := []string{
 		"Pod",
 		"Kube",
+		"Build",
 		"Network",
 		"Volume",
 		"Image",
 		"Container",
-		"Build",
+		"Unit",
+		"Install",
 	}
 
 	diags := listSections(Completion{})

@@ -11,7 +11,7 @@ import (
 func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
-	allowedFiles := []string{"container", "build"}
+	allowedFiles := []string{"container", "build", "build"}
 	var findings []utils.QuadletLine
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {

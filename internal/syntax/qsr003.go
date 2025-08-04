@@ -11,7 +11,7 @@ import (
 
 // Checking for invalid properties
 func qsr003(s SyntaxChecker) []protocol.Diagnostic {
-	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod"}
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build"}
 	if c := canFileBeApplied(s.uri, allowedFiles); c == "" {
 		return []protocol.Diagnostic{}
 	}
