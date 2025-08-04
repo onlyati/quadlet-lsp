@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -11,30 +12,35 @@ import (
 func qsr020(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
-	var findings []utils.QuadletLine
 	allowedFiles := []string{"container", "pod", "network", "volume"}
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findings = utils.FindItems(
+		propertyName := strings.TrimPrefix(c, "[")
+		propertyName = strings.TrimSuffix(propertyName, "]")
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			c+"Name",
+			utils.PodmanVersion{},
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: propertyName + "Name"}: {},
+			},
+			qsr020Action,
 		)
 	}
 
-	for _, finding := range findings {
-		match := namingConvention.MatchString(finding.Value)
-		if !match {
-			diags = append(diags, protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
-					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
-				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr020"),
-				Message:  fmt.Sprintf("Invalid name of unit: %s", finding.Value),
-			})
-		}
-	}
-
 	return diags
+}
+
+func qsr020Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	match := namingConvention.MatchString(q.Value)
+	if match {
+		return nil
+	}
+	return &protocol.Diagnostic{
+		Range: protocol.Range{
+			Start: protocol.Position{Line: q.LineNumber, Character: 0},
+			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+		},
+		Severity: &errDiag,
+		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr020"),
+		Message:  fmt.Sprintf("Invalid name of unit: %s", q.Value),
+	}
 }

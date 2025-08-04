@@ -75,7 +75,6 @@ func ScanQadlet(
 func FindItems(text, section, property string) []QuadletLine {
 	var findings []QuadletLine
 
-	section = "[" + section + "]"
 	inSection := false
 
 	for i, rawLine := range strings.Split(text, "\n") {
@@ -116,7 +115,7 @@ func findImageInContainerUnit(f []byte) []string {
 
 	lines := FindItems(
 		string(f),
-		"Container",
+		"[Container]",
 		"Image",
 	)
 
@@ -128,7 +127,7 @@ func findImageInContainerUnit(f []byte) []string {
 			}
 			lines := FindItems(
 				string(f),
-				"Image",
+				"[Image]",
 				"Image",
 			)
 
@@ -189,7 +188,7 @@ func FindImageExposedPorts(c Commander, name string) []string {
 
 			lines := FindItems(
 				string(f),
-				"Container",
+				"[Container]",
 				"Pod",
 			)
 

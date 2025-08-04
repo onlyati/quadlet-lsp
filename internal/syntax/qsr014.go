@@ -16,40 +16,43 @@ func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod", "build", "kube"}
-	var findings []utils.QuadletLine
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findings = utils.FindItems(
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			"Network",
+			utils.PodmanVersion{},
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: "Network"}: {},
+			},
+			qsr014Action,
 		)
 	}
 
-	for _, finding := range findings {
-		netName := finding.Value
-		if strings.HasSuffix(netName, ".network") {
-			_, err := os.Stat("./" + netName)
+	return diags
+}
 
-			if errors.Is(err, os.ErrNotExist) {
-				diags = append(diags, protocol.Diagnostic{
-					Range: protocol.Range{
-						Start: protocol.Position{Line: finding.LineNumber, Character: uint32(len(finding.Property) + 1)},
-						End:   protocol.Position{Line: finding.LineNumber, Character: uint32(len(finding.Property) + 1 + len(netName))},
-					},
-					Severity: &errDiag,
-					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr014"),
-					Message:  fmt.Sprintf("Network file does not exists: %s", netName),
-				})
-				continue
-			}
+func qsr014Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	netName := q.Value
+	if strings.HasSuffix(netName, ".network") {
+		_, err := os.Stat("./" + netName)
 
-			if err != nil {
-				log.Printf("failed to stat file: %s", err.Error())
-				continue
+		if errors.Is(err, os.ErrNotExist) {
+			return &protocol.Diagnostic{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
+					End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(netName))},
+				},
+				Severity: &errDiag,
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr014"),
+				Message:  fmt.Sprintf("Network file does not exists: %s", netName),
 			}
+		}
+
+		if err != nil {
+			log.Printf("failed to stat file: %s", err.Error())
+			return nil
 		}
 	}
 
-	return diags
+	return nil
 }

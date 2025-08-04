@@ -31,7 +31,7 @@ func TestQSR018_Invalid(t *testing.T) {
 		diags := qsr018(s)
 
 		if len(diags) != 1 {
-			t.Fatalf("Expected 0 diagnostics, got %d at %s", len(diags), s.uri)
+			t.Fatalf("Expected 1 diagnostics, got %d at %s", len(diags), s.uri)
 		}
 
 		if *diags[0].Source != "quadlet-lsp.qsr018" {

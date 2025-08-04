@@ -29,7 +29,7 @@ func canFileBeApplied(uri string, allowed []string) string {
 	tmp := strings.Split(uri, ".")
 	ext := tmp[len(tmp)-1]
 	if slices.Contains(allowed, ext) {
-		return utils.FirstCharacterToUpper(ext)
+		return "[" + utils.FirstCharacterToUpper(ext) + "]"
 	}
 
 	return ""

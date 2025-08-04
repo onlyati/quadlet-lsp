@@ -7,7 +7,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-// Container cannot have PublishPort if belongs to a pod
+// Container cannot have Network if belongs to a pod
 func qsr019(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 

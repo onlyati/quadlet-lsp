@@ -23,7 +23,7 @@ Restart=on-failure
 RestartSec=5
 StartLimitBurst=5
 `
-	findings := utils.FindItems(text, "Container", "Environment")
+	findings := utils.FindItems(text, "[Container]", "Environment")
 
 	if len(findings) != 2 {
 		t.Fatalf("Expected 2 founds, got %d", len(findings))

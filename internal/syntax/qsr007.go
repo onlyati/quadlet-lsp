@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -12,47 +13,53 @@ func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "build", "build"}
-	var findings []utils.QuadletLine
-
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findings = utils.FindItems(
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			"Environment",
+			utils.PodmanVersion{},
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: "Environment"}: {},
+			},
+			qsr007Action,
 		)
 	}
 
-	for _, finding := range findings {
-		tokens, err := splitQuoted(finding.Value)
-		if err != nil {
-			diags = append(diags, protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
-					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
-				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
-				Message:  fmt.Sprintf("Invalid format: %s", err.Error()),
-			})
-			continue
-		}
+	return diags
+}
 
-		for _, token := range tokens {
-			if quotedKV.MatchString(token) || unquotedKV.MatchString(token) || aposthropeKV.MatchString(token) {
-				continue
-			}
-
-			diags = append(diags, protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
-					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
-				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
-				Message:  fmt.Sprintf("Invalid format: bad delimiter usage at %s", token),
-			})
+func qsr007Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	tokens, err := splitQuoted(q.Value)
+	if err != nil {
+		return &protocol.Diagnostic{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
+			Message:  fmt.Sprintf("Invalid format: %s", err.Error()),
 		}
 	}
 
-	return diags
+	invalids := []string{}
+	for _, token := range tokens {
+		if quotedKV.MatchString(token) || unquotedKV.MatchString(token) || aposthropeKV.MatchString(token) {
+			continue
+		}
+		invalids = append(invalids, token)
+	}
+
+	if len(invalids) == 0 {
+		return nil
+	}
+
+	return &protocol.Diagnostic{
+		Range: protocol.Range{
+			Start: protocol.Position{Line: q.LineNumber, Character: 0},
+			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+		},
+		Severity: &errDiag,
+		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr007"),
+		Message:  fmt.Sprintf("Invalid format: bad delimiter usage at %s", strings.Join(invalids, ", ")),
+	}
 }

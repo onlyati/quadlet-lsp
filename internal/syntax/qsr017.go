@@ -16,40 +16,43 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container"}
-	var findings []utils.QuadletLine
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findings = utils.FindItems(
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			"Pod",
+			utils.PodmanVersion{},
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: "Pod"}: {},
+			},
+			qsr017Action,
 		)
 	}
 
-	for _, finding := range findings {
-		podName := finding.Value
-		if strings.HasSuffix(podName, ".pod") {
-			_, err := os.Stat("./" + podName)
+	return diags
+}
 
-			if errors.Is(err, os.ErrNotExist) {
-				diags = append(diags, protocol.Diagnostic{
-					Range: protocol.Range{
-						Start: protocol.Position{Line: finding.LineNumber, Character: uint32(len(finding.Property) + 1)},
-						End:   protocol.Position{Line: finding.LineNumber, Character: uint32(len(finding.Property) + 1 + len(podName))},
-					},
-					Severity: &errDiag,
-					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr017"),
-					Message:  fmt.Sprintf("Pod file does not exists: %s", podName),
-				})
-				continue
-			}
+func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	podName := q.Value
+	if strings.HasSuffix(podName, ".pod") {
+		_, err := os.Stat("./" + podName)
 
-			if err != nil {
-				log.Printf("failed to stat file: %s", err.Error())
-				continue
+		if errors.Is(err, os.ErrNotExist) {
+			return &protocol.Diagnostic{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
+					End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(podName))},
+				},
+				Severity: &errDiag,
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr017"),
+				Message:  fmt.Sprintf("Pod file does not exists: %s", podName),
 			}
+		}
+
+		if err != nil {
+			log.Printf("failed to stat file: %s", err.Error())
+			return nil
 		}
 	}
 
-	return diags
+	return nil
 }

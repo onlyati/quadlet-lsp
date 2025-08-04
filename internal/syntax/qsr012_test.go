@@ -112,7 +112,7 @@ func TestQSR012_InvalidWithEnv(t *testing.T) {
 	for _, s := range cases {
 		diags := qsr012(s)
 
-		if len(diags) != 3 {
+		if len(diags) != 1 {
 			t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
 		}
 

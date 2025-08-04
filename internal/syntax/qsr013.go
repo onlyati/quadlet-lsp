@@ -16,45 +16,47 @@ func qsr013(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod", "build"}
-	var findings []utils.QuadletLine
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findings = utils.FindItems(
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			"Volume",
+			utils.PodmanVersion{},
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: "Volume"}: {},
+			},
+			qsr013Action,
 		)
 	}
 
-	for _, finding := range findings {
-		tmp := strings.Split(finding.Value, ":")
-		if len(tmp) == 0 {
-			continue
-		}
+	return diags
+}
 
-		volName := tmp[0]
-		if strings.HasSuffix(volName, ".volume") {
-			_, err := os.Stat("./" + volName)
-
-			if errors.Is(err, os.ErrNotExist) {
-				diags = append(diags, protocol.Diagnostic{
-					Range: protocol.Range{
-						Start: protocol.Position{Line: finding.LineNumber, Character: uint32(len(finding.Property) + 1)},
-						End:   protocol.Position{Line: finding.LineNumber, Character: uint32(len(finding.Property) + 1 + len(volName))},
-					},
-					Severity: &errDiag,
-					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr013"),
-					Message:  fmt.Sprintf("Volume file does not exists: %s", volName),
-				})
-				continue
-			}
-
-			if err != nil {
-				log.Printf("failed to stat file: %s", err.Error())
-				continue
-			}
-		}
+func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	tmp := strings.Split(q.Value, ":")
+	if len(tmp) == 0 {
+		return nil
 	}
 
-	return diags
+	volName := tmp[0]
+	if strings.HasSuffix(volName, ".volume") {
+		_, err := os.Stat("./" + volName)
+
+		if errors.Is(err, os.ErrNotExist) {
+			return &protocol.Diagnostic{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
+					End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(volName))},
+				},
+				Severity: &errDiag,
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr013"),
+				Message:  fmt.Sprintf("Volume file does not exists: %s", volName),
+			}
+		}
+
+		if err != nil {
+			log.Printf("failed to stat file: %s", err.Error())
+			return nil
+		}
+	}
+	return nil
 }
