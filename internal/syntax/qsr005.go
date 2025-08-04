@@ -12,31 +12,32 @@ func qsr005(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "kube"}
-	var findings []utils.QuadletLine
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findings = utils.FindItems(
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			"AutoUpdate",
+			utils.PodmanVersion{}, // placeholder
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: "AutoUpdate"}: {},
+			},
+			qsr005Action,
 		)
 	}
 
-	if len(findings) > 0 {
-		for _, f := range findings {
-			if f.Value != "registry" && f.Value != "local" {
-				diags = append(diags, protocol.Diagnostic{
-					Range: protocol.Range{
-						Start: protocol.Position{Line: f.LineNumber, Character: 0},
-						End:   protocol.Position{Line: f.LineNumber, Character: f.Length},
-					},
-					Severity: &errDiag,
-					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr005"),
-					Message:  fmt.Sprintf("Invalid value of AutoUpdate: %s", f.Value),
-				})
-			}
-		}
-	}
-
 	return diags
+}
+
+func qsr005Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	if q.Value == "registry" || q.Value == "local" {
+		return nil
+	}
+	return &protocol.Diagnostic{
+		Range: protocol.Range{
+			Start: protocol.Position{Line: q.LineNumber, Character: 0},
+			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+		},
+		Severity: &errDiag,
+		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr005"),
+		Message:  fmt.Sprintf("Invalid value of AutoUpdate: %s", q.Value),
+	}
 }

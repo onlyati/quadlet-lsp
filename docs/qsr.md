@@ -228,16 +228,16 @@ Label='fooVariable=barValue'
 
 **Message**
 
-> Incorrect format of PublishPort: _%reason%_
+> Incorrect format of PublishPort
 
 **Explanation**
 
-Depends on the `reason` text:
+Valid formats for `PublishPort`:
 
-- `invalid format`: Line must have `PublishPort=xxx:xxx` or
-  `PublishPort=ip:xxx:xxx` format
-- `not a number`: Instead of port number, text is provided
-- `port must be between [0;65535]`: Invalid port number is used
+```ini
+PublishPort=10.0.0.1:10069:69
+PublishPort=10420:420
+```
 
 ## `QSR011` - Port is not exposed in image
 

@@ -44,7 +44,7 @@ func TestQSR016_NoParameters(t *testing.T) {
 	diags := qsr016(s)
 
 	if len(diags) != 1 {
-		t.Fatalf("Exptected 0 diagnostics, but got %d", len(diags))
+		t.Fatalf("Exptected 1 diagnostics, but got %d", len(diags))
 	}
 
 	if *diags[0].Source != "quadlet-lsp.qsr016" {
@@ -65,7 +65,7 @@ func TestQSR016_KeepIdWrongParameter(t *testing.T) {
 	diags := qsr016(s)
 
 	if len(diags) != 1 {
-		t.Fatalf("Exptected 0 diagnostics, but got %d", len(diags))
+		t.Fatalf("Exptected 1 diagnostics, but got %d", len(diags))
 	}
 
 	if *diags[0].Source != "quadlet-lsp.qsr016" {
@@ -86,7 +86,7 @@ func TestQSR016_InvalidValue(t *testing.T) {
 	diags := qsr016(s)
 
 	if len(diags) != 1 {
-		t.Fatalf("Exptected 0 diagnostics, but got %d", len(diags))
+		t.Fatalf("Exptected 1 diagnostics, but got %d", len(diags))
 	}
 
 	if *diags[0].Source != "quadlet-lsp.qsr016" {

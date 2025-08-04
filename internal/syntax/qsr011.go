@@ -9,18 +9,24 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+var qsr011Ports []string
+
 // The exposed port is not present in the image
 func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod"}
 	var findigs []utils.QuadletLine
+	qsr011Ports = utils.FindImageExposedPorts(s.commander, s.uri)
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		findigs = utils.FindItems(
+		diags = utils.ScanQadlet(
 			s.documentText,
-			c,
-			"PublishPort",
+			utils.PodmanVersion{},
+			map[utils.ScanProperty]struct{}{
+				{Section: c, Property: "PublishPort"}: {},
+			},
+			qsr011Action,
 		)
 	}
 
@@ -28,24 +34,24 @@ func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 		return diags
 	}
 
-	ports := utils.FindImageExposedPorts(s.commander, s.uri)
+	return diags
+}
 
-	for _, finding := range findigs {
-		tmp := strings.Split(finding.Value, ":")
-		usedPort := tmp[len(tmp)-1]
+func qsr011Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+	tmp := strings.Split(q.Value, ":")
+	usedPort := tmp[len(tmp)-1]
 
-		if !slices.Contains(ports, usedPort) {
-			diags = append(diags, protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: finding.LineNumber, Character: 0},
-					End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
-				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
-				Message:  fmt.Sprintf("Port is not exposed in the image, exposed ports: %v", ports),
-			})
+	if !slices.Contains(qsr011Ports, usedPort) {
+		return &protocol.Diagnostic{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
+			Message:  fmt.Sprintf("Port is not exposed in the image, exposed ports: %v", qsr011Ports),
 		}
 	}
 
-	return diags
+	return nil
 }

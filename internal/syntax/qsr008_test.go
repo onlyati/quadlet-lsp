@@ -54,7 +54,7 @@ func TestQSR008_InvalidUnfinished(t *testing.T) {
 		}
 
 		if *diags[0].Source != "quadlet-lsp.qsr008" {
-			t.Fatalf("Exptected quadlet-lsp.qsr007 source but got %s", *diags[0].Source)
+			t.Fatalf("Exptected quadlet-lsp.qsr008 source but got %s", *diags[0].Source)
 		}
 
 		if diags[0].Message != "Invalid format: bad delimiter usage at FOO" {

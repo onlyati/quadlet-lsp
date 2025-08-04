@@ -70,7 +70,7 @@ func TestQSR010_InvalidFormat(t *testing.T) {
 			t.Fatalf("Wrong source, expected 'quadlet-lsp.qsr010', got '%s' at %s", *d[0].Source, s.uri)
 		}
 
-		if d[0].Message != "Incorrect format of PublishPort: invalid format" {
+		if d[0].Message != "Incorrect format of PublishPort" {
 			t.Fatalf("Unexpected message: '%s' at %s", d[0].Message, s.uri)
 		}
 	}
@@ -111,7 +111,7 @@ func TestQSR010_InvalidPortIsText(t *testing.T) {
 			t.Fatalf("Wrong source, expected 'quadlet-lsp.qsr010', got '%s' at %s", *d[0].Source, s.uri)
 		}
 
-		if d[0].Message != "Incorrect format of PublishPort: not a number" {
+		if d[0].Message != "Incorrect format of PublishPort" {
 			t.Fatalf("Unexpected message: '%s' at %s", d[0].Message, s.uri)
 		}
 	}
@@ -148,7 +148,7 @@ func TestQSR010_InvalidInvalidPortNumber(t *testing.T) {
 			t.Fatalf("Wrong source, expected 'quadlet-lsp.qsr010', got '%s' at %s", *d[0].Source, s.uri)
 		}
 
-		if d[0].Message != "Incorrect format of PublishPort: port must be between [0;65535]" {
+		if d[0].Message != "Incorrect format of PublishPort" {
 			t.Fatalf("Unexpected message: '%s' at %s", d[0].Message, s.uri)
 		}
 	}

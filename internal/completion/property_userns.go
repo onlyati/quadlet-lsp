@@ -25,7 +25,7 @@ func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 	ext := tmp[len(tmp)-1]
 	findings := utils.FindItems(
 		strings.Join(s.text, "\n"),
-		utils.FirstCharacterToUpper(ext),
+		"["+utils.FirstCharacterToUpper(ext)+"]",
 		"Image",
 	)
 
