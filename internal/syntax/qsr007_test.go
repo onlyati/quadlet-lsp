@@ -3,6 +3,8 @@ package syntax
 import (
 	"strings"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 func TestQSR007_Valid(t *testing.T) {
@@ -30,6 +32,7 @@ func TestQSR007_Valid(t *testing.T) {
 	}
 
 	for _, s := range variants {
+		s.config = &utils.QuadletConfig{}
 		diags := qsr007(s)
 
 		if len(diags) != 0 {
@@ -47,6 +50,7 @@ func TestQSR007_InvalidUnfinished(t *testing.T) {
 	}
 
 	for _, s := range variants {
+		s.config = &utils.QuadletConfig{}
 		diags := qsr007(s)
 
 		if len(diags) != 1 {
@@ -77,6 +81,7 @@ func TestQSR007_InvalidSpaceFound(t *testing.T) {
 	}
 
 	for _, s := range variants {
+		s.config = &utils.QuadletConfig{}
 		diags := qsr007(s)
 
 		if len(diags) == 0 {
@@ -88,5 +93,24 @@ func TestQSR007_InvalidSpaceFound(t *testing.T) {
 			t.Fatalf("Got unexpected error message: '%s' at %s", diags[0].Message, s.uri)
 		}
 
+	}
+}
+
+func TestQSR007_ValidAfter560(t *testing.T) {
+	variants := []SyntaxChecker{
+		NewSyntaxChecker(
+			"[Container]\nEnvironment=FOO",
+			"test1.container",
+		),
+	}
+
+	for _, s := range variants {
+		s.config = &utils.QuadletConfig{}
+		s.config.Podman = utils.BuildPodmanVersion(5, 6, 0)
+		diags := qsr007(s)
+
+		if len(diags) != 0 {
+			t.Fatalf("Exptected 0 diagnosis, but got %d at %s", len(diags), s.uri)
+		}
 	}
 }

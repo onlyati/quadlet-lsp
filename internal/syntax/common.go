@@ -9,14 +9,14 @@ import (
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
-// regex for unquoted key=value
-var unquotedKV = regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)=(.*)$`)
+// regex for like:
+// key=value
+// "key=value"
+// 'key=value'
+var keyValueCheck = regexp.MustCompile(`^(['"]?)([A-Za-z_][A-Za-z0-9_]*)=(.*)(['"]?)$`)
 
-// regex for quoted "key=value"
-var quotedKV = regexp.MustCompile(`^"([A-Za-z_][A-Za-z0-9_]*)=(.*)"$`)
-
-// regex for quoted 'key=value'
-var aposthropeKV = regexp.MustCompile(`^'([A-Za-z_][A-Za-z0-9_]*)=(.*)'$`)
+// From version 5.6, environment variables accept simple name, like Environemnt=MYVAR
+var keyValueCheck56 = regexp.MustCompile(`^(['"]?)([A-Za-z_][A-Za-z0-9_]*)(['"]?)$`)
 
 // regex for name convention, like ContainerName, PodName, VolumeName, NetworkName
 var namingConvention = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`)
