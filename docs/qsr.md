@@ -250,7 +250,11 @@ PublishPort=10420:420
 
 **Message**
 
-> Port is not exposed in the image, exposed ports: %port_list%
+> Port is not exposed in the image, exposed ports: _%port_list%_
+
+or
+
+> Not able to verify exposed ports, because image not pulled: _%image_list%_
 
 **Explanation**
 
