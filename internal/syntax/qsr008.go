@@ -44,7 +44,7 @@ func qsr008Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 
 	invalids := []string{}
 	for _, token := range tokens {
-		if quotedKV.MatchString(token) || unquotedKV.MatchString(token) || aposthropeKV.MatchString(token) {
+		if keyValueCheck.MatchString(token) {
 			continue
 		}
 		invalids = append(invalids, token)

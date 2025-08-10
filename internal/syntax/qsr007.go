@@ -12,11 +12,15 @@ import (
 func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
+	s.config.Mu.RLock()
+	podman := s.config.Podman
+	s.config.Mu.RUnlock()
+
 	allowedFiles := []string{"container", "build", "build"}
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		diags = utils.ScanQadlet(
 			s.documentText,
-			utils.PodmanVersion{},
+			podman,
 			map[utils.ScanProperty]struct{}{
 				{Section: c, Property: "Environment"}: {},
 			},
@@ -27,7 +31,7 @@ func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr007Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr007Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnostic {
 	tokens, err := splitQuoted(q.Value)
 	if err != nil {
 		return &protocol.Diagnostic{
@@ -43,9 +47,15 @@ func qsr007Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 
 	invalids := []string{}
 	for _, token := range tokens {
-		if quotedKV.MatchString(token) || unquotedKV.MatchString(token) || aposthropeKV.MatchString(token) {
+		if keyValueCheck.MatchString(token) {
 			continue
 		}
+
+		checkVersion := p.GreaterOrEqual(utils.BuildPodmanVersion(5, 6, 0))
+		if checkVersion && keyValueCheck56.MatchString(token) {
+			continue
+		}
+
 		invalids = append(invalids, token)
 	}
 

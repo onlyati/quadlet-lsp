@@ -170,6 +170,13 @@ Environment=FOO=
 Environment='fooVariable=barValue'
 ```
 
+After `5.6.0` version, it accept environment variable without assignment. In
+this case, the value is get from the host.
+
+```ini
+Environment=FOO
+```
+
 ## `QSR008` - Invalid format of Annotation
 
 **Message**
