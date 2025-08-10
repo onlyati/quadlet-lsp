@@ -250,7 +250,9 @@ func runCLI(args []string) {
 	found := false
 	for f, fDiags := range diags {
 		for _, diag := range fDiags {
-			found = true
+			if *diag.Severity != protocol.DiagnosticSeverityInformation {
+				found = true
+			}
 			fmt.Printf(
 				"%-20s, %s, %02d.%03d-%02d.%03d, %s\n",
 				f,

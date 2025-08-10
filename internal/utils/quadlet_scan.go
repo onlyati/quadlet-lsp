@@ -215,6 +215,7 @@ func FindImageExposedPorts(c Commander, name string) []string {
 			"image", "inspect", img,
 		)
 		if err != nil {
+			ports = append(ports, "failed-check-"+img)
 			log.Printf("failed to inspect image: %+v", err.Error())
 			return ports
 		}

@@ -51,6 +51,8 @@ $ echo $?
 4
 ```
 
+Binary return with non-zero return code if it find any non information finding.
+
 ## Get the executable
 
 ### Download the latest version
