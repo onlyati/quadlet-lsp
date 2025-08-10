@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/commands"
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	_ "github.com/tliron/commonlog/simple"
@@ -23,6 +24,7 @@ var (
 	handler   protocol.Handler
 	config    *utils.QuadletConfig
 	documents = utils.NewDocuments()
+	commander commands.EditorCommandExecutor
 )
 
 // Entry point of the language server
@@ -120,6 +122,9 @@ func Start() {
 
 		// Whenever a save happen, perform a syntax checking
 		TextDocumentDidSave: SyntaxCheckOnSave,
+
+		// Handle commands that should be executed
+		WorkspaceExecuteCommand: ExecuteCommands,
 	}
 
 	server := server.NewServer(&handler, lsName, false)
@@ -156,6 +161,8 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 		})
 	}
 
+	commander = commands.NewEditorCommandExecutor(cfg.WorkspaceRoot)
+
 	startFileWatcher(
 		context,
 		path.Join(workspaceDir, ".quadletrc.json"),
@@ -165,6 +172,9 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 
 	// Setup server
 	capabilities := handler.CreateServerCapabilities()
+	capabilities.ExecuteCommandProvider = &protocol.ExecuteCommandOptions{
+		Commands: []string{"pullAll", "listJobs"},
+	}
 
 	capabilities.CompletionProvider = &protocol.CompletionOptions{
 		TriggerCharacters: []string{"=", "[", "]", ".", ":", ","},

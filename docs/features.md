@@ -2,14 +2,15 @@
 
 <!-- toc -->
 
+- [Built-in commands](#built-in-commands)
 - [Syntax checking](#syntax-checking)
 - [Hover menu](#hover-menu)
 - [Completion](#completion)
-    * [Starter template](#starter-template)
-    * [Static completion](#static-completion)
-    * [Templates](#templates)
-    * [Dynamic completion](#dynamic-completion)
-    * [Go definition/references](#go-definitionreferences)
+  * [Starter template](#starter-template)
+  * [Static completion](#static-completion)
+  * [Templates](#templates)
+  * [Dynamic completion](#dynamic-completion)
+  * [Go definition/references](#go-definitionreferences)
 
 <!-- tocstop -->
 
@@ -26,6 +27,15 @@ Features below are implemented to support following file extensions:
 >
 > Only Quadlet part has features in the files below. The generic systemd related
 > parts are not covered.
+
+## Built-in commands
+
+LSP provides some command that can be called from IDEs.
+
+| Command name | Neovim Command  | VS Code command          | Description                                                |
+| ------------ | --------------- | ------------------------ | ---------------------------------------------------------- |
+| listJobs     | QuadletListJobs | Quadlet: List activities | List which background tasks are running                    |
+| pulAll       | QuadletPullAll  | Quadlet: Pull All        | Looking for all images in the directory and pull them down |
 
 ## Syntax checking
 
