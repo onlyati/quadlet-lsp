@@ -5,18 +5,17 @@ import (
 	"sync"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
-	"github.com/tliron/glsp"
-	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 type EditorCommandExecutor struct {
 	commands map[string]*allowedCommand
 	mutex    sync.Mutex
 	rootDir  string
+	syncCall bool
 }
 
 type allowedCommand struct {
-	fn      func(command string, e *EditorCommandExecutor, ctx glsp.Context, executor utils.Commander)
+	fn      func(command string, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander)
 	running bool
 }
 
@@ -37,21 +36,22 @@ func NewEditorCommandExecutor(rootDir string) EditorCommandExecutor {
 	}
 }
 
-func (e *EditorCommandExecutor) Run(command string, ctx glsp.Context, executor utils.Commander) error {
-	err := e.tryRun(command, ctx, executor)
+func (e *EditorCommandExecutor) Run(command string, messenger utils.Messenger, executor utils.Commander) error {
+	err := e.tryRun(command, messenger, executor)
 	if err != nil {
-		ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-			Type:    protocol.MessageTypeError,
-			Message: "Command failed: " + command + ", reason: " + err.Error(),
-		})
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Command failed: "+command+", reason: "+err.Error(),
+		)
 		return nil
 	}
 
 	return nil
 }
 
-func (e *EditorCommandExecutor) tryRun(command string, ctx glsp.Context, executor utils.Commander) error {
+func (e *EditorCommandExecutor) tryRun(command string, messenger utils.Messenger, executor utils.Commander) error {
 	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	v, found := e.commands[command]
 	if !found {
 		return errors.New("not found")
@@ -60,8 +60,16 @@ func (e *EditorCommandExecutor) tryRun(command string, ctx glsp.Context, executo
 		return errors.New("already running")
 	}
 	v.running = true
-	go v.fn(command, e, ctx, executor)
-	e.mutex.Unlock()
+
+	if e.syncCall {
+		// Just for unit tests
+		e.mutex.Unlock()
+		v.fn(command, e, messenger, executor)
+		e.mutex.Lock()
+		return nil
+	}
+
+	go v.fn(command, e, messenger, executor)
 
 	return nil
 }

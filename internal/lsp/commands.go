@@ -7,7 +7,10 @@ import (
 )
 
 func ExecuteCommands(context *glsp.Context, params *protocol.ExecuteCommandParams) (any, error) {
-	commander.Run(params.Command, *context, utils.CommandExecutor{})
+	messenger := utils.ContextMessenger{
+		Context: context,
+	}
+	commander.Run(params.Command, &messenger, utils.CommandExecutor{})
 
 	return nil, nil
 }
