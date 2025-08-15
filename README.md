@@ -1,10 +1,5 @@
 # Podman Quadlet language server
 
-> [!IMPORTANT]
->
-> The main branch may not stable. Preparation of v0.3 is in progress. Use the
-> version tags for stable versions.
-
 This is an implementation of language server for
 [Podman Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#description)
 files.
@@ -18,6 +13,7 @@ Following features are currently available:
 - Hover menu
 - Implemented "go definition" and "go references" functions
 - Provide syntax checking
+- Execute built-in commands
 
 For a more details overview, with visual examples see the
 [document](/docs/README.md).
