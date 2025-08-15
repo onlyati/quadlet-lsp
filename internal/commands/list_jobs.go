@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
-	"github.com/tliron/glsp"
-	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func listJobs(command string, e *EditorCommandExecutor, ctx glsp.Context, executor utils.Commander) {
+func listJobs(command string, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander) {
 	defer e.resetRunning(command)
 
 	e.mutex.Lock()
@@ -20,8 +18,8 @@ func listJobs(command string, e *EditorCommandExecutor, ctx glsp.Context, execut
 	}
 	e.mutex.Unlock()
 
-	ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-		Type:    protocol.MessageTypeInfo,
-		Message: fmt.Sprintf("Running tasks: %+v", runningTasks),
-	})
+	messenger.SendMessage(
+		utils.MessengerInfo,
+		fmt.Sprintf("Running tasks: %+v", runningTasks),
+	)
 }

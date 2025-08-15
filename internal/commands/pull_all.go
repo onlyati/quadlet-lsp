@@ -7,11 +7,9 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
-	"github.com/tliron/glsp"
-	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func pullAll(command string, e *EditorCommandExecutor, ctx glsp.Context, executor utils.Commander) {
+func pullAll(command string, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander) {
 	defer e.resetRunning(command)
 
 	e.mutex.Lock()
@@ -21,10 +19,10 @@ func pullAll(command string, e *EditorCommandExecutor, ctx glsp.Context, executo
 	dir, err := os.ReadDir(rootDir)
 	if err != nil {
 		log.Println("failed to list directory: " + err.Error())
-		ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-			Type:    protocol.MessageTypeError,
-			Message: "failed to list directory: " + err.Error(),
-		})
+		messenger.SendMessage(
+			utils.MessengerError,
+			"failed to list directory: "+err.Error(),
+		)
 		return
 	}
 
@@ -46,10 +44,10 @@ func pullAll(command string, e *EditorCommandExecutor, ctx glsp.Context, executo
 		file, err := os.ReadFile(path.Join(rootDir, entry.Name()))
 		if err != nil {
 			log.Println("failed to read file: " + err.Error())
-			ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-				Type:    protocol.MessageTypeError,
-				Message: "failed to read file: " + err.Error(),
-			})
+			messenger.SendMessage(
+				utils.MessengerError,
+				"failed to read file: "+err.Error(),
+			)
 			continue
 		}
 
@@ -83,22 +81,22 @@ func pullAll(command string, e *EditorCommandExecutor, ctx glsp.Context, executo
 					continue
 				}
 
-				ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-					Type:    protocol.MessageTypeInfo,
-					Message: "Start pulling image: " + image,
-				})
+				messenger.SendMessage(
+					utils.MessengerInfo,
+					"Start pulling image: "+image,
+				)
 
 				output, err := executor.Run("podman", "image", "pull", image)
 				if err != nil {
-					ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-						Type:    protocol.MessageTypeError,
-						Message: "Failed to pull image: " + image,
-					})
+					messenger.SendMessage(
+						utils.MessengerError,
+						"Failed to pull image: "+image,
+					)
 				} else {
-					ctx.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
-						Type:    protocol.MessageTypeInfo,
-						Message: "Image pulled: " + image + "\n" + strings.Join(output, "\n"),
-					})
+					messenger.SendMessage(
+						utils.MessengerInfo,
+						"Image pulled: "+image+"\n"+strings.Join(output, "\n"),
+					)
 				}
 			}
 		}
