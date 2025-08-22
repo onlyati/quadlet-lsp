@@ -118,6 +118,12 @@ $0
 				},
 				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
 			},
+			{
+				Label: "DefaultInstance",
+				Hover: []string{
+					"The default instance that is used to create an instance based on template. For example if container name is `webapp@.container` and `DefaultInstance=8080` then webapp@8081.service is created",
+				},
+			},
 		},
 		"Unit": {
 			{
