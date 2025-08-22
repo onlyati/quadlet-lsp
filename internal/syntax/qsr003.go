@@ -2,7 +2,6 @@ package syntax
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -11,77 +10,69 @@ import (
 
 // Checking for invalid properties
 func qsr003(s SyntaxChecker) []protocol.Diagnostic {
-	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build"}
-	if c := canFileBeApplied(s.uri, allowedFiles); c == "" {
-		return []protocol.Diagnostic{}
-	}
-
-	var diags []protocol.Diagnostic
-
-	lineNum := uint32(0)
-	section := ""
-	props := []data.PropertyMapItem{}
-	lines := strings.SplitSeq(s.documentText, "\n")
+	diags := []protocol.Diagnostic{}
 
 	s.config.Mu.RLock()
 	podmanVersion := s.config.Podman
 	s.config.Mu.RUnlock()
 
-	for line := range lines {
-		lineNum++
-		line = strings.TrimSpace(line)
-
-		// Skip emptry or comment lines
-		if len(line) == 0 || strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		// Read the current section
-		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			tSection := line[1 : len(line)-1]
-
-			if tProps, ok := data.PropertiesMap[tSection]; ok {
-				section = tSection
-				props = tProps
-			} else {
-				section = ""
-				props = nil
-			}
-			continue
-		}
-
-		// If we are in a section then check for property
-		if section != "" && len(props) > 0 && strings.Contains(line, "=") {
-			tmp := strings.Split(line, "=")
-			if len(tmp) == 0 {
-				continue
-			}
-
-			found := false
-			for _, prop := range props {
-				if tmp[0] == prop.Label && podmanVersion.GreaterOrEqual(prop.MinVersion) {
-					found = true
-					break
-				}
-			}
-
-			if found {
-				continue
-			}
-
-			// If this point reached, then property not found
-			diags = append(diags, protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: lineNum - 1, Character: 0},
-					End:   protocol.Position{Line: lineNum - 1, Character: uint32(len(line) - 1)},
-				},
-				Severity: &errDiag,
-				Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, tmp[0]),
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
-			})
-		}
-
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build"}
+	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
+		diags = utils.ScanQadlet(
+			s.documentText,
+			podmanVersion,
+			map[utils.ScanProperty]struct{}{
+				{Section: "*", Property: "*"}: {},
+			},
+			qsr003Action,
+		)
 	}
 
 	return diags
+}
+
+func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnostic {
+	section := q.Section[1 : len(q.Section)-1]
+	if section == "Service" {
+		// The [Service] is not implemented
+		return nil
+	}
+
+	properties, foundSection := data.PropertiesMap[section]
+
+	if !foundSection {
+		// In this case we are in the line of the section header
+		// Check that the section header exists
+		return &protocol.Diagnostic{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
+		}
+	}
+
+	if q.Property == "" && q.Value == "" {
+		// This only happen if it is a header line
+		return nil
+	}
+
+	// The section exists the property should be checked now
+	for _, prop := range properties {
+		if prop.Label == q.Property && p.GreaterOrEqual(prop.MinVersion) {
+			return nil
+		}
+	}
+
+	return &protocol.Diagnostic{
+		Range: protocol.Range{
+			Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
+			End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+		},
+		Severity: &errDiag,
+		Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
+		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
+	}
 }
