@@ -239,7 +239,7 @@ func TestQSR021_ValidOld(t *testing.T) {
 		diags := qsr021(s)
 
 		if len(diags) != 0 {
-			t.Fatalf("Expected 0 diagnostics, but got %d", len(diags))
+			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(diags), s.uri)
 		}
 	}
 }
@@ -304,6 +304,33 @@ func TestQSR021_ValidOldWithNew(t *testing.T) {
 		},
 		{
 			documentText: "[Unit]\nAfter=test1-volume.service\n[Container]\nImage=my-image.image",
+			uri:          "test1.container",
+			config: &utils.QuadletConfig{
+				Podman: utils.BuildPodmanVersion(5, 5, 2),
+			},
+		},
+	}
+
+	for _, s := range cases {
+		diags := qsr021(s)
+
+		if len(diags) != 0 {
+			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(diags), s.uri)
+		}
+	}
+}
+
+func TestQSR021_ValidWantsTemplate(t *testing.T) {
+	cases := []SyntaxChecker{
+		{
+			documentText: "[Unit]\nWants=webapp@8081.service\nWants=webapp@8082.service\n[Container]\nImage=my-image.image",
+			uri:          "test1.container",
+			config: &utils.QuadletConfig{
+				Podman: utils.BuildPodmanVersion(5, 5, 2),
+			},
+		},
+		{
+			documentText: "[Unit]\nWants=webapp@8081.container\nWants=webapp@8082.service\n[Container]\nImage=my-image.image",
 			uri:          "test1.container",
 			config: &utils.QuadletConfig{
 				Podman: utils.BuildPodmanVersion(5, 5, 2),
