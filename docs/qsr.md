@@ -114,12 +114,18 @@ The specified image name is not fully qualified:
 Image=debian:bookworm-slim
 ```
 
-Use fully qualified image name instead:
+Use fully qualified image name instead. It means that the image must begin with
+`localhost` or with a valid address (e.g.: something.tld). It can also contains
+port number.
+
+Some examples:
 
 ```ini
-[Container]
 Image=docker.io/library/debian:bookworm-slim
-
+Image=ghcr.io/henrygd/beszel/beszel-agent
+Image=localhost/test
+Image=localhost:5000/test
+Image=example.com:5000/test
 ```
 
 ## `QSR005` - Invalid value of AutoUpdate

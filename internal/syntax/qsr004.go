@@ -2,16 +2,14 @@ package syntax
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-var (
-	qsr004AnotherQuadlet      = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*\.(image|build)$`)
-	qsr004FullyQualifiedImage = regexp.MustCompile(
-		`^[a-z0-9]+(?:[._-][a-z0-9]+)*(:[0-9]+)?/[a-z0-9]+(?:[._-][a-z0-9]+)*/[a-z0-9]+(?:[._-][a-z0-9]+)*(?::[\w][\w.-]{0,127}|@sha256:[a-f0-9]{64})$`,
-	)
+var qsr004FullyQualifiedImage = regexp.MustCompile(
+	`^(?:[a-z0-9]+(?:[a-z0-9._-]+)*\.(?:[a-z0-9]+)|localhost)(?::[0-9]+)?(?:\/[a-z0-9]+(?:[a-zA-Z0-9-._]*))+`,
 )
 
 // Check if image name is fully qualified.
@@ -35,7 +33,7 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 }
 
 func qsr004Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
-	if qsr004AnotherQuadlet.MatchString(q.Value) {
+	if strings.HasSuffix(q.Value, ".image") || strings.HasSuffix(q.Value, ".build") {
 		return nil
 	}
 	if qsr004FullyQualifiedImage.MatchString(q.Value) {
