@@ -3,11 +3,35 @@ package syntax
 import "testing"
 
 func TestQSR004_Valid(t *testing.T) {
-	s := NewSyntaxChecker("[Container]\nImage=docker.io/library/debian:bookworm-slim", "test.container")
-	diags := qsr004(s)
+	cases := []SyntaxChecker{
+		NewSyntaxChecker(
+			"[Container]\nImage=docker.io/library/debian:bookworm-slim",
+			"test1.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nImage=ghcr.io/henrygd/beszel/beszel-agent:latest",
+			"test2.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nImage=localhost/test",
+			"test3.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nImage=localhost:5000/test",
+			"test3.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nImage=example.com:5000/test",
+			"test3.container",
+		),
+	}
 
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
+	for _, s := range cases {
+		diags := qsr004(s)
+
+		if len(diags) != 0 {
+			t.Errorf("Expected no diagnostics, got %d at %s", len(diags), s.uri)
+		}
 	}
 }
 
@@ -39,11 +63,27 @@ func TestQSR004_ValidWithBuild(t *testing.T) {
 }
 
 func TestQSR004_Invalid(t *testing.T) {
-	s := NewSyntaxChecker("[Container]\nImage=library/debian:bookworm-slim", "test.container")
-	diags := qsr004(s)
+	cases := []SyntaxChecker{
+		NewSyntaxChecker(
+			"[Container]\nImage=library/debian:bookworm-slim",
+			"test1.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nImage=localhost",
+			"test1.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nImage=localhost/",
+			"test1.container",
+		),
+	}
 
-	if len(diags) != 1 {
-		t.Errorf("Expected 1 diagnostic, got %d", len(diags))
+	for _, s := range cases {
+		diags := qsr004(s)
+
+		if len(diags) != 1 {
+			t.Errorf("Expected 1 diagnostic, got %d at %s", len(diags), s.uri)
+		}
 	}
 }
 
