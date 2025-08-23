@@ -5,6 +5,8 @@
 - [Built-in commands](#built-in-commands)
 - [Syntax checking](#syntax-checking)
 - [Hover menu](#hover-menu)
+  * [Hover on properties](#hover-on-properties)
+  * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
 - [Completion](#completion)
   * [Starter template](#starter-template)
   * [Static completion](#static-completion)
@@ -44,10 +46,20 @@ check the [description of Quadlet Syntax Rules](./qsr.md).
 
 ## Hover menu
 
+### Hover on properties
+
 Provide some information about specific property. See a demo about a container
 file in the following video.
 
 <img src="assets/hover_demo.gif" style="width: 100%;"/>
+
+### Hover on systemd specifiers
+
+The
+[systemd specifiers](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers)
+can be used in Quadlets. Language server provide hover functionality for them.
+
+<img src="assets/systemd_specifier_hover_demo.gif" style="width: 100%;"/>
 
 ## Completion
 
