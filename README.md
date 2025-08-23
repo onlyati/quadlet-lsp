@@ -33,6 +33,13 @@ There is a simple VS Code extension to use it:
 - [MarketPlace](https://marketplace.visualstudio.com/items?itemName=onlyati.quadlet-lsp)
 - [Repository](https://github.com/onlyati/quadlet-lsp-vscode-extension)
 
+## Usage with Zed
+
+There is a third-party Zed extension that makes use of `quadlet-lsp`:
+
+- [Marketplace](https://zed.dev/extensions/quadlet)
+- [Repository](https://github.com/mufeedali/zed-quadlet/)
+
 ## Alternate usage
 
 This binary can be used as a CLI syntax checker for Quadlet files. This can be
