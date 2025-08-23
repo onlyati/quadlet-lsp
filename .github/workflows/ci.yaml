@@ -3,7 +3,18 @@ name: Go CI
 on:
   push:
     branches:
-      - "**" # all branches
+      - "main"
+  pull_request:
+    branches:
+      - "**"
+    paths-ignore:
+      - "**/*.md"
+      - "docs/"
+      - ".github/**"
+      - ".markdownlint.json"
+      - ".gitignore"
+      - ".prettierrc"
+      - "LICENSE"
 
 jobs:
   test:
