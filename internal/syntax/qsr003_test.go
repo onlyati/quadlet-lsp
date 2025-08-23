@@ -42,17 +42,21 @@ func TestQSR003_InvalidProperty(t *testing.T) {
 	if diag.Message != expectedMessage {
 		t.Errorf("Unexpected message:\n  got: %s\n want: %s", diag.Message, expectedMessage)
 	}
+
+	if diag.Range.Start.Line != 2 {
+		t.Fatalf("expected error in line 2 but got %d", diag.Range.Start.Line)
+	}
 }
 
 func TestQSR003_UnknownSection(t *testing.T) {
-	s := NewSyntaxChecker("[Unit]\nDescription=42", "test.container")
+	s := NewSyntaxChecker("[Test]\nDescription=42", "test.container")
 	s.config = &utils.QuadletConfig{
 		Podman: utils.BuildPodmanVersion(5, 5, 2),
 	}
 	diags := qsr003(s)
 
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics for unknown section, got %d", len(diags))
+	if len(diags) != 2 {
+		t.Errorf("Expected 2 diagnostics for unknown section, got %d", len(diags))
 	}
 }
 

@@ -46,8 +46,8 @@ func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnos
 		return []protocol.Diagnostic{
 			{
 				Range: protocol.Range{
-					Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
-					End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+					Start: protocol.Position{Line: q.LineNumber, Character: 0},
+					End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
 				},
 				Severity: &errDiag,
 				Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
@@ -71,8 +71,8 @@ func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnos
 	return []protocol.Diagnostic{
 		{
 			Range: protocol.Range{
-				Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
-				End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
 			},
 			Severity: &errDiag,
 			Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
