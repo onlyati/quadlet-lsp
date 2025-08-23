@@ -2,11 +2,14 @@ package syntax
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
+
+var qsr009KeyValueCheck = regexp.MustCompile(`^(['"]?)([A-Za-z0-9][A-Za-z0-9.-_]*)=(.*)(['"]?)$`)
 
 // Verify Annotation property
 func qsr009(s SyntaxChecker) []protocol.Diagnostic {
@@ -46,7 +49,7 @@ func qsr009Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 
 	invalids := []string{}
 	for _, token := range tokens {
-		if keyValueCheck.MatchString(token) {
+		if qsr009KeyValueCheck.MatchString(token) {
 			continue
 		}
 		invalids = append(invalids, token)

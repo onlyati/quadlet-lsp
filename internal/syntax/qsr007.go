@@ -2,10 +2,16 @@ package syntax
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
+)
+
+var (
+	qsr007KeyValueCHeck   = regexp.MustCompile(`^(['"]?)([A-Za-z_][A-Za-z0-9_]*)=(.*)(['"]?)$`)
+	qsr007KeyValueCHeck56 = regexp.MustCompile(`^(['"]?)([A-Za-z_][A-Za-z0-9_]*)(['"]?)$`)
 )
 
 // Check syntax of Environment property
@@ -49,12 +55,12 @@ func qsr007Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnos
 
 	invalids := []string{}
 	for _, token := range tokens {
-		if keyValueCheck.MatchString(token) {
+		if qsr007KeyValueCHeck.MatchString(token) {
 			continue
 		}
 
 		checkVersion := p.GreaterOrEqual(utils.BuildPodmanVersion(5, 6, 0))
-		if checkVersion && keyValueCheck56.MatchString(token) {
+		if checkVersion && qsr007KeyValueCHeck56.MatchString(token) {
 			continue
 		}
 
