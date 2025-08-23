@@ -3,7 +3,7 @@ package lsp
 import (
 	"strings"
 
-	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/internal/hover"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -17,24 +17,17 @@ func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.H
 	text := documents.Read(uri)
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	editorLine := params.Position.Line
+	cursorPos := params.Position.Character
 
 	section := findSection(lines, editorLine)
 	if section == "" {
 		return nil, nil
 	}
 
-	property := strings.Split(lines[editorLine], "=")[0]
-
-	for _, item := range data.PropertiesMap[section] {
-		if property == item.Label {
-			return &protocol.Hover{
-				Contents: protocol.MarkupContent{
-					Kind:  protocol.MarkupKindMarkdown,
-					Value: "**" + item.Label + "**\n\n" + strings.Join(item.Hover, "\n"),
-				},
-			}, nil
-		}
-	}
-
-	return nil, nil
+	return hover.HoverFunction(hover.HoverInformation{
+		Line:              lines[editorLine],
+		CharacterPosition: cursorPos,
+		Section:           section,
+		Uri:               uri,
+	}), nil
 }
