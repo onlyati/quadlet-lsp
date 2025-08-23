@@ -2,24 +2,11 @@ package syntax
 
 import (
 	"fmt"
-	"regexp"
 	"slices"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
-
-// regex for like:
-// key=value
-// "key=value"
-// 'key=value'
-var keyValueCheck = regexp.MustCompile(`^(['"]?)([A-Za-z_][A-Za-z0-9_]*)=(.*)(['"]?)$`)
-
-// From version 5.6, environment variables accept simple name, like Environemnt=MYVAR
-var keyValueCheck56 = regexp.MustCompile(`^(['"]?)([A-Za-z_][A-Za-z0-9_]*)(['"]?)$`)
-
-// regex for name convention, like ContainerName, PodName, VolumeName, NetworkName
-var namingConvention = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`)
 
 // Function checking what is the extenstion in the URI
 // and return if it is on the allowed array list.

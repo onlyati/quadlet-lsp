@@ -2,11 +2,14 @@ package syntax
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
+
+var qsr020NamingConvention = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`)
 
 // Verify name of Container, Pod, Network, Volume
 func qsr020(s SyntaxChecker) []protocol.Diagnostic {
@@ -30,7 +33,7 @@ func qsr020(s SyntaxChecker) []protocol.Diagnostic {
 }
 
 func qsr020Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
-	match := namingConvention.MatchString(q.Value)
+	match := qsr020NamingConvention.MatchString(q.Value)
 	if match {
 		return nil
 	}
