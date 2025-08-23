@@ -31,20 +31,22 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	podName := q.Value
 	if strings.HasSuffix(podName, ".pod") {
 		_, err := os.Stat("./" + podName)
 
 		if errors.Is(err, os.ErrNotExist) {
-			return &protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
-					End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(podName))},
+			return []protocol.Diagnostic{
+				{
+					Range: protocol.Range{
+						Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
+						End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(podName))},
+					},
+					Severity: &errDiag,
+					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr017"),
+					Message:  fmt.Sprintf("Pod file does not exists: %s", podName),
 				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr017"),
-				Message:  fmt.Sprintf("Pod file does not exists: %s", podName),
 			}
 		}
 

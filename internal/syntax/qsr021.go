@@ -46,7 +46,7 @@ func qsr021(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr021Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnostic {
+func qsr021Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnostic {
 	if qsr021ServiceNamingConvention.MatchString(q.Value) {
 		return nil
 	}
@@ -56,13 +56,15 @@ func qsr021Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnost
 			return nil
 		}
 	}
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: q.LineNumber, Character: 0},
-			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr021"),
+			Message:  fmt.Sprintf("Invalid depdency is specified: %s", q.Value),
 		},
-		Severity: &errDiag,
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr021"),
-		Message:  fmt.Sprintf("Invalid depdency is specified: %s", q.Value),
 	}
 }

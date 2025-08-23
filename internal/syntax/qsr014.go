@@ -31,20 +31,22 @@ func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr014Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr014Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	netName := q.Value
 	if strings.HasSuffix(netName, ".network") {
 		_, err := os.Stat("./" + netName)
 
 		if errors.Is(err, os.ErrNotExist) {
-			return &protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
-					End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(netName))},
+			return []protocol.Diagnostic{
+				{
+					Range: protocol.Range{
+						Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
+						End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(netName))},
+					},
+					Severity: &errDiag,
+					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr014"),
+					Message:  fmt.Sprintf("Network file does not exists: %s", netName),
 				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr014"),
-				Message:  fmt.Sprintf("Network file does not exists: %s", netName),
 			}
 		}
 
