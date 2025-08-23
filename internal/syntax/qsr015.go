@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/data"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -51,7 +52,21 @@ func qsr015Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 	tmp := strings.Split(q.Value, ":")
 
 	if len(tmp) >= 2 {
-		if !strings.HasPrefix(tmp[1], "/") {
+		containerPath := tmp[1]
+
+		// If path start with '%' then user may want to use systemd specifier
+		// like %h instead of home. It has to be checked this is a directory.
+		startsWithValidSpecifier := false
+		if strings.HasPrefix(containerPath, "%") && len(containerPath) > 1 {
+			specifier := containerPath[0:2]
+			data, found := data.SystemdSpecifierSet[specifier]
+			if found && data.IsDirectory {
+				startsWithValidSpecifier = true
+			}
+		}
+
+		starsWithSlash := strings.HasPrefix(containerPath, "/")
+		if !starsWithSlash && !startsWithValidSpecifier {
 			return &protocol.Diagnostic{
 				Range: protocol.Range{
 					Start: protocol.Position{Line: q.LineNumber, Character: 0},
@@ -66,7 +81,8 @@ func qsr015Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 
 	if len(tmp) == 3 {
 		// Verify flags
-		for f := range strings.SplitSeq(tmp[2], ",") {
+		flags := tmp[2]
+		for f := range strings.SplitSeq(flags, ",") {
 			if !slices.Contains(qsr015ValidFlags, f) {
 				return &protocol.Diagnostic{
 					Range: protocol.Range{
