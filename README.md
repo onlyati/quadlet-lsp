@@ -1,5 +1,9 @@
 # Podman Quadlet language server
 
+> [!CAUTION]
+>
+> The main branch may unstable. Use version tagged code to get stable code.
+
 This is an implementation of language server for
 [Podman Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#description)
 files.
