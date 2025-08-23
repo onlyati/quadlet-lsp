@@ -32,20 +32,22 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr004Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr004Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	if strings.HasSuffix(q.Value, ".image") || strings.HasSuffix(q.Value, ".build") {
 		return nil
 	}
 	if qsr004FullyQualifiedImage.MatchString(q.Value) {
 		return nil
 	}
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: q.LineNumber, Character: 0},
-			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &warnDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr004"),
+			Message:  "Image name is not fully qualified",
 		},
-		Severity: &warnDiag,
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr004"),
-		Message:  "Image name is not fully qualified",
 	}
 }

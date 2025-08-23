@@ -24,6 +24,8 @@
 - [`QSR019` - Container cannot have network with pod](#qsr019---container-cannot-have-network-with-pod)
 - [`QSR020` - Naming of unit is invalid](#qsr020---naming-of-unit-is-invalid)
 - [`QSR021` - Unit points to not a systemd unit](#qsr021---unit-points-to-not-a-systemd-unit)
+- [`QSR022` - '/' is before systemd directory specifier](#qsr022----is-before-systemd-directory-specifier)
+- [`QSR023` - Invalid systemd specifier is used](#qsr023---invalid-systemd-specifier-is-used)
 
 <!-- tocstop -->
 
@@ -418,3 +420,26 @@ Requires=basic-container.service
 [Container]
 Image=registry.fedoraproject.org/fedora:41
 ```
+
+## `QSR022` - '/' is before systemd directory specifier
+
+**Message**
+
+> Specifier, _%specifier%_, already starts with '/' sign
+
+**Explanation**
+
+The _specifier_ is a directory and it already begin with `/` sign. For example
+`/%T` would evaluate as `//tmp` which is invalid path.
+
+## `QSR023` - Invalid systemd specifier is used
+
+**Message**
+
+> Specifier '_%specifier%_' is invalid
+
+**Explanation**
+
+Specifier does not exists:
+[specifiers](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers).
+If you want to write '%' then escape it as '%%'.

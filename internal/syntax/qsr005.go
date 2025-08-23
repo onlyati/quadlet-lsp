@@ -27,17 +27,19 @@ func qsr005(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr005Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr005Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	if q.Value == "registry" || q.Value == "local" {
 		return nil
 	}
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: q.LineNumber, Character: 0},
-			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr005"),
+			Message:  fmt.Sprintf("Invalid value of AutoUpdate: %s", q.Value),
 		},
-		Severity: &errDiag,
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr005"),
-		Message:  fmt.Sprintf("Invalid value of AutoUpdate: %s", q.Value),
 	}
 }

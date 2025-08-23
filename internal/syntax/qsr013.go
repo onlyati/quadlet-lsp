@@ -31,7 +31,7 @@ func qsr013(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	tmp := strings.Split(q.Value, ":")
 	if len(tmp) == 0 {
 		return nil
@@ -42,14 +42,16 @@ func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 		_, err := os.Stat("./" + volName)
 
 		if errors.Is(err, os.ErrNotExist) {
-			return &protocol.Diagnostic{
-				Range: protocol.Range{
-					Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
-					End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(volName))},
+			return []protocol.Diagnostic{
+				{
+					Range: protocol.Range{
+						Start: protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1)},
+						End:   protocol.Position{Line: q.LineNumber, Character: uint32(len(q.Property) + 1 + len(volName))},
+					},
+					Severity: &errDiag,
+					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr013"),
+					Message:  fmt.Sprintf("Volume file does not exists: %s", volName),
 				},
-				Severity: &errDiag,
-				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr013"),
-				Message:  fmt.Sprintf("Volume file does not exists: %s", volName),
 			}
 		}
 

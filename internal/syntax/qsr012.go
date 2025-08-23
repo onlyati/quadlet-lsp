@@ -28,7 +28,7 @@ func qsr012(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr012Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr012Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	tmp := strings.Split(q.Value, ",")
 
 	secretParms := map[string]string{}
@@ -100,14 +100,16 @@ func qsr012Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 	return nil
 }
 
-func qsr012MakeDiag(text string, finding utils.QuadletLine) *protocol.Diagnostic {
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: finding.LineNumber, Character: 0},
-			End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
+func qsr012MakeDiag(text string, finding utils.QuadletLine) []protocol.Diagnostic {
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: finding.LineNumber, Character: 0},
+				End:   protocol.Position{Line: finding.LineNumber, Character: finding.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr012"),
+			Message:  fmt.Sprintf("Invalid format of secret specification: %s", text),
 		},
-		Severity: &errDiag,
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr012"),
-		Message:  fmt.Sprintf("Invalid format of secret specification: %s", text),
 	}
 }

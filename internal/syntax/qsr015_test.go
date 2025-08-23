@@ -12,11 +12,27 @@ func TestQSR015_Valid(t *testing.T) {
 		),
 		NewSyntaxChecker(
 			"[Container]\nVolume=foo.volume:/app:ro",
-			"test1.container",
+			"test2.container",
 		),
 		NewSyntaxChecker(
 			"[Container]\nVolume=foo.volume:/app:ro,Z",
-			"test1.container",
+			"test3.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nVolume=%h:%h:ro,Z",
+			"test4.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nVolume=%t:%t",
+			"test5.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nVolume=%t:/container/%t",
+			"test6.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nVolume=%h:%h/container",
+			"test7.container",
 		),
 	}
 

@@ -29,18 +29,20 @@ func qsr020(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr020Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr020Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	match := namingConvention.MatchString(q.Value)
 	if match {
 		return nil
 	}
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: q.LineNumber, Character: 0},
-			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr020"),
+			Message:  fmt.Sprintf("Invalid name of unit: %s", q.Value),
 		},
-		Severity: &errDiag,
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr020"),
-		Message:  fmt.Sprintf("Invalid name of unit: %s", q.Value),
 	}
 }

@@ -31,7 +31,7 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnostic {
+func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnostic {
 	section := q.Section[1 : len(q.Section)-1]
 	if section == "Service" {
 		// The [Service] is not implemented
@@ -43,14 +43,16 @@ func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnost
 	if !foundSection {
 		// In this case we are in the line of the section header
 		// Check that the section header exists
-		return &protocol.Diagnostic{
-			Range: protocol.Range{
-				Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
-				End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+		return []protocol.Diagnostic{
+			{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
+					End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+				},
+				Severity: &errDiag,
+				Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
 			},
-			Severity: &errDiag,
-			Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
-			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
 		}
 	}
 
@@ -66,13 +68,15 @@ func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) *protocol.Diagnost
 		}
 	}
 
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
-			End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber - 1, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber - 1, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
 		},
-		Severity: &errDiag,
-		Message:  fmt.Sprintf("Invalid property is found: %s.%s", section, q.Property),
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr003"),
 	}
 }

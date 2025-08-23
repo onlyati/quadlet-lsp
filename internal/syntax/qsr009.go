@@ -28,17 +28,19 @@ func qsr009(s SyntaxChecker) []protocol.Diagnostic {
 	return diags
 }
 
-func qsr009Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnostic {
+func qsr009Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	tokens, err := splitQuoted(q.Value)
 	if err != nil {
-		return &protocol.Diagnostic{
-			Range: protocol.Range{
-				Start: protocol.Position{Line: q.LineNumber, Character: 0},
-				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+		return []protocol.Diagnostic{
+			{
+				Range: protocol.Range{
+					Start: protocol.Position{Line: q.LineNumber, Character: 0},
+					End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+				},
+				Severity: &errDiag,
+				Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr009"),
+				Message:  fmt.Sprintf("Invalid format: %s", err.Error()),
 			},
-			Severity: &errDiag,
-			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr009"),
-			Message:  fmt.Sprintf("Invalid format: %s", err.Error()),
 		}
 	}
 
@@ -54,13 +56,15 @@ func qsr009Action(q utils.QuadletLine, _ utils.PodmanVersion) *protocol.Diagnost
 		return nil
 	}
 
-	return &protocol.Diagnostic{
-		Range: protocol.Range{
-			Start: protocol.Position{Line: q.LineNumber, Character: 0},
-			End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+	return []protocol.Diagnostic{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: q.LineNumber, Character: 0},
+				End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+			},
+			Severity: &errDiag,
+			Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr009"),
+			Message:  fmt.Sprintf("Invalid format: bad delimiter usage at %s", strings.Join(invalids, ", ")),
 		},
-		Severity: &errDiag,
-		Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr009"),
-		Message:  fmt.Sprintf("Invalid format: bad delimiter usage at %s", strings.Join(invalids, ", ")),
 	}
 }
