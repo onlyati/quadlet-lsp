@@ -55,6 +55,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			{"qsr020", qsr020},
 			{"qsr021", qsr021},
 			{"qsr022", qsr022},
+			{"qsr023", qsr023},
 		},
 		commander: utils.CommandExecutor{},
 	}
