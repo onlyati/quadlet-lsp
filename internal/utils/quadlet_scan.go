@@ -34,33 +34,27 @@ func ScanQadlet(
 	var returnValue []protocol.Diagnostic
 
 	currentSection := ""
-	sectionRegexp := regexp.MustCompile(`^\[([A-Za-z0-9_.-]+)\]$`)
+	sectionRegexp := regexp.MustCompile(`^\[([A-Za-z]+)\]$`)
 
 	// If properts[*] = "*", it means scan all lines
 	_, scanAllLines := properties[ScanProperty{Section: "*", Property: "*"}]
 
-	readPropertyExec, execValue := false, ""
+	readContinue, lineValue := false, QuadletLine{}
 
 	for i, rawLine := range strings.Split(text, "\n") {
 		line := strings.TrimSpace(rawLine)
 
-		if strings.HasPrefix(line, "#") {
+		// skip if commented line
+		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
 			continue
 		}
 
-		if readPropertyExec {
-			lineValue, contSign := strings.CutSuffix(rawLine, " \\")
-			execValue += lineValue
+		if readContinue {
+			partialValue, contSign := strings.CutSuffix(rawLine, " \\")
+			lineValue.Value += " " + strings.TrimSpace(partialValue)
 			if !contSign {
-				readPropertyExec = false
-				diag := action(QuadletLine{
-					LineNumber: uint32(i),
-					Length:     uint32(len(line)),
-					Property:   "Exec",
-					Value:      execValue,
-					RawLine:    rawLine,
-					Section:    currentSection,
-				}, podmanVer)
+				readContinue = false
+				diag := action(lineValue, podmanVer)
 				if diag != nil {
 					returnValue = append(returnValue, diag...)
 				}
@@ -77,21 +71,22 @@ func ScanQadlet(
 				}]
 
 				if found || scanAllLines {
-					if lineArray[0] == "Exec" {
-						execValue, readPropertyExec = strings.CutSuffix(lineArray[1], " \\")
-						if readPropertyExec {
-							continue
-						}
-					}
-
-					diag := action(QuadletLine{
+					partialValue, mustContinue := strings.CutSuffix(lineArray[1], " \\")
+					lineValue = QuadletLine{
 						LineNumber: uint32(i),
 						Length:     uint32(len(line)),
 						Property:   lineArray[0],
-						Value:      lineArray[1],
+						Value:      strings.TrimSpace(partialValue),
 						RawLine:    rawLine,
 						Section:    currentSection,
-					}, podmanVer)
+					}
+
+					if mustContinue {
+						readContinue = true
+						continue
+					}
+
+					diag := action(lineValue, podmanVer)
 					if diag != nil {
 						returnValue = append(returnValue, diag...)
 					}
@@ -128,19 +123,18 @@ func FindItems(text, section, property string) []QuadletLine {
 
 	inSection := false
 
-	// If the property is Exec, then it can be split to multiple
-	// lines by using the ' \' at the end of the line.
-	readExecProperty := false
+	// Value can be split to multiple line using ' \'
+	readContinue := false
 
 	for i, rawLine := range strings.Split(text, "\n") {
 		line := strings.TrimSpace(rawLine)
 
-		if readExecProperty {
+		if readContinue {
 			addValue, contSign := strings.CutSuffix(rawLine, " \\")
 			if !contSign {
-				readExecProperty = false
+				readContinue = false
 			}
-			findings[len(findings)-1].Value += addValue
+			findings[len(findings)-1].Value += " " + strings.TrimSpace(addValue)
 			continue
 		}
 
@@ -148,15 +142,13 @@ func FindItems(text, section, property string) []QuadletLine {
 			tmp := strings.SplitN(line, "=", 2)
 			if len(tmp) > 1 {
 				if tmp[0] == property {
-					value := tmp[1]
-					if property == "Exec" {
-						value, readExecProperty = strings.CutSuffix(tmp[1], " \\")
-					}
+					value, mustContinue := strings.CutSuffix(tmp[1], " \\")
+					readContinue = mustContinue
 					findings = append(findings, QuadletLine{
 						LineNumber: uint32(i),
 						Length:     uint32(len(line)),
 						Property:   tmp[0],
-						Value:      value,
+						Value:      strings.TrimSpace(value),
 						RawLine:    rawLine,
 					})
 				}

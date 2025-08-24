@@ -73,8 +73,8 @@ StartLimitBurst=5
 		t.Fatalf("Expected to get 'Environment' property, but got %s", findings[0].Property)
 	}
 
-	if findings[0].Value != "tail    -f    /dev/null" {
-		t.Fatalf("Expected to get 'tail    -f    /dev/null' value, but got '%s'", findings[0].Value)
+	if findings[0].Value != "tail -f /dev/null" {
+		t.Fatalf("Expected to get 'tail -f /dev/null' value, but got '%s'", findings[0].Value)
 	}
 
 	if findings[0].LineNumber != 8 {
@@ -139,7 +139,7 @@ StartLimitBurst=5
 		t.Fatalf("unexpected finding for 0: '%s=%s'", findings[0].p, findings[0].v)
 	}
 
-	if findings[1].p != "Exec" && findings[1].v != "tail    -f    /dev/null" {
+	if findings[1].p != "Exec" && findings[1].v != "tail -f /dev/null" {
 		t.Fatalf("unexpected finding for 1: '%s=%s'", findings[1].p, findings[1].v)
 	}
 
@@ -202,7 +202,7 @@ NoExist=true
 		{c: "[Unit]", p: "Description", v: "description"},
 		{c: "[Container]", p: "", v: ""},
 		{c: "[Container]", p: "Image", v: "docker.io/library/debian:bookworm-slim"},
-		{c: "[Container]", p: "Exec", v: "tail    -f    /dev/null"},
+		{c: "[Container]", p: "Exec", v: "tail -f /dev/null"},
 		{c: "[Container]", p: "AutoUpdate", v: "registry"},
 		{c: "[Service]", p: "", v: ""},
 		{c: "[Service]", p: "Restart", v: "on-failure"},
