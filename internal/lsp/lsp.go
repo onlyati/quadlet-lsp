@@ -177,7 +177,7 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 	}
 
 	capabilities.CompletionProvider = &protocol.CompletionOptions{
-		TriggerCharacters: []string{"=", "[", "]", ".", ":", ","},
+		TriggerCharacters: []string{"=", "[", "]", ".", ":", ",", "%"},
 	}
 	capabilities.HoverProvider = &protocol.HoverOptions{}
 

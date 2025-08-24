@@ -19,6 +19,10 @@ func TestQSR023_Valid(t *testing.T) {
 			"[Pod]\nVolume=%h/app1:/app:ro",
 			"test3.container",
 		),
+		NewSyntaxChecker(
+			"[Container]\nLabel=Unit=%",
+			"test4.container",
+		),
 	}
 
 	for _, s := range cases {
