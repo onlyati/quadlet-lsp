@@ -48,26 +48,3 @@ func TestFindQuadlets_NoMatch(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "", string(loc.URI))
 }
-
-func TestTemplateNameConversion(t *testing.T) {
-	cases := []struct {
-		input    string
-		expected string
-	}{
-		{
-			input:    "web@8080.volume",
-			expected: "web@.volume",
-		},
-		{
-			input:    "web@siteA.container",
-			expected: "web@.container",
-		},
-	}
-
-	for _, s := range cases {
-		result := convertTemplateNameToFile(s.input)
-		if s.expected != result {
-			t.Fatalf("expected '%s' but got '%s'", s.expected, result)
-		}
-	}
-}

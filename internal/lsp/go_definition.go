@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -59,7 +60,7 @@ func findQuadlets(mask, value string) (protocol.Location, error) {
 
 	if strings.Contains(value, "@") {
 		// If contains '@' then it is a systemd template
-		value = convertTemplateNameToFile(value)
+		value = utils.ConvertTemplateNameToFile(value)
 	}
 
 	currDir, err := os.Getwd()
@@ -75,12 +76,4 @@ func findQuadlets(mask, value string) (protocol.Location, error) {
 	}
 
 	return location, nil
-}
-
-// Convert template name like 'web@siteA.container' to 'web@.container'
-func convertTemplateNameToFile(s string) string {
-	atSign := strings.Index(s, "@")
-	dotSign := strings.LastIndex(s, ".")
-
-	return s[:atSign] + "@" + s[dotSign:]
 }
