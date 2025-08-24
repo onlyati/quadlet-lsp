@@ -57,6 +57,11 @@ func findQuadlets(mask, value string) (protocol.Location, error) {
 		value = volParts[0]
 	}
 
+	if strings.Contains(value, "@") {
+		// If contains '@' then it is a systemd template
+		value = convertTemplateNameToFile(value)
+	}
+
 	currDir, err := os.Getwd()
 	if err != nil {
 		return location, err
@@ -70,4 +75,12 @@ func findQuadlets(mask, value string) (protocol.Location, error) {
 	}
 
 	return location, nil
+}
+
+// Convert template name like 'web@siteA.container' to 'web@.container'
+func convertTemplateNameToFile(s string) string {
+	atSign := strings.Index(s, "@")
+	dotSign := strings.LastIndex(s, ".")
+
+	return s[:atSign] + "@" + s[dotSign:]
 }
