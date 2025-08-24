@@ -10,10 +10,10 @@ import (
 
 var (
 	qsr021ServiceNamingConvention = regexp.MustCompile(
-		`^[a-zA-Z0-9][@:\a-zA-Z0-9_.-]*\.(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope)$`,
+		`^[a-zA-Z0-9][%@:\a-zA-Z0-9_.-]*\.(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope)$`,
 	)
 	qsr021QuadletNamingConvention = regexp.MustCompile(
-		`^[a-zA-Z0-9][@a-zA-Z0-9_.-]*\.(image|container|volume|network|kube|pod|build)$`,
+		`^[a-zA-Z0-9][%@a-zA-Z0-9_.-]*\.(image|container|volume|network|kube|pod|build)$`,
 	)
 )
 

@@ -198,17 +198,17 @@ func TestQSR021_Invalid(t *testing.T) {
 
 func TestQSR021_TestServiceRegexp(t *testing.T) {
 	inputs := []string{
-		"foobar@:\\_.-.service",
-		"foobar@:\\_.-.socket",
-		"foobar@:\\_.-.device",
-		"foobar@:\\_.-.mount",
-		"foobar@:\\_.-.automount",
-		"foobar@:\\_.-.swap",
-		"foobar@:\\_.-.target",
-		"foobar@:\\_.-.path",
-		"foobar@:\\_.-.timer",
-		"foobar@:\\_.-.slice",
-		"foobar@:\\_.-.scope",
+		"foobar%i@:\\_.-.service",
+		"foobar%i@:\\_.-.socket",
+		"foobar%i@:\\_.-.device",
+		"foobar%i@:\\_.-.mount",
+		"foobar%i@:\\_.-.automount",
+		"foobar%i@:\\_.-.swap",
+		"foobar%i@:\\_.-.target",
+		"foobar%i@:\\_.-.path",
+		"foobar%i@:\\_.-.timer",
+		"foobar%i@:\\_.-.slice",
+		"foobar%i@:\\_.-.scope",
 	}
 
 	for _, s := range inputs {
@@ -220,13 +220,13 @@ func TestQSR021_TestServiceRegexp(t *testing.T) {
 
 func TestQSR021_TestQuadletRegexp(t *testing.T) {
 	inputs := []string{
-		"foobar@_.-.image",
-		"foobar@_.-.container",
-		"foobar@_.-.volume",
-		"foobar@_.-.network",
-		"foobar@_.-.kube",
-		"foobar@_.-.pod",
-		"foobar@_.-.build",
+		"foobar%i@_.-.image",
+		"foobar%i@_.-.container",
+		"foobar%i@_.-.volume",
+		"foobar%i@_.-.network",
+		"foobar%i@_.-.kube",
+		"foobar%i@_.-.pod",
+		"foobar%i@_.-.build",
 	}
 
 	for _, s := range inputs {
