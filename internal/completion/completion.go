@@ -48,6 +48,11 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 		return listNewMacros(s)
 	}
 
+	// If user type '%' suggest systemd specifiers
+	if isItSystemSpecifier(s.text[s.line], s.char) {
+		return listSystemdSoecifier(s)
+	}
+
 	// There is a '=' in the line, so check for property's value
 	if isItPropertyCompletion(s.text[s.line]) {
 		return listPropertyCompletions(s)

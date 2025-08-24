@@ -5,14 +5,14 @@
 - [Built-in commands](#built-in-commands)
 - [Syntax checking](#syntax-checking)
 - [Hover menu](#hover-menu)
-  * [Hover on properties](#hover-on-properties)
-  * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
+    * [Hover on properties](#hover-on-properties)
+    * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
 - [Completion](#completion)
-  * [Starter template](#starter-template)
-  * [Static completion](#static-completion)
-  * [Templates](#templates)
-  * [Dynamic completion](#dynamic-completion)
-  * [Go definition/references](#go-definitionreferences)
+    * [Starter template](#starter-template)
+    * [Static completion](#static-completion)
+    * [Templates](#templates)
+    * [Dynamic completion](#dynamic-completion)
+    * [Go definition/references](#go-definitionreferences)
 
 <!-- tocstop -->
 
@@ -105,6 +105,7 @@ Language server provide some dynamic completion:
 - Gather and list `uid` and `gid` from image if `UserNS=keep-id:` is specified
 - Gather exposed ports from image and provide them when `PublishPort` is
   specified. In case of pod, it gather all images exposed ports.
+- List systemd specifier (e.g.: `%h`, `%t`, `%n`) whenever write '%' sign
 
 <img src="assets/din_comp_demo.gif" style="width: 100%;"/>
 

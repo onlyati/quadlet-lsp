@@ -18,6 +18,10 @@ func TestQSR022_Valid(t *testing.T) {
 			"[Container]\nVolume=%t:/%N",
 			"test3.container",
 		),
+		NewSyntaxChecker(
+			"[Container]\nVolume=%t:/%",
+			"test3.container",
+		),
 	}
 
 	for _, s := range cases {

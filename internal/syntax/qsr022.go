@@ -32,7 +32,7 @@ func qsr022Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 	diags := []protocol.Diagnostic{}
 
 	for i, c := range q.Value {
-		if c != '/' || i > len(q.Value)-2 {
+		if c != '/' || i > len(q.Value)-3 {
 			continue
 		}
 
