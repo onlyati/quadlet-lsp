@@ -43,3 +43,11 @@ func ListQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 
 	return dirs, nil
 }
+
+// Convert template name like 'web@siteA.container' to 'web@.container'
+func ConvertTemplateNameToFile(s string) string {
+	atSign := strings.Index(s, "@")
+	dotSign := strings.LastIndex(s, ".")
+
+	return s[:atSign] + "@" + s[dotSign:]
+}

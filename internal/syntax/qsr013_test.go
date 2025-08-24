@@ -21,6 +21,12 @@ func TestQSR013_Valid(t *testing.T) {
 		"data2.volume",
 		"[Volume]",
 	)
+	createTempFile(
+		t,
+		tmpDir,
+		"data@.volume",
+		"[Volume]",
+	)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -33,6 +39,10 @@ func TestQSR013_Valid(t *testing.T) {
 		),
 		NewSyntaxChecker(
 			"[Build]\nVolume=data1.volume:/app:r\nVolume=data2.volume:/data/:rw",
+			"file://"+tmpDir+"/test2.build",
+		),
+		NewSyntaxChecker(
+			"[Build]\nVolume=data@%i.volume:/app:r\nVolume=data@test.volume:/data/:rw",
 			"file://"+tmpDir+"/test2.build",
 		),
 	}

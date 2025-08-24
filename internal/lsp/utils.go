@@ -57,7 +57,16 @@ func findLineStartWith(prefix string) ([]protocol.Location, error) {
 		lineNum := 0
 		for scanner.Scan() {
 			line := scanner.Text()
-			if strings.HasPrefix(line, prefix) {
+
+			condition := false
+			if strings.Contains(prefix, "@") {
+				tmp := strings.SplitN(prefix, "@", 2)
+				condition = strings.HasPrefix(line, tmp[0]) && strings.Contains(line, tmp[1])
+			} else {
+				condition = strings.HasPrefix(line, prefix)
+			}
+
+			if condition {
 				locations = append(locations, protocol.Location{
 					URI: protocol.DocumentUri("file://" + absPath),
 					Range: protocol.Range{

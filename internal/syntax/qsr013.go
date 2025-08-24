@@ -39,6 +39,9 @@ func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 
 	volName := tmp[0]
 	if strings.HasSuffix(volName, ".volume") {
+		if strings.Contains(volName, "@") {
+			volName = utils.ConvertTemplateNameToFile(volName)
+		}
 		_, err := os.Stat("./" + volName)
 
 		if errors.Is(err, os.ErrNotExist) {

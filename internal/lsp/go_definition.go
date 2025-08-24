@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -55,6 +56,11 @@ func findQuadlets(mask, value string) (protocol.Location, error) {
 	if mask == "*.volume" {
 		volParts := strings.Split(value, ":")
 		value = volParts[0]
+	}
+
+	if strings.Contains(value, "@") {
+		// If contains '@' then it is a systemd template
+		value = utils.ConvertTemplateNameToFile(value)
 	}
 
 	currDir, err := os.Getwd()

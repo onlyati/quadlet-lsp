@@ -3,6 +3,7 @@ package lsp
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,4 +30,22 @@ func TestFindReferences(t *testing.T) {
 	assert.Len(t, locations, 1)
 	assert.Contains(t, string(locations[0].URI), "example.volume")
 	assert.Equal(t, uint32(0), locations[0].Range.Start.Line)
+}
+
+func TestFiindReferencesTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "web@.container", "[Container]\nVolume=web@%i.volume:/app")
+	createTempFile(t, tmpDir, "builder@.container", "[Container]\nVolume=web@%i.volume:/app")
+
+	locations, err := findReferences("Volume", "web@.volume")
+	assert.NoError(t, err)
+	assert.Len(t, locations, 2)
+
+	for _, loc := range locations {
+		if !strings.Contains(loc.URI, "web@.container") && !strings.Contains(loc.URI, "builder@.container") {
+			t.Fatalf("Unexpected finding: %+v", loc)
+		}
+	}
 }
