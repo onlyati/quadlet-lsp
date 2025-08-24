@@ -29,5 +29,6 @@ func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.H
 		CharacterPosition: cursorPos,
 		Section:           section,
 		Uri:               uri,
+		LineNumber:        editorLine,
 	}), nil
 }

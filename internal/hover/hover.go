@@ -11,6 +11,7 @@ type HoverInformation struct {
 	Line              string
 	Uri               string
 	Section           string
+	LineNumber        protocol.UInteger
 	CharacterPosition protocol.UInteger
 	property          string
 	value             string
@@ -35,9 +36,10 @@ func HoverFunction(info HoverInformation) *protocol.Hover {
 		if hoverValue != nil {
 			return hoverValue
 		}
-	}
 
-	return nil
+		// Handle value specific hovers
+		return handleValueHover(info)
+	}
 }
 
 func handlePropertyHover(info HoverInformation) *protocol.Hover {
@@ -50,6 +52,19 @@ func handlePropertyHover(info HoverInformation) *protocol.Hover {
 				},
 			}
 		}
+	}
+
+	return nil
+}
+
+func handleValueHover(info HoverInformation) *protocol.Hover {
+	handlerMap := map[string]func(HoverInformation) *protocol.Hover{
+		"UserNS": handleValueUserNS,
+	}
+
+	fn, found := handlerMap[info.property]
+	if found {
+		return fn(info)
 	}
 
 	return nil
