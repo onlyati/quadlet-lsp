@@ -26,6 +26,7 @@
 - [`QSR021` - Unit points to not a systemd unit](#qsr021---unit-points-to-not-a-systemd-unit)
 - [`QSR022` - '/' is before systemd directory specifier](#qsr022----is-before-systemd-directory-specifier)
 - [`QSR023` - Invalid systemd specifier is used](#qsr023---invalid-systemd-specifier-is-used)
+- [`QSR024` - Not recommended property usage in Service section](#qsr024---not-recommended-property-usage-in-service-section)
 
 <!-- tocstop -->
 
@@ -443,3 +444,21 @@ The _specifier_ is a directory and it already begin with `/` sign. For example
 Specifier does not exists:
 [specifiers](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers).
 If you want to write '%' then escape it as '%%'.
+
+## `QSR024` - Not recommended property usage in Service section
+
+**Message**
+
+> Usage in rootless podman is not recommended: Service._%property%_
+
+**Explanation**
+
+Note that Quadlet units do not support running as a non-root user by defining
+the
+[User, Group](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#User=),
+or
+[DynamicUser](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#DynamicUser=)
+systemd options. If you want to run a rootless Quadlet, you will need to create
+the user and add the unit file to one of the above rootless unit search paths.
+
+If this is a rootful Podman, you can ignore the message.
