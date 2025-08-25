@@ -4,6 +4,8 @@
 
 - [Built-in commands](#built-in-commands)
 - [Syntax checking](#syntax-checking)
+    * [Disable syntax rule per file](#disable-syntax-rule-per-file)
+- [Configuration file](#configuration-file)
 - [Hover menu](#hover-menu)
     * [Hover on properties](#hover-on-properties)
     * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
@@ -43,6 +45,61 @@ LSP provides some command that can be called from IDEs.
 
 The language server performs syntax checking over the files. For more details,
 check the [description of Quadlet Syntax Rules](./qsr.md).
+
+### Disable syntax rule per file
+
+It is possible to suspend specific QSR rules on file and on directory level. On
+directory level you must edit the `.quadletrc.json` file, see
+[configuration file](#configuration-file).
+
+On file level, it must be specified at the beginning of file. If line starts
+with `# disable-qsr:` or `; disable-qsr:` and followed by specific QSR code,
+they do not be checked on specific file. See an example.
+
+```ini
+# disable-qsr: qsr004
+
+[Container]
+Image=library/postgres:17
+```
+
+You can put more QSR codes to one line, you can create multiple lines, both
+config below are valid.
+
+```ini
+# disable-qsr: qsr003 qsr021
+[Unit]
+Description=...
+```
+
+```ini
+# disable-qsr: qsr003 qsr021
+# disable-qsr: qsr018
+[Unit]
+Description=...
+```
+
+## Configuration file
+
+If `.quadletrc.json` file exists in the current working directory, then some
+settings can be override.
+
+- `disabled`: A string array, if any syntax checker source can be found here
+  that is ignored.
+- `podmanVersion`: Podman version can be specified. It can be useful if you want
+  to make Quadlets to another system where older Podman running than on your
+  current machine. If omitted, then it try to automatically discover based on
+  `podman version` command. If failed, then assumes you are using the highest
+  version.
+
+Example for file:
+
+```json
+{
+  "disabled": ["qsr013", "qsr004"],
+  "podmanVersion": "5.4.0"
+}
+```
 
 ## Hover menu
 

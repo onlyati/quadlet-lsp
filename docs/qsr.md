@@ -2,7 +2,6 @@
 
 <!-- toc -->
 
-- [Configuration file](#configuration-file)
 - [`QSR001` - Missing section header](#qsr001---missing-section-header)
 - [`QSR002` - Unfinished line](#qsr002---unfinished-line)
 - [`QSR003` - Invalid property](#qsr003---invalid-property)
@@ -29,28 +28,6 @@
 - [`QSR024` - Not recommended property usage in Service section](#qsr024---not-recommended-property-usage-in-service-section)
 
 <!-- tocstop -->
-
-## Configuration file
-
-If `.quadletrc.json` file exists in the current working directory, then some
-settings can be override.
-
-- `disabled`: A string array, if any syntax checker source can be found here
-  that is ignored.
-- `podmanVersion`: Podman version can be specified. It can be useful if you want
-  to make Quadlets to another system where older Podman running than on your
-  current machine. If omitted, then it try to automatically discover based on
-  `podman version` command. If failed, then assumes you are using the highest
-  version.
-
-Example for file:
-
-```json
-{
-  "disabled": ["qsr013", "qsr004"],
-  "podmanVersion": "5.4.0"
-}
-```
 
 ## `QSR001` - Missing section header
 
