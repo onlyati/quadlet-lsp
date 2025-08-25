@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -73,6 +74,24 @@ func (s SyntaxChecker) RunAll(config *utils.QuadletConfig) []protocol.Diagnostic
 			continue
 		}
 
+		// Check if rule is disabled on file level
+		disabledByFile := false
+		for line := range strings.SplitSeq(s.documentText, "\n") {
+			if !strings.HasPrefix(line, "# disable-qsr:") && !strings.HasPrefix(line, "; disable-qsr:") {
+				break
+			}
+
+			if slices.Contains(strings.Split(line, " "), check.name) {
+				disabledByFile = true
+				break
+			}
+		}
+
+		if disabledByFile {
+			continue
+		}
+
+		// Perform the syntac check
 		wg.Add(1)
 		go func(rule func(SyntaxChecker) []protocol.Diagnostic) {
 			defer wg.Done()
