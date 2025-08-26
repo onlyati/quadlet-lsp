@@ -110,6 +110,11 @@ file in the following video.
 
 <img src="assets/hover_demo.gif" style="width: 100%;"/>
 
+Besides, following property values has hover explanation:
+
+- `UserNS`
+- `Volume` (including flags)
+
 ### Hover on systemd specifiers
 
 The

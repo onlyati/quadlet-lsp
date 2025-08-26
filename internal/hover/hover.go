@@ -60,6 +60,7 @@ func handlePropertyHover(info HoverInformation) *protocol.Hover {
 func handleValueHover(info HoverInformation) *protocol.Hover {
 	handlerMap := map[string]func(HoverInformation) *protocol.Hover{
 		"UserNS": handleValueUserNS,
+		"Volume": handleValueVolume,
 	}
 
 	fn, found := handlerMap[info.property]
