@@ -9,12 +9,13 @@ on:
       - "**"
     paths-ignore:
       - "**/*.md"
-      - "docs/"
+      - "docs/**"
       - ".github/**"
       - ".markdownlint.json"
       - ".gitignore"
       - ".prettierrc"
       - "LICENSE"
+      - "Makefile"
 
 jobs:
   test:
