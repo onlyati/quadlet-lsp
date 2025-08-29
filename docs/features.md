@@ -114,6 +114,7 @@ Besides, following property values has hover explanation:
 
 - `UserNS`
 - `Volume` (including flags)
+- `Secret`
 
 ### Hover on systemd specifiers
 
