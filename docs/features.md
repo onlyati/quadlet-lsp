@@ -26,6 +26,7 @@ Features below are implemented to support following file extensions:
 - `*.network`
 - `*.kube`
 - `*.pod`
+- `*.build`
 
 > [!IMPORTANT]
 >
@@ -34,7 +35,7 @@ Features below are implemented to support following file extensions:
 
 ## Built-in commands
 
-LSP provides some command that can be called from IDEs.
+Language server provides some command that can be called from IDEs.
 
 | Command name | Neovim Command  | VS Code command          | Description                                                |
 | ------------ | --------------- | ------------------------ | ---------------------------------------------------------- |
@@ -131,7 +132,7 @@ can be used in Quadlets. Language server provide hover functionality for them.
 The `newContainer`, `newVolume`, and so on, provide a started template for
 specific files.
 
-<img src="assets/newContainer_demo.gif" style="width: 100%;"/>
+<img src="assets/overall_demo.gif" style="width: 100%;"/>
 
 ### Static completion
 
