@@ -1,0 +1,51 @@
+name: Bug report
+description: File a bug
+labels: ["bug"]
+assignees:
+  - onlyati
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue description
+      description: Explain your issue
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: Explain what should have been done
+    validations:
+      required: true
+  - type: textarea
+    id: documents
+    attributes:
+      label: Additional documents
+      description:
+        Provide some link (from podman, systemd, etc.) that give more
+        information about the expected behaviour if possible.
+    validations:
+      required: false
+  - type: dropdown
+    id: ide
+    attributes:
+      label: What IDE do you use?
+      multiple: false
+      options:
+        - Neovim
+        - VS Code
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here
+    validations:
+      required: true
