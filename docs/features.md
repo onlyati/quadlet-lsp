@@ -26,6 +26,7 @@ Features below are implemented to support following file extensions:
 - `*.network`
 - `*.kube`
 - `*.pod`
+- `*.build`
 
 > [!IMPORTANT]
 >
@@ -34,7 +35,7 @@ Features below are implemented to support following file extensions:
 
 ## Built-in commands
 
-LSP provides some command that can be called from IDEs.
+Language server provides some command that can be called from IDEs.
 
 | Command name | Neovim Command  | VS Code command          | Description                                                |
 | ------------ | --------------- | ------------------------ | ---------------------------------------------------------- |
