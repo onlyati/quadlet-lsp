@@ -4,7 +4,7 @@ go 1.24.6
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	github.com/tliron/commonlog v0.2.20
 	github.com/tliron/glsp v0.2.2
 )
