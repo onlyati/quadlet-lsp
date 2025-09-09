@@ -1,6 +1,6 @@
 name: Feature request
 description: Ask a request
-labels: ["bug"]
+labels: ["enhancement"]
 assignees:
   - onlyati
 body:
