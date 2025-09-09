@@ -28,6 +28,11 @@ Features below are implemented to support following file extensions:
 - `*.pod`
 - `*.build`
 
+Language server also support the drop-ins directories. For example having
+`foo.container`. Settings can be override or added in a drop-ins file like
+`foo.container.d/10-ports.conf`. On this way settings can be override without
+changing the actual Quadlet files.
+
 > [!IMPORTANT]
 >
 > Only Quadlet part has features in the files below. The generic systemd related

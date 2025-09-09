@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"fmt"
+	"os"
 	"slices"
 	"strings"
 
@@ -10,9 +11,24 @@ import (
 
 // Function checking what is the extenstion in the URI
 // and return if it is on the allowed array list.
+// This also check for drop-ins file like foo.contaner.d/10-ports.conf.
 // Return with the extension (with high capitalized first character)
 // if matches on list. If does not match return value is empty.
 func canFileBeApplied(uri string, allowed []string) string {
+	// First check for drop-ins
+	if strings.HasSuffix(uri, ".conf") {
+		tmp := strings.Split(uri, string(os.PathSeparator))
+		if len(tmp) > 2 {
+			parentDirectory := tmp[len(tmp)-2]
+			for _, item := range allowed {
+				if strings.HasSuffix(parentDirectory, item+".d") {
+					return "[" + utils.FirstCharacterToUpper(item) + "]"
+				}
+			}
+		}
+	}
+
+	// Check for actual file extension like foo.container
 	tmp := strings.Split(uri, ".")
 	ext := tmp[len(tmp)-1]
 	if slices.Contains(allowed, ext) {
