@@ -2,8 +2,10 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -116,11 +118,80 @@ func ScanQadlet(
 	return returnValue
 }
 
+// Parameter of FindItems() function.
+type FindItemProperty struct {
+	Uri           string // URI that is passed from editor
+	RootDirectory string // Workspace root directory
+	Text          string // Text of the current document
+	Section       string // Section we are looking for
+	Property      string // Property we are looking for within the section
+}
+
 // This function scanning the passed text and
 // looking for property in specific section.
-func FindItems(text, section, property string) []QuadletLine {
-	var findings []QuadletLine
+func FindItems(params FindItemProperty) []QuadletLine {
+	fileName := params.Uri[strings.LastIndex(params.Uri, "/")+1:]
+	extension := fileName[strings.LastIndex(fileName, ".")+1:]
+	fileName = fileName[:strings.LastIndex(fileName, ".")]
 
+	// First looking for the unit related dropins
+	parts := strings.Split(fileName, "-")
+	for i := range parts {
+		p := parts[0 : len(parts)-i]
+		dirPath := strings.Join(p, "-")
+
+		if i != 0 {
+			dirPath += "-"
+		}
+		dirPath += "." + extension + ".d"
+
+		q := findItemsInDir(params, dirPath)
+		if len(q) > 0 {
+			return q
+		}
+	}
+
+	// Then looking for the generic <extension>.d directory
+	dirPath := path.Join(params.RootDirectory, extension+".d")
+	q := findItemsInDir(params, dirPath)
+	if len(q) > 0 {
+		return q
+	}
+
+	// Looking for the in file
+	return readItems(params.Text, params.Property, params.Section)
+}
+
+func findItemsInDir(params FindItemProperty, dirPath string) []QuadletLine {
+	entries, err := os.ReadDir(dirPath)
+	if err == nil {
+		for _, e := range entries {
+			if e.IsDir() {
+				continue
+			}
+
+			if !strings.HasSuffix(e.Name(), ".conf") {
+				continue
+			}
+
+			file, err := os.ReadFile(path.Join(dirPath, e.Name()))
+			if err != nil {
+				fmt.Printf("failed to open file: %s", err.Error())
+				return nil
+			}
+
+			q := readItems(string(file), params.Property, params.Section)
+			if len(q) > 0 {
+				return q
+			}
+		}
+	}
+
+	return nil
+}
+
+func readItems(text, property, section string) []QuadletLine {
+	var findings []QuadletLine
 	inSection := false
 
 	// Value can be split to multiple line using ' \'
@@ -170,13 +241,17 @@ func FindItems(text, section, property string) []QuadletLine {
 	return findings
 }
 
-func findImageInContainerUnit(f []byte) []string {
+func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
 	var images []string
 
 	lines := FindItems(
-		string(f),
-		"[Container]",
-		"Image",
+		FindItemProperty{
+			RootDirectory: rootDir,
+			Text:          string(f),
+			Section:       "[Container]",
+			Property:      "Image",
+			Uri:           uri,
+		},
 	)
 
 	for _, line := range lines {
@@ -186,9 +261,13 @@ func findImageInContainerUnit(f []byte) []string {
 				return images
 			}
 			lines := FindItems(
-				string(f),
-				"[Image]",
-				"Image",
+				FindItemProperty{
+					RootDirectory: rootDir,
+					Text:          string(f),
+					Section:       "[Image]",
+					Property:      "Image",
+					Uri:           uri,
+				},
 			)
 
 			for _, l := range lines {
@@ -213,7 +292,7 @@ func findImageInContainerUnit(f []byte) []string {
 
 // This function looking around the current working directory and looking
 // for references of the specified name
-func FindImageExposedPorts(c Commander, name string) []string {
+func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
 	var ports []string
 
 	name, _ = strings.CutPrefix(name, "file://")
@@ -225,37 +304,45 @@ func FindImageExposedPorts(c Commander, name string) []string {
 			log.Printf("failed to read file: %+v", err.Error())
 			return ports
 		}
-		images = findImageInContainerUnit(f)
+		images = findImageInContainerUnit(f, rootDir, uri)
 	}
 
 	if strings.HasSuffix(name, ".pod") {
 		tmp := strings.Split(name, string(os.PathSeparator))
 		podFileName := tmp[len(tmp)-1]
 
-		err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(".", func(p string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
-			if info.IsDir() || !strings.HasSuffix(path, ".container") {
+			isItQuadletFile := strings.HasSuffix(p, ".container")
+			if info.IsDir() || !isItQuadletFile {
 				return nil
 			}
 
-			f, err := os.ReadFile(path)
+			f, err := os.ReadFile(p)
 			if err != nil {
 				return err
 			}
 
 			lines := FindItems(
-				string(f),
-				"[Container]",
-				"Pod",
+				FindItemProperty{
+					RootDirectory: rootDir,
+					Text:          string(f),
+					Section:       "[Container]",
+					Property:      "Pod",
+					Uri:           "file://" + path.Join(rootDir, info.Name()),
+				},
 			)
 
 			if len(lines) > 0 {
 				if lines[0].Value == podFileName {
-					log.Printf("looking for in %s", lines[0].Value)
-					tmp := findImageInContainerUnit(f)
+					tmp := findImageInContainerUnit(
+						f,
+						rootDir,
+						"file://"+path.Join(rootDir, info.Name()),
+					)
 					images = append(images, tmp...)
 				}
 			}

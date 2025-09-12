@@ -4,6 +4,8 @@ import (
 	"os"
 	"slices"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 type portMockCommander struct{}
@@ -52,6 +54,9 @@ func TestPropertyPort_ValidRawImage(t *testing.T) {
 
 	s := Completion{}
 	s.commander = portMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+	}
 	s.text = []string{"[Container]", "Image=scr.io/org/mock1:latest", "PublishPort=69:"}
 	s.char = 0
 	s.line = 2
@@ -92,6 +97,9 @@ func TestPropertyPort_ValidImageFile(t *testing.T) {
 
 	s := Completion{}
 	s.commander = portMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+	}
 	s.text = []string{"[Container]", "Image=bar.image", "PublishPort=69:"}
 	s.char = 0
 	s.line = 2
@@ -143,6 +151,9 @@ func TestPropertyPort_ValidPod(t *testing.T) {
 
 	s := Completion{}
 	s.commander = portMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+	}
 	s.text = []string{"[Pod]", "PublishPort=69:"}
 	s.char = 0
 	s.line = 1

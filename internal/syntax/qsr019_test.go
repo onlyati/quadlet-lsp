@@ -1,8 +1,15 @@
 package syntax
 
-import "testing"
+import (
+	"os"
+	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
+)
 
 func TestQSR019_Valid(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
 			"[Container]\nPod=test.pod",
@@ -11,6 +18,9 @@ func TestQSR019_Valid(t *testing.T) {
 	}
 
 	for _, s := range cases {
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
 		diags := qsr019(s)
 
 		if len(diags) != 0 {
@@ -20,6 +30,8 @@ func TestQSR019_Valid(t *testing.T) {
 }
 
 func TestQSR019_Invalid(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
 			"[Container]\nPod=test.pod\nNetwork=my.network",
@@ -28,6 +40,9 @@ func TestQSR019_Invalid(t *testing.T) {
 	}
 
 	for _, s := range cases {
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
 		diags := qsr019(s)
 
 		if len(diags) != 1 {

@@ -15,14 +15,22 @@ func qsr018(s SyntaxChecker) []protocol.Diagnostic {
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		publishFindings := utils.FindItems(
-			s.documentText,
-			c,
-			"PublishPort",
+			utils.FindItemProperty{
+				Uri:           s.uri,
+				RootDirectory: s.config.WorkspaceRoot,
+				Text:          s.documentText,
+				Section:       c,
+				Property:      "PublishPort",
+			},
 		)
 		podFindings := utils.FindItems(
-			s.documentText,
-			c,
-			"Pod",
+			utils.FindItemProperty{
+				Uri:           s.uri,
+				RootDirectory: s.config.WorkspaceRoot,
+				Text:          s.documentText,
+				Section:       c,
+				Property:      "Pod",
+			},
 		)
 
 		if len(publishFindings) > 0 && len(podFindings) > 0 {

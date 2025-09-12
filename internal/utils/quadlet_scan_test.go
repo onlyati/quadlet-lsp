@@ -1,6 +1,7 @@
 package utils_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -8,6 +9,8 @@ import (
 )
 
 func TestFindItems(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
 	text := `[Unit]
 Description=description
 
@@ -24,7 +27,15 @@ Restart=on-failure
 RestartSec=5
 StartLimitBurst=5
 `
-	findings := utils.FindItems(text, "[Container]", "Environment")
+	findings := utils.FindItems(
+		utils.FindItemProperty{
+			RootDirectory: tmpDir,
+			Text:          text,
+			Section:       "[Container]",
+			Property:      "Environment",
+			Uri:           "file://" + tmpDir + "foo.container",
+		},
+	)
 
 	if len(findings) != 2 {
 		t.Fatalf("Expected 2 founds, got %d", len(findings))
@@ -44,6 +55,8 @@ StartLimitBurst=5
 }
 
 func TestFindItemsWithExec(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
 	text := `[Unit]
 Description=description
 
@@ -63,7 +76,15 @@ Restart=on-failure
 RestartSec=5
 StartLimitBurst=5
 `
-	findings := utils.FindItems(text, "[Container]", "Exec")
+	findings := utils.FindItems(
+		utils.FindItemProperty{
+			RootDirectory: tmpDir,
+			Text:          text,
+			Section:       "[Container]",
+			Property:      "Exec",
+			Uri:           "file://" + tmpDir + "foo.container",
+		},
+	)
 
 	if len(findings) != 1 {
 		t.Fatalf("Expected 1 founds, got %d", len(findings))
