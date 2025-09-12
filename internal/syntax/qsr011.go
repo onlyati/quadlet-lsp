@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -13,15 +14,26 @@ var (
 	qsr011PortsRaw    []string
 	qsr011FailedCheck []string
 	qsr011Ports       []string
+	qsr011Mutex       sync.Mutex
 )
 
 // The exposed port is not present in the image
 func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
+	qsr011Mutex.Lock()
+	defer qsr011Mutex.Unlock()
+	qsr011PortsRaw = nil
+	qsr011FailedCheck = nil
+	qsr011Ports = nil
+
 	allowedFiles := []string{"container", "pod"}
-	var findigs []utils.QuadletLine
-	qsr011PortsRaw = utils.FindImageExposedPorts(s.commander, s.uri)
+	qsr011PortsRaw = utils.FindImageExposedPorts(
+		s.commander,
+		s.uri,
+		s.config.WorkspaceRoot,
+		s.uri,
+	)
 
 	for _, s := range qsr011PortsRaw {
 		if strings.HasPrefix(s, "failed-check-") {
@@ -35,18 +47,20 @@ func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 	}
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
-		diags = utils.ScanQadlet(
-			s.documentText,
-			utils.PodmanVersion{},
-			map[utils.ScanProperty]struct{}{
-				{Section: c, Property: "PublishPort"}: {},
+		items := utils.FindItems(
+			utils.FindItemProperty{
+				Uri:           s.uri,
+				RootDirectory: s.config.WorkspaceRoot,
+				Text:          s.documentText,
+				Section:       c,
+				Property:      "PublishPort",
 			},
-			qsr011Action,
 		)
-	}
 
-	if len(findigs) == 0 {
-		return diags
+		for _, q := range items {
+			tempDiags := qsr011Action(q, utils.PodmanVersion{})
+			diags = append(diags, tempDiags...)
+		}
 	}
 
 	return diags

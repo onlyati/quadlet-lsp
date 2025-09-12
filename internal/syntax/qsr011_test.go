@@ -3,8 +3,10 @@ package syntax
 import (
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,6 +51,14 @@ func createTempFile(t *testing.T, dir, name, content string) string {
 	return path
 }
 
+func createTempDir(t *testing.T, dir, name string) string {
+	t.Helper()
+	path := filepath.Join(dir, name)
+	err := os.Mkdir(path, 0755)
+	assert.NoError(t, err)
+	return path
+}
+
 func TestQSR011_ValidContainer(t *testing.T) {
 	tmpDir := t.TempDir()
 	os.Chdir(tmpDir)
@@ -69,6 +79,9 @@ func TestQSR011_ValidContainer(t *testing.T) {
 
 	for _, s := range cases {
 		s.commander = mockCommanderQSR011{}
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
 		diags := qsr011(s)
 
 		if len(diags) != 0 {
@@ -97,6 +110,9 @@ func TestQSR011_InvalidContainer(t *testing.T) {
 
 	for _, s := range cases {
 		s.commander = mockCommanderQSR011{}
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
 		diags := qsr011(s)
 
 		if len(diags) != 1 {
@@ -147,6 +163,9 @@ func TestQSR011_ValidPod(t *testing.T) {
 
 	for _, s := range cases {
 		s.commander = mockCommanderQSR011{}
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
 		diags := qsr011(s)
 
 		if len(diags) != 0 {
@@ -189,6 +208,9 @@ func TestQSR011_InvalidPod(t *testing.T) {
 
 	for _, s := range cases {
 		s.commander = mockCommanderQSR011{}
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
 		diags := qsr011(s)
 
 		if len(diags) != 1 {
@@ -202,5 +224,83 @@ func TestQSR011_InvalidPod(t *testing.T) {
 		if diags[0].Message != "Port is not exposed in the image, exposed ports: [8080 69]" {
 			t.Fatalf("Unexptected message: '%s' at %s", diags[0].Message, s.uri)
 		}
+	}
+}
+
+func TestQSR011_InvalidDropins(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "foo.container", "[Container]\nPublishPort=420:69")
+	createTempDir(t, tmpDir, "foo.container.d")
+	createTempFile(t, tmpDir+"/foo.container.d", "image.conf", "[Container]\nImage=mock1")
+
+	s := NewSyntaxChecker(
+		"[Container]\nPublishPort=420:69",
+		"file://"+tmpDir+"/foo.container",
+	)
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Mu:            sync.RWMutex{},
+	}
+	s.commander = mockCommanderQSR011{}
+
+	diags := qsr011(s)
+
+	if len(diags) != 1 {
+		t.Fatalf("expected 1 diags, but got %d", len(diags))
+	}
+}
+
+func TestQSR011_InvalidMultiDropins(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "foo-bar-baz.container", "[Container]")
+	createTempDir(t, tmpDir, "foo-bar-baz.container.d")
+	createTempFile(t, tmpDir+"/foo-bar-baz.container.d", "port.conf", "[Container]\nPublishPort=8080:8080")
+	createTempDir(t, tmpDir, "foo-bar-.container.d")
+	createTempFile(t, tmpDir+"/foo-bar-.container.d", "image.conf", "[Container]\nImage=mock2")
+
+	s := NewSyntaxChecker(
+		"[Container]",
+		"file://"+tmpDir+"/foo-bar-baz.container",
+	)
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Mu:            sync.RWMutex{},
+	}
+	s.commander = mockCommanderQSR011{}
+
+	diags := qsr011(s)
+
+	if len(diags) != 1 {
+		t.Fatalf("expected 1 diags, but got %d", len(diags))
+	}
+}
+
+func TestQSR011_ValidPodDropins(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "foo.pod", "[Pod]\nPublishPort=10080:8080")
+	createTempFile(t, tmpDir, "foo-bar-baz.container", "[Container]\nPod=foo.pod")
+	createTempDir(t, tmpDir, "foo-bar-.container.d")
+	createTempFile(t, tmpDir+"/foo-bar-.container.d", "image.conf", "[Container]\nImage=mock1")
+
+	s := NewSyntaxChecker(
+		"[Pod]\nPublishPort=10080:8080",
+		"file://"+tmpDir+"/foo.pod",
+	)
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Mu:            sync.RWMutex{},
+	}
+	s.commander = mockCommanderQSR011{}
+
+	diags := qsr011(s)
+
+	if len(diags) != 0 {
+		t.Fatalf("expected 0 diags, but got %d", len(diags))
 	}
 }

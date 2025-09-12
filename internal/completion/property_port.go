@@ -28,7 +28,7 @@ func propertyListPorts(s Completion) []protocol.CompletionItem {
 	}
 
 	// Now gather ports
-	ports := utils.FindImageExposedPorts(s.commander, s.uri)
+	ports := utils.FindImageExposedPorts(s.commander, s.uri, s.config.WorkspaceRoot, s.uri)
 	for _, port := range ports {
 		completionItems = append(completionItems, protocol.CompletionItem{
 			Label: port,

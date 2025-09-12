@@ -24,9 +24,13 @@ func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 	tmp := strings.Split(s.uri, ".")
 	ext := tmp[len(tmp)-1]
 	findings := utils.FindItems(
-		strings.Join(s.text, "\n"),
-		"["+utils.FirstCharacterToUpper(ext)+"]",
-		"Image",
+		utils.FindItemProperty{
+			Uri:           s.uri,
+			RootDirectory: s.config.WorkspaceRoot,
+			Text:          strings.Join(s.text, "\n"),
+			Section:       "[" + utils.FirstCharacterToUpper(ext) + "]",
+			Property:      "Image",
+		},
 	)
 
 	if len(findings) == 0 {

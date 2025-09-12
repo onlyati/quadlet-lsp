@@ -1,8 +1,11 @@
 package completion
 
 import (
+	"os"
 	"slices"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 type usernsMockCommander struct{}
@@ -24,6 +27,8 @@ func (m usernsMockCommander) Run(name string, args ...string) ([]string, error) 
 }
 
 func TestPropertyUserIDs_Valid(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
 	s := NewCompletion(
 		[]string{"[Container]", "UserNS=keep-id:", "Image=scr.io/org/mock1:latest"},
 		"foo.container",
@@ -31,6 +36,9 @@ func TestPropertyUserIDs_Valid(t *testing.T) {
 		0,
 	)
 	s.commander = usernsMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+	}
 
 	comps := propertyListUserIDs(s)
 
@@ -56,6 +64,8 @@ func TestPropertyUserIDs_Valid(t *testing.T) {
 }
 
 func TestPropertyUserIDs_Invalid(t *testing.T) {
+	tmpDir := os.TempDir()
+	os.Chdir(tmpDir)
 	s := NewCompletion(
 		[]string{"[Container]", "UserNS=auto", "Image=scr.io/org/mock1:latest"},
 		"foo.container",
@@ -63,6 +73,9 @@ func TestPropertyUserIDs_Invalid(t *testing.T) {
 		0,
 	)
 	s.commander = usernsMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+	}
 
 	comps := propertyListUserIDs(s)
 
