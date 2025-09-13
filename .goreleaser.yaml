@@ -17,10 +17,13 @@ builds:
 
 archives:
   - id: quadlet-lsp
-    format: tar.gz
+    formats:
+      - tar.gz
     format_overrides:
-      - format: zip
+      - formats:
+          - zip
       - goos: windows
+    name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
 
 nfpms:
   - id: quadlet-lsp
