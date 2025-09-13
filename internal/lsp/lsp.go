@@ -3,9 +3,12 @@ package lsp
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"path"
+	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/commands"
@@ -40,8 +43,11 @@ func Start() {
 		}
 
 		if args[1] == "check" {
-			runCLI(args)
-			return
+			rc, output := runCLI(args, utils.CommandExecutor{})
+			for _, l := range output {
+				fmt.Println(l)
+			}
+			os.Exit(rc)
 		}
 	}
 
@@ -198,7 +204,7 @@ func shutdown(context *glsp.Context) error {
 	return nil
 }
 
-func runCLI(args []string) {
+func runCLI(args []string, commander utils.Commander) (int, []string) {
 	log.SetOutput(io.Discard)
 
 	cwd, err := os.Getwd()
@@ -207,7 +213,7 @@ func runCLI(args []string) {
 		os.Exit(1)
 	}
 
-	checkCfg, err := utils.LoadConfig(cwd, utils.CommandExecutor{})
+	checkCfg, err := utils.LoadConfig(cwd, commander)
 	if err != nil {
 		fmt.Printf("failed to load config: %s", err.Error())
 		os.Exit(1)
@@ -217,6 +223,7 @@ func runCLI(args []string) {
 	if len(args) == 3 {
 		workEntity = args[2]
 	}
+
 	stat, err := os.Stat(workEntity)
 	if err != nil {
 		fmt.Printf("failed to stat info: %s", err.Error())
@@ -225,26 +232,47 @@ func runCLI(args []string) {
 	diags := map[string][]protocol.Diagnostic{}
 
 	if stat.IsDir() {
-		files, err := os.ReadDir(workEntity)
-		if err != nil {
-			fmt.Printf("failed to list files in directory: %s", err.Error())
-			os.Exit(1)
-		}
-
-		for _, file := range files {
-			if file.IsDir() {
-				continue
-			}
-			filePath := path.Join(cwd, file.Name())
-			f, err := os.ReadFile(filePath)
+		filepath.WalkDir(workEntity, func(p string, d fs.DirEntry, err error) error {
 			if err != nil {
-				fmt.Printf("failed to read file: %s", err.Error())
-				os.Exit(1)
+				return err
 			}
-			s := syntax.NewSyntaxChecker(string(f), file.Name())
+			if d.IsDir() {
+				return nil
+			}
+			tmp := strings.Split(d.Name(), ".")
+			ext := tmp[len(tmp)-1]
+
+			allowed := []string{
+				"container",
+				"network",
+				"pod",
+				"kube",
+				"volume",
+				"build",
+				"conf",
+			}
+			if !slices.Contains(allowed, ext) {
+				return nil
+			}
+
+			f, err := os.ReadFile(p)
+			if err != nil {
+				fmt.Printf("failed to read file: %s\n", err.Error())
+				return nil
+			}
+
+			uri := p
+			isStartWithWorkEntity := strings.HasPrefix(uri, workEntity)
+			if !isStartWithWorkEntity {
+				uri = workEntity + string(os.PathSeparator) + uri
+			}
+			s := syntax.NewSyntaxChecker(string(f), uri)
 			tmpDiags := s.RunAll(checkCfg)
-			diags[file.Name()] = tmpDiags
-		}
+
+			key, _ := strings.CutPrefix(p, workEntity+string(os.PathSeparator))
+			diags[key] = tmpDiags
+			return nil
+		})
 	} else {
 		f, err := os.ReadFile(workEntity)
 		if err != nil {
@@ -254,8 +282,17 @@ func runCLI(args []string) {
 		s := syntax.NewSyntaxChecker(string(f), workEntity)
 		tmpDiags := s.RunAll(checkCfg)
 		diags[workEntity] = tmpDiags
-
 	}
+
+	output := []string{}
+	line := fmt.Sprintf(
+		"%-40s, %-18s, %-13s, %s",
+		"File",
+		"QSR number",
+		"Range",
+		"Message",
+	)
+	output = append(output, line)
 
 	found := false
 	for f, fDiags := range diags {
@@ -263,18 +300,20 @@ func runCLI(args []string) {
 			if *diag.Severity != protocol.DiagnosticSeverityInformation {
 				found = true
 			}
-			fmt.Printf(
-				"%-20s, %s, %02d.%03d-%02d.%03d, %s\n",
+			line := fmt.Sprintf(
+				"%-40s, %-18s, %02d.%03d-%02d.%03d, %s",
 				f,
 				*diag.Source,
 				diag.Range.Start.Line, diag.Range.Start.Character,
 				diag.Range.End.Line, diag.Range.End.Character,
 				diag.Message,
 			)
+			output = append(output, line)
 		}
 	}
 
 	if found {
-		os.Exit(4)
+		return 4, output
 	}
+	return 0, output
 }
