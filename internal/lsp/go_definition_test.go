@@ -16,6 +16,14 @@ func createTestFile(t *testing.T, dir, name, content string) string {
 	return path
 }
 
+func createTempDir(t *testing.T, dir, name string) string {
+	t.Helper()
+	path := filepath.Join(dir, name)
+	err := os.Mkdir(path, 0755)
+	assert.NoError(t, err)
+	return path
+}
+
 func TestFindQuadlets_MatchingFile(t *testing.T) {
 	tmpDir := t.TempDir()
 	os.Chdir(tmpDir)
