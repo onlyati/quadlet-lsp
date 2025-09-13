@@ -16,6 +16,7 @@ on:
       - ".prettierrc"
       - "LICENSE"
       - "Makefile"
+      - ".goreleaser.yaml"
 
 jobs:
   test:
