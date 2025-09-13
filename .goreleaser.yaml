@@ -14,9 +14,6 @@ builds:
     goarch:
       - amd64
       - arm64
-    flags:
-      - -s
-      - -w
 
 archives:
   - id: quadlet-lsp
