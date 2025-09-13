@@ -22,7 +22,7 @@ archives:
     format_overrides:
       - formats:
           - zip
-      - goos: windows
+        goos: windows
     name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
 
 nfpms:
