@@ -12,25 +12,6 @@ jobs:
   build:
     name: Build and Upload Binaries
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin]
-        goarch: [amd64, arm64]
-        exclude:
-          - goos: darwin
-            goarch: arm64 # Optional: exclude unsupported
-        include:
-          - goos: windows
-            ext: .exe
-            archive: zip
-          - goos: linux
-            ext: ""
-            archive: tar.gz
-          - goos: darwin
-            ext: ""
-            archive: tar.gz
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
