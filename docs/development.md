@@ -50,9 +50,9 @@ implementation.
 
 ## Getting started
 
-To start to work on this language server, you need to have a proper environment.
-The project uses `go v1.24.6` version. Go to [go's website](https://go.dev/dl/)
-about how to download and install it.
+For simplicity this project uses [mise](https://github.com/jdx/mise). Visit the
+website about installation. The `mise.toml` file contains the uses go version
+which is picked up by `mise` with the proper terminal integration.
 
 To build the application to your platform, just execute `make build` command
 from the root of the directory. To use the language server, just use the VS Code
@@ -60,8 +60,10 @@ extension or Neovim plugin and specify the command location where the build is
 done (`project_root/bin/quadlet-lsp`). Check [README.md](../README.md) file for
 extension links.
 
-You can test you code by using `make test` command. You can cross build the
-project using `make build_all` command.
+You can test you code by using `make test` command.
+
+You can cross build the project using `make build_all` command. This requires
+[goreleaser](https://github.com/goreleaser/goreleaser) to be installed.
 
 ## Project structure
 
