@@ -17,6 +17,7 @@ on:
       - "LICENSE"
       - "Makefile"
       - ".goreleaser.yaml"
+      - "mise.toml"
 
 jobs:
   test:
