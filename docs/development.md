@@ -54,16 +54,18 @@ For simplicity this project uses [mise](https://github.com/jdx/mise). Visit the
 website about installation. The `mise.toml` file contains the uses go version
 which is picked up by `mise` with the proper terminal integration.
 
-To build the application to your platform, just execute `make build` command
-from the root of the directory. To use the language server, just use the VS Code
-extension or Neovim plugin and specify the command location where the build is
-done (`project_root/bin/quadlet-lsp`). Check [README.md](../README.md) file for
-extension links.
+You can use the following `mise tasks` to easily perform actions:
 
-You can test you code by using `make test` command.
+```bash
+$ mise task ls
+Name       Description
+build      Build languager server to your system
+build_all  Make an offline release
+test       Run unit tests
+```
 
-You can cross build the project using `make build_all` command. This requires
-[goreleaser](https://github.com/goreleaser/goreleaser) to be installed.
+The `build_all` command uses `goreleaser` but this is included as tool onto
+`mise.toml` file.
 
 ## Project structure
 

@@ -1,2 +1,15 @@
+[tasks.build]
+description = "Build languager server to your system"
+run = "CGO_ENABLED=0 go build -o bin/quadlet-lsp"
+
+[tasks.build_all]
+description = "Make an offline release"
+run = "goreleaser release --clean --skip=publish --skip=validate"
+
+[tasks.test]
+description = "Run unit tests"
+run = "go test -race ./..."
+
 [tools]
 go = "1.25.1"
+goreleaser = "2.12.1"
