@@ -25,7 +25,6 @@ Following features are currently available:
 
 %prep
 %autosetup -n %{name}-%{version}
-%goinstall
 
 %build
 %gobuild -o %{name} .
