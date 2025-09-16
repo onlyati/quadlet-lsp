@@ -8,6 +8,7 @@
 - [Alternate usage](#alternate-usage)
 - [Get the executable](#get-the-executable)
     * [Use with mise](#use-with-mise)
+    * [Install from Fedora copr](#install-from-fedora-copr)
     * [Download the latest version](#download-the-latest-version)
     * [Compile with Go](#compile-with-go)
 
@@ -87,6 +88,15 @@ You can easily download, update and use with
 
 ```bash
 mise use -g ubi:onlyati/quadlet-lsp
+```
+
+### Install from Fedora copr
+
+This is supported on Fedora 42/43, RHEL 10, Alma Linux 10, Rocky Linux 10.
+
+```bash
+sudo dnf copr enable onlyati/quadlet-lsp
+sudo dnf install quadlet-lsp
 ```
 
 ### Download the latest version

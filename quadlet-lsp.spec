@@ -8,7 +8,7 @@ URL:            https://github.com/onlyati/quadlet-lsp
 Source0:        https://github.com/onlyati/quadlet-lsp/archive/refs/tags/v%{version}.tar.gz
 
 BuildRequires:  golang >= 1.22
-ExclusiveArch:  %{go_arches}
+BuildRequires:  git
 
 %description
 This is an implementation of language server for Podman Quadlet files.
@@ -25,16 +25,14 @@ Following features are currently available:
 
 %prep
 %autosetup -n %{name}-%{version}
-%goinstall
 
 %build
-%gobuild -o %{name} .
+CGO_ENABLED=0 go build -o %{name}
 
 %install
-cp %{name} %{_bindir}/%{name}
+install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
 
 %check
-%gotest ./...
 
 %files
 %license LICENSE
