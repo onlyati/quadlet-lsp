@@ -9,7 +9,9 @@
 - [Get the executable](#get-the-executable)
     * [Use with mise](#use-with-mise)
     * [Install from Fedora copr](#install-from-fedora-copr)
-    * [Download the latest version](#download-the-latest-version)
+    * [Install from Debian registry](#install-from-debian-registry)
+    * [Install from .deb and .rpm package](#install-from-deb-and-rpm-package)
+    * [Download the compiled version](#download-the-compiled-version)
     * [Compile with Go](#compile-with-go)
 
 <!-- tocstop -->
@@ -99,7 +101,36 @@ sudo dnf copr enable onlyati/quadlet-lsp
 sudo dnf install quadlet-lsp
 ```
 
-### Download the latest version
+### Install from Debian registry
+
+This method is supported for Debian 13. Add the following registry, then update:
+
+```bash
+$ sudo curl \
+    https://git.thinkaboutit.tech/api/packages/pandora/debian/repository.key \
+    -o /etc/apt/keyrings/gitea-pandora.asc
+$ sudo tee /etc/apt/sources.list.d/onlyati.sources > /dev/null <<'EOF'
+Types: deb
+URIs: https://git.thinkaboutit.tech/api/packages/pandora/debian
+Suites: trixie
+Components: main
+Signed-By: /etc/apt/keyrings/gitea-pandora.asc
+EOF
+$ sudo apt update
+```
+
+Then simply install:
+
+```bash
+sudo apt install quadlet-lsp
+```
+
+### Install from .deb and .rpm package
+
+Check GitHub [release page](https://github.com/onlyati/quadlet-lsp/releases) and
+download the version you need, then install it manually.
+
+### Download the compiled version
 
 Check GitHub [release page](https://github.com/onlyati/quadlet-lsp/releases) and
 download the version you need. The archive contains only the binary of language
