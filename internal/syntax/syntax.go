@@ -1,3 +1,6 @@
+// Package syntax
+//
+// This package stores everything that is related to syntax checkint.
 package syntax
 
 import (
@@ -10,7 +13,6 @@ import (
 )
 
 var (
-	hintDiag = protocol.DiagnosticSeverityHint
 	infoDiag = protocol.DiagnosticSeverityInformation
 	warnDiag = protocol.DiagnosticSeverityWarning
 	errDiag  = protocol.DiagnosticSeverityError
@@ -58,6 +60,7 @@ func NewSyntaxChecker(documentText, uri string) SyntaxChecker {
 			{"qsr022", qsr022},
 			{"qsr023", qsr023},
 			{"qsr024", qsr024},
+			{"qsr025", qsr025},
 		},
 		commander: utils.CommandExecutor{},
 	}

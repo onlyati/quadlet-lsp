@@ -1,3 +1,6 @@
+// Package lsp
+//
+// Main entrypoint of the project, this is where the language server is starting.
 package lsp
 
 import (
