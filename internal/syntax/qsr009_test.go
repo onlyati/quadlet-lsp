@@ -27,6 +27,18 @@ func TestQSR009_Valid(t *testing.T) {
 			`[Container]\nLabel='fooVariable=barValue'\n`,
 			"test4.build",
 		),
+		NewSyntaxChecker(
+			`[Container]\nLabel=sample.valid-key=true\n`,
+			"test5.container",
+		),
+		NewSyntaxChecker(
+			`[Container]\nLabel=com.example.my-app.version=1.0.0\n`,
+			"test6.container",
+		),
+		NewSyntaxChecker(
+			`[Container]\nLabel="com.example.my-app/subkey=value"\n`,
+			"test7.container",
+		),
 	}
 
 	for _, s := range variants {

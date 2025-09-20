@@ -9,7 +9,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-var qsr009KeyValueCheck = regexp.MustCompile(`^(['"]?)([A-Za-z0-9][A-Za-z0-9.-_]*)=(.*)(['"]?)$`)
+var qsr009KeyValueCheck = regexp.MustCompile(`^(['"]?)([A-Za-z0-9][A-Za-z0-9._/-]*)=(.*)(['"]?)$`)
 
 // Verify Annotation property
 func qsr009(s SyntaxChecker) []protocol.Diagnostic {
