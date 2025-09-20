@@ -118,19 +118,18 @@ func ScanQadlet(
 	return returnValue
 }
 
-// Parameter of FindItems() function.
+// FindItemProperty Parameter of FindItems() function.
 type FindItemProperty struct {
-	Uri           string // URI that is passed from editor
+	URI           string // URI that is passed from editor
 	RootDirectory string // Workspace root directory
 	Text          string // Text of the current document
 	Section       string // Section we are looking for
 	Property      string // Property we are looking for within the section
 }
 
-// This function scanning the passed text and
-// looking for property in specific section.
+// FindItems This function scanning the passed text and looking for property in specific section.
 func FindItems(params FindItemProperty) []QuadletLine {
-	fileName := params.Uri[strings.LastIndex(params.Uri, "/")+1:]
+	fileName := params.URI[strings.LastIndex(params.URI, "/")+1:]
 	extension := fileName[strings.LastIndex(fileName, ".")+1:]
 	fileName = fileName[:strings.LastIndex(fileName, ".")]
 
@@ -250,7 +249,7 @@ func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
 			Text:          string(f),
 			Section:       "[Container]",
 			Property:      "Image",
-			Uri:           uri,
+			URI:           uri,
 		},
 	)
 
@@ -266,7 +265,7 @@ func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
 					Text:          string(f),
 					Section:       "[Image]",
 					Property:      "Image",
-					Uri:           uri,
+					URI:           uri,
 				},
 			)
 
@@ -290,7 +289,7 @@ func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
 	return images
 }
 
-// This function looking around the current working directory and looking
+// FindImageExposedPorts This function looking around the current working directory and looking
 // for references of the specified name
 func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
 	var ports []string
@@ -332,7 +331,7 @@ func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
 					Text:          string(f),
 					Section:       "[Container]",
 					Property:      "Pod",
-					Uri:           "file://" + path.Join(rootDir, info.Name()),
+					URI:           "file://" + path.Join(rootDir, info.Name()),
 				},
 			)
 
@@ -395,7 +394,7 @@ func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
 	return ports
 }
 
-// This function looking for that the cursor currently in which section.
+// FindSection This function looking for that the cursor currently in which section.
 // Sections are like `[Container]`, `[Unit]`, and so on.
 func FindSection(lines []string, lineNumber uint32) string {
 	section := ""

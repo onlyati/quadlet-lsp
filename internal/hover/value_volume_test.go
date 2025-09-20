@@ -8,19 +8,19 @@ func TestValueVolumeSource(t *testing.T) {
 	cases := []HoverInformation{
 		{
 			Line:              "Volume=/home/ati/tmp:/app/tmp:ro",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(7),
 		},
 		{
 			Line:              "Volume=/home/ati/tmp:/app/tmp:ro",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(8),
 		},
 		{
 			Line:              "Volume=/home/ati/tmp:/app/tmp:ro",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(20),
 		},
@@ -44,19 +44,19 @@ func TestValueVolumeContainer(t *testing.T) {
 	cases := []HoverInformation{
 		{
 			Line:              "Volume=/home/ati/tmp:/app/tmp:ro",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(22),
 		},
 		{
 			Line:              "Volume=/home/ati/tmp:/app/tmp:ro",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(23),
 		},
 		{
 			Line:              "Volume=/home/ati/tmp:/app/tmp:ro",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(29),
 		},
@@ -79,7 +79,7 @@ func TestValueVolumeContainer(t *testing.T) {
 func TestValueVolumeFlag(t *testing.T) {
 	info := HoverInformation{
 		Line:    "Volume=/home/ati/tmp:/app/tmp:rw,z,U,nocopy,shared",
-		Uri:     "file://test.container",
+		URI:     "file://test.container",
 		Section: "Container",
 	}
 	cases := []struct {

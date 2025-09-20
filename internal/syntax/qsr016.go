@@ -57,9 +57,9 @@ func qsr016Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 			}
 		} else {
 			for p := range strings.SplitSeq(tmp[1], ",") {
-				checkUid := strings.HasPrefix(p, "uid=")
-				checkGid := strings.HasPrefix(p, "gid=")
-				if !checkUid && !checkGid {
+				checkUID := strings.HasPrefix(p, "uid=")
+				checkGID := strings.HasPrefix(p, "gid=")
+				if !checkUID && !checkGID {
 					return []protocol.Diagnostic{
 						{
 							Range: protocol.Range{

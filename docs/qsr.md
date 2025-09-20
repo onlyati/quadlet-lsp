@@ -26,6 +26,7 @@
 - [`QSR022` - '/' is before systemd directory specifier](#qsr022----is-before-systemd-directory-specifier)
 - [`QSR023` - Invalid systemd specifier is used](#qsr023---invalid-systemd-specifier-is-used)
 - [`QSR024` - Not recommended property usage in Service section](#qsr024---not-recommended-property-usage-in-service-section)
+- [`QSR025` - Image is missing in container](#qsr025---image-is-missing-in-container)
 
 <!-- tocstop -->
 
@@ -439,3 +440,13 @@ systemd options. If you want to run a rootless Quadlet, you will need to create
 the user and add the unit file to one of the above rootless unit search paths.
 
 If this is a rootful Podman, you can ignore the message.
+
+## `QSR025` - Image is missing in container
+
+**Message**
+
+> Image is missing in container
+
+**Explanation**
+
+The `Image` property is mandatory to specify in container Quadlet files.

@@ -1,3 +1,7 @@
+// Package commands
+//
+// This packages contains the callable commands and the command handler
+// that can be issued from editors.
 package commands
 
 import (

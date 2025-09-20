@@ -44,7 +44,7 @@ func (d *Documents) Read(uri string) string {
 	return text
 }
 
-func (d *Documents) CheckUri(uri string) (string, bool) {
+func (d *Documents) CheckURI(uri string) (string, bool) {
 	d.mu.RLock()
 	text, ok := d.files[uri]
 	d.mu.RUnlock()

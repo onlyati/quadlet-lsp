@@ -1,3 +1,6 @@
+// Package hover
+//
+// This package contains hover actions and reactions for them.
 package hover
 
 import (
@@ -9,7 +12,7 @@ import (
 
 type HoverInformation struct {
 	Line              string
-	Uri               string
+	URI               string
 	Section           string
 	LineNumber        protocol.UInteger
 	CharacterPosition protocol.UInteger

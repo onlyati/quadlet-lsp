@@ -1,3 +1,7 @@
+// Package completion
+//
+// This packages contains everything that is related for any completion
+// from logical view.
 package completion
 
 import (

@@ -13,7 +13,7 @@ type Commander interface {
 
 type CommandExecutor struct{}
 
-// This method execute an OS command and return with its output
+// Run This method execute an OS command and return with its output
 func (c CommandExecutor) Run(name string, args ...string) ([]string, error) {
 	output := []string{}
 	cmd := exec.Command(name, args...)

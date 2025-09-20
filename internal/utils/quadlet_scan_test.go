@@ -33,7 +33,7 @@ StartLimitBurst=5
 			Text:          text,
 			Section:       "[Container]",
 			Property:      "Environment",
-			Uri:           "file://" + tmpDir + "foo.container",
+			URI:           "file://" + tmpDir + "foo.container",
 		},
 	)
 
@@ -82,7 +82,7 @@ StartLimitBurst=5
 			Text:          text,
 			Section:       "[Container]",
 			Property:      "Exec",
-			Uri:           "file://" + tmpDir + "foo.container",
+			URI:           "file://" + tmpDir + "foo.container",
 		},
 	)
 
