@@ -51,14 +51,14 @@ func TestPropertyUserIDs_Valid(t *testing.T) {
 		t.Fatalf("exptected 2 completions, but got %d", len(labels))
 	}
 
-	checkGid := slices.Contains(labels, "gid=999")
-	checkUid := slices.Contains(labels, "uid=999")
-	if !checkGid || !checkUid {
+	checkGID := slices.Contains(labels, "gid=999")
+	checkUID := slices.Contains(labels, "uid=999")
+	if !checkGID || !checkUID {
 		t.Fatalf(
 			"did not read correct values: %v %v %v",
 			labels,
-			checkGid,
-			checkUid,
+			checkGID,
+			checkUID,
 		)
 	}
 }

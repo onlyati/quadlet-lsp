@@ -93,7 +93,7 @@ func Start() {
 		},
 		TextDocumentDidChange: func(ctx *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			if text, ok := documents.CheckUri(uri); ok {
+			if text, ok := documents.CheckURI(uri); ok {
 				for _, change := range params.ContentChanges {
 					if change_, ok := change.(protocol.TextDocumentContentChangeEvent); ok {
 						startIndex, endIndex := change_.Range.IndexesIn(text)
