@@ -7,7 +7,7 @@ License:        GPLv3
 URL:            https://github.com/onlyati/quadlet-lsp
 Source0:        https://github.com/onlyati/quadlet-lsp/archive/refs/tags/v%{version}.tar.gz
 
-BuildRequires:  golang >= 1.22
+BuildRequires:  golang >= 1.24.4
 BuildRequires:  git
 
 %description
