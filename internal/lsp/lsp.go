@@ -26,7 +26,7 @@ import (
 const lsName = "quadlet"
 
 var (
-	version   = "0.5.0rc1"
+	version   = "0.5.0"
 	handler   protocol.Handler
 	config    *utils.QuadletConfig
 	documents = utils.NewDocuments()
