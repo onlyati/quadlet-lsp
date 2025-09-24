@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"io/fs"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -16,39 +17,47 @@ func pullAll(command string, e *EditorCommandExecutor, messenger utils.Messenger
 	rootDir := e.rootDir
 	e.mutex.Unlock()
 
-	dir, err := os.ReadDir(rootDir)
-	if err != nil {
-		log.Println("failed to list directory: " + err.Error())
-		messenger.SendMessage(
-			utils.MessengerError,
-			"failed to list directory: "+err.Error(),
-		)
-		return
-	}
-
-	for _, entry := range dir {
-		if entry.IsDir() {
-			continue
+	filepath.WalkDir(rootDir, func(p string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
-
 		isItContainer := strings.HasSuffix(entry.Name(), ".container")
 		isItImage := strings.HasSuffix(entry.Name(), ".image")
 		isItVolume := strings.HasSuffix(entry.Name(), ".volume")
-		if !isItContainer && !isItImage && !isItVolume {
-			continue
+		section := ""
+
+		allowed := []string{"container", "image", "volume"}
+		isItDoprins := false
+		if strings.HasSuffix(entry.Name(), ".conf") {
+			tmp := strings.Split(p, string(os.PathSeparator))
+			if len(tmp) > 2 {
+				parentDirectory := tmp[len(tmp)-2]
+				for _, item := range allowed {
+					if strings.HasSuffix(parentDirectory, item+".d") {
+						isItDoprins = true
+						section = "[" + utils.FirstCharacterToUpper(item) + "]"
+					}
+				}
+			}
+		}
+
+		if !isItContainer && !isItImage && !isItVolume && !isItDoprins {
+			return nil
 		}
 
 		tmp := strings.Split(entry.Name(), ".")
-		section := "[" + utils.FirstCharacterToUpper(tmp[len(tmp)-1]) + "]"
+		if section == "" {
+			section = "[" + utils.FirstCharacterToUpper(tmp[len(tmp)-1]) + "]"
+		}
 
-		file, err := os.ReadFile(path.Join(rootDir, entry.Name()))
+		file, err := os.ReadFile(p)
 		if err != nil {
 			log.Println("failed to read file: " + err.Error())
 			messenger.SendMessage(
 				utils.MessengerError,
 				"failed to read file: "+err.Error(),
 			)
-			continue
+			return nil
 		}
 
 		inSection := false
@@ -100,5 +109,6 @@ func pullAll(command string, e *EditorCommandExecutor, messenger utils.Messenger
 				}
 			}
 		}
-	}
+		return nil
+	})
 }
