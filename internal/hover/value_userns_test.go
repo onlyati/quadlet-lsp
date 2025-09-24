@@ -8,31 +8,31 @@ func TestValueUserNS(t *testing.T) {
 	cases := []HoverInformation{
 		{
 			Line:              "UserNS=keep-id",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(7),
 		},
 		{
 			Line:              "UserNS=keep-id",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(13),
 		},
 		{
 			Line:              "UserNS=auto",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(7),
 		},
 		{
 			Line:              "UserNS=nomap",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(7),
 		},
 		{
 			Line:              "UserNS=host",
-			Uri:               "file://test.container",
+			URI:               "file://test.container",
 			Section:           "Container",
 			CharacterPosition: uint32(7),
 		},

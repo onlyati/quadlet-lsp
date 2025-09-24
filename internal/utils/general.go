@@ -1,3 +1,6 @@
+// Package utils
+//
+// This package contains generic functions that are used in other packages.
 package utils
 
 import (
@@ -9,7 +12,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-// I did not find better solution, probably not nice but works
+// ReturnAsStringPtr I did not find better solution, probably not nice but works
 func ReturnAsStringPtr(s string) *string {
 	return &s
 }
@@ -20,7 +23,7 @@ func FirstCharacterToUpper(s string) string {
 	return string(runes)
 }
 
-// List quadlet files from the current work directory based on extenstion
+// ListQuadletFiles List quadlet files from the current work directory based on extenstion
 func ListQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 	dirs := []protocol.CompletionItem{}
 
@@ -44,7 +47,7 @@ func ListQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 	return dirs, nil
 }
 
-// Convert template name like 'web@siteA.container' to 'web@.container'
+// ConvertTemplateNameToFile Convert template name like 'web@siteA.container' to 'web@.container'
 func ConvertTemplateNameToFile(s string) string {
 	atSign := strings.Index(s, "@")
 	dotSign := strings.LastIndex(s, ".")

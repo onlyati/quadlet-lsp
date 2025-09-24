@@ -15,7 +15,7 @@ func TestValueSecret(t *testing.T) {
 		{
 			info: HoverInformation{
 				Line:    "Secret=my-secret,type=env,target=MYTARGET",
-				Uri:     "file:///test.container",
+				URI:     "file:///test.container",
 				Section: "Container",
 			},
 			expectedHighlight: struct {
@@ -28,7 +28,7 @@ func TestValueSecret(t *testing.T) {
 		{
 			info: HoverInformation{
 				Line:    "Secret=my-secret,type=env,target=MYTARGET",
-				Uri:     "file:///test.container",
+				URI:     "file:///test.container",
 				Section: "Container",
 			},
 			expectedHighlight: struct {
@@ -41,7 +41,7 @@ func TestValueSecret(t *testing.T) {
 		{
 			info: HoverInformation{
 				Line:    "Secret=my-secret,type=env,target=MYTARGET",
-				Uri:     "file:///test.container",
+				URI:     "file:///test.container",
 				Section: "Container",
 			},
 			expectedHighlight: struct {
@@ -54,7 +54,7 @@ func TestValueSecret(t *testing.T) {
 		{
 			info: HoverInformation{
 				Line:    "Secret=my-secret,type=env,target=MYTARGET",
-				Uri:     "file:///test.container",
+				URI:     "file:///test.container",
 				Section: "Container",
 			},
 			expectedHighlight: struct {
@@ -67,7 +67,7 @@ func TestValueSecret(t *testing.T) {
 		{
 			info: HoverInformation{
 				Line:    "Secret=my-secret,type=env,target=MYTARGET",
-				Uri:     "file:///test.container",
+				URI:     "file:///test.container",
 				Section: "Container",
 			},
 			expectedHighlight: struct {
@@ -80,7 +80,7 @@ func TestValueSecret(t *testing.T) {
 		{
 			info: HoverInformation{
 				Line:    "Secret=my-secret,type=env,target=MYTARGET",
-				Uri:     "file:///test.container",
+				URI:     "file:///test.container",
 				Section: "Container",
 			},
 			expectedHighlight: struct {

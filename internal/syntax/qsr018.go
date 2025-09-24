@@ -16,7 +16,7 @@ func qsr018(s SyntaxChecker) []protocol.Diagnostic {
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		publishFindings := utils.FindItems(
 			utils.FindItemProperty{
-				Uri:           s.uri,
+				URI:           s.uri,
 				RootDirectory: s.config.WorkspaceRoot,
 				Text:          s.documentText,
 				Section:       c,
@@ -25,7 +25,7 @@ func qsr018(s SyntaxChecker) []protocol.Diagnostic {
 		)
 		podFindings := utils.FindItems(
 			utils.FindItemProperty{
-				Uri:           s.uri,
+				URI:           s.uri,
 				RootDirectory: s.config.WorkspaceRoot,
 				Text:          s.documentText,
 				Section:       c,

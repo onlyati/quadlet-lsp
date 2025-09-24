@@ -51,7 +51,6 @@ jobs:
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           version: "~> v2"
-          args: goreleaser release --clean --skip=publish --skip=validate
+          args: release --clean --skip=publish --skip=validate --snapshot

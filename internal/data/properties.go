@@ -1,3 +1,7 @@
+// Package data
+//
+// This package does not contains any functions or logic just data that
+// can be used by other packages like completion, syntax, etc.
 package data
 
 import "github.com/onlyati/quadlet-lsp/internal/utils"
