@@ -445,7 +445,7 @@ If this is a rootful Podman, you can ignore the message.
 
 **Message**
 
-> Image is missing in container
+> Container Quadlet file does not have Image property
 
 **Explanation**
 
