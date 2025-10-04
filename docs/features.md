@@ -6,6 +6,7 @@
 - [Syntax checking](#syntax-checking)
     * [Disable syntax rule per file](#disable-syntax-rule-per-file)
 - [Configuration file](#configuration-file)
+- [Format file](#format-file)
 - [Hover menu](#hover-menu)
     * [Hover on properties](#hover-on-properties)
     * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
@@ -105,6 +106,69 @@ Example for file:
   "disabled": ["qsr013", "qsr004"],
   "podmanVersion": "5.4.0"
 }
+```
+
+## Format file
+
+Language server has feature to format the document. Format has the following
+rules:
+
+- Line width does not exceed the 80 character width. If a line is longer, then
+  line is split by using `\` continuation sign.
+- Each comment line is removed, except from the beginning of the file.
+- Properties are grouped based on topics.
+- Within the topics, settings are sorted based on alphabetical order.
+
+Example formatted file:
+
+```ini
+# disable-qsr: qsr014 qsr013
+#
+# File name: gitea.container
+
+[Unit]
+Description=Gitea application
+Wants=gitea-db.service
+
+[Container]
+# Base options
+AutoUpdate=registry
+Image=docker.io/gitea/gitea:latest-rootless
+Pod=gitea.pod
+
+# Storage options
+Volume=/etc/localtime:/etc/localtime:ro
+Volume=/etc/timezone:/etc/timezone:ro
+
+# Environment options
+Environment=GITEA__database__DB_TYPE=postgres
+Environment=GITEA__database__HOST=127.0.0.1
+Environment=GITEA__database__NAME=gitea
+Environment=GITEA__database__USER=gitea
+
+# Secret options
+Secret=gitea-db-password,type=env,target=GITEA__database__PASSWD
+Secret=gitea-smtp-password,type=env,target=GITEA__mailer__PASSWD
+
+# Healthcheck options
+HealthCmd=/bin/curlcurl -k --fail --connect-timeout 5 \
+  https://127.0.0.1:3000/api/healthz
+HealthRetries=10
+HealthStartPeriod=15s
+HealthTimeout=15s
+
+# Other options
+LogDriver=journald
+UserNS=keep-id
+
+[Service]
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+
+[Install]
+WantedBy=default.target
+
 ```
 
 ## Hover menu

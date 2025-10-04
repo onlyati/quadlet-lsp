@@ -11,5 +11,5 @@ description = "Run unit tests"
 run = "go test -race ./..."
 
 [tools]
-go = "1.24.4"
+go = "1.25.1"
 goreleaser = "2.12.1"
