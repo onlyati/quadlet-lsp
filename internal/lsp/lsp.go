@@ -26,7 +26,7 @@ import (
 const lsName = "quadlet"
 
 var (
-	version   = "0.5.0"
+	version   = "0.6.0rc1"
 	handler   protocol.Handler
 	config    *utils.QuadletConfig
 	documents = utils.NewDocuments()
@@ -134,6 +134,9 @@ func Start() {
 
 		// Handle commands that should be executed
 		WorkspaceExecuteCommand: ExecuteCommands,
+
+		// Handle format requests
+		TextDocumentFormatting: Format,
 	}
 
 	server := server.NewServer(&handler, lsName, false)

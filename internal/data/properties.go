@@ -4,14 +4,30 @@
 // can be used by other packages like completion, syntax, etc.
 package data
 
-import "github.com/onlyati/quadlet-lsp/internal/utils"
+import (
+	"github.com/onlyati/quadlet-lsp/internal/utils"
+)
+
+type FormatGroup string
+
+const (
+	FormatGroupNetwork     FormatGroup = "Network"
+	FormatGroupStorage     FormatGroup = "Storage"
+	FormatGroupEnvironment FormatGroup = "Environment"
+	FormatGroupBase        FormatGroup = "Base"
+	FormatGroupHealth      FormatGroup = "Healthcheck"
+	FormatGroupLabel       FormatGroup = "Label"
+	FormatGroupSecret      FormatGroup = "Secret"
+	FormatGroupOther       FormatGroup = "Other"
+)
 
 type PropertyMapItem struct {
-	Label      string
-	Hover      []string
-	Parameters []string
-	Macro      string
-	MinVersion utils.PodmanVersion
+	Label       string
+	Hover       []string
+	Parameters  []string
+	Macro       string
+	MinVersion  utils.PodmanVersion
+	FormatGroup FormatGroup
 }
 
 type CategoryPropertyItem struct {
@@ -264,7 +280,8 @@ $0
 					"",
 					"Equivalent to the Podman --add-host option. This key can be listed multiple times.",
 				},
-				Macro: "AddHost=${1:hostname}:${2:ip}\n$0",
+				Macro:       "AddHost=${1:hostname}:${2:ip}\n$0",
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "Annotation",
@@ -283,7 +300,8 @@ $0
 					"- `registry`: Requires a fully-qualified image reference (e.g., quay.io/podman/stable:latest) to be used to create the container. This enforcement is necessary to know which image to actually check and pull. If an image ID was used, Podman does not know which image to check/pull anymore.",
 					"- `local`: Tells Podman to compare the image a container is using to the image with its raw name in local storage. If an image is updated locally, Podman simply restarts the systemd unit executing the container.",
 				},
-				Parameters: []string{"registry", "local"},
+				Parameters:  []string{"registry", "local"},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "CgroupsMode",
@@ -300,6 +318,7 @@ $0
 				Hover: []string{
 					"The (optional) name of the Podman container. If this is not specified, the default value of `systemd-%N` is used, which is the same as the service name but with a `systemd-` prefix to avoid conflicts with user-managed containers.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "ContainersConfModule",
@@ -330,6 +349,7 @@ $0
 					"9.9.9.9",
 					"149.112.112.112",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "DNSOption",
@@ -338,6 +358,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "DNSSearch",
@@ -346,6 +367,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "DropCapability",
@@ -365,6 +387,7 @@ $0
 				Hover: []string{
 					"Override the default ENTRYPOINT from the image. Equivalent to the Podman --entrypoint option. Specify multi option commands in the form of a JSON string.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "Environment",
@@ -376,19 +399,22 @@ $0
 					"Environment=APP_USERNAME=appuser",
 					"```",
 				},
-				Macro: "Environment=\"${1:name}=${2:value}\"\n$0",
+				Macro:       "Environment=\"${1:name}=${2:value}\"\n$0",
+				FormatGroup: FormatGroupEnvironment,
 			},
 			{
 				Label: "EnvironmentFile",
 				Hover: []string{
 					"Use a line-delimited file to set environment variables in the container. The path may be absolute or relative to the location of the unit file. This key may be used multiple times, and the order persists when passed to `podman run`.",
 				},
+				FormatGroup: FormatGroupEnvironment,
 			},
 			{
 				Label: "EnvironmentHost",
 				Hover: []string{
 					"Use the host environment inside of the container.",
 				},
+				FormatGroup: FormatGroupEnvironment,
 			},
 			{
 				Label: "Exec",
@@ -401,6 +427,7 @@ $0
 					"",
 					"Another way to describe this is that it works the same way as the [args field in a Kubernetes pod](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell).",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "ExposeHostPort",
@@ -409,6 +436,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "GIDMap",
@@ -445,12 +473,14 @@ $0
 				Hover: []string{
 					"Set or alter a healthcheck command for a container. A value of none disables existing healthchecks. Equivalent to the Podman `--health-cmd option`.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthInterval",
 				Hover: []string{
 					"Set an interval for the healthchecks. An interval of disable results in no automatic timer setup. Equivalent to the Podman `--health-interval` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthLogDestination",
@@ -461,78 +491,91 @@ $0
 					"- `directory`: creates a log file named `<container-ID>-healthcheck.log` with HealthCheck logs in the specified directory.",
 					"- `events_logger`: The log will be written with logging mechanism set by events_logger. It also saves the log to a default directory, for performance on a system with a large number of logs.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthMaxLogCount",
 				Hover: []string{
 					"Set maximum number of attempts in the HealthCheck log file. (‘0’ value means an infinite number of attempts in the log file) (Default: 5 attempts) Equivalent to the Podman `--Health-max-log-count` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthMaxLogSize",
 				Hover: []string{
 					"Set maximum length in characters of stored HealthCheck log. (“0” value means an infinite log length) (Default: 500 characters) Equivalent to the Podman `--Health-max-log-size` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthOnFailure",
 				Hover: []string{
 					"Action to take once the container transitions to an unhealthy state. The “kill” action in combination integrates best with systemd. Once the container turns unhealthy, it gets killed, and systemd restarts the service. Equivalent to the Podman `--health-on-failure` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthRetries",
 				Hover: []string{
 					"The number of retries allowed before a healthcheck is considered to be unhealthy. Equivalent to the Podman `--health-retries` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthStartPeriod",
 				Hover: []string{
 					"The initialization time needed for a container to bootstrap. Equivalent to the Podman `--health-start-period` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthStartupCmd",
 				Hover: []string{
 					"Set a startup healthcheck command for a container. Equivalent to the Podman `--health-startup-cmd` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthStartupInterval",
 				Hover: []string{
 					"Set an interval for the startup healthcheck. An interval of disable results in no automatic timer setup. Equivalent to the Podman `--health-startup-interval` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthStartupRetries",
 				Hover: []string{
 					"The number of attempts allowed before the startup healthcheck restarts the container. Equivalent to the Podman `--health-startup-retries` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthStartupSuccess",
 				Hover: []string{
 					"The number of successful runs required before the startup healthcheck succeeds and the regular healthcheck begins. Equivalent to the Podman `--health-startup-success` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthStartupTimeout",
 				Hover: []string{
 					"The maximum time a startup healthcheck command has to complete before it is marked as failed. Equivalent to the Podman `--health-startup-timeout` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HealthTimeout",
 				Hover: []string{
 					"The maximum time allowed to complete the healthcheck before an interval is considered failed. Equivalent to the Podman `--health-timeout` option.",
 				},
+				FormatGroup: FormatGroupHealth,
 			},
 			{
 				Label: "HostName",
 				Hover: []string{
 					"Sets the host name that is available inside the container. Equivalent to the Podman --hostname option.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "Image",
@@ -545,18 +588,21 @@ $0
 					"- If the name of the image ends with `.image`, Quadlet will use the image pulled by the corresponding `.image` file, and the generated systemd service contains a dependency on the `$name-image.service` (or the service name set in the .image file). Note that the corresponding `.image` file must exist.",
 					"- If the name of the image ends with `.build`, Quadlet will use the image built by the corresponding `.build` file, and the generated systemd service contains a dependency on the `$name-build.service`. Note: the corresponding `.build` file must exist.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "IP",
 				Hover: []string{
 					"Specify a static IPv4 address for the container, for example **10.88.64.128**. Equivalent to the Podman `--ip` option.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "IP6",
 				Hover: []string{
 					"Specify a static IPv6 address for the container, for example **fd46:db93:aa76:ac37::10**. Equivalent to the Podman `--ip6` option.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "Label",
@@ -570,7 +616,8 @@ $0
 					"Label=app=myapp",
 					"```",
 				},
-				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
+				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
+				FormatGroup: FormatGroupLabel,
 			},
 			{
 				Label: "LogDriver",
@@ -610,6 +657,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupStorage,
 			},
 			{
 				Label: "Network",
@@ -623,6 +671,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "NetworkAlias",
@@ -631,12 +680,14 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "NoNewPrivileges",
 				Hover: []string{
 					"If enabled, this disables the container processes from gaining additional privileges via things like setuid and file capabilities. Defaults to false.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "Notify",
@@ -661,6 +712,7 @@ $0
 					"",
 					"Quadlet will add all the necessary parameters to link between the container and the pod and between their corresponding services.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "PodmanArgs",
@@ -671,6 +723,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "PublishPort",
@@ -683,7 +736,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
+				Macro:       "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "Pull",
@@ -696,6 +750,7 @@ $0
 					"never",
 					"newer",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "ReadOnly",
@@ -772,7 +827,8 @@ $0
 				Hover: []string{
 					"Use a Podman secret in the container either as a file or an environment variable. This is equivalent to the Podman `--secret` option and generally has the form `secret[,opt=opt ...]`",
 				},
-				Macro: "Secret=${1:secret},type=${2:type},target=${3:target}\n$0",
+				Macro:       "Secret=${1:secret},type=${2:type},target=${3:target}\n$0",
+				FormatGroup: FormatGroupSecret,
 			},
 			{
 				Label: "SecurityLabelDisable",
@@ -943,7 +999,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Volume=${1:destination}:${2:source}\n$0",
+				Macro:       "Volume=${1:destination}:${2:source}\n$0",
+				FormatGroup: FormatGroupStorage,
 			},
 			{
 				Label: "WorkingDir",
@@ -962,6 +1019,7 @@ $0
 					"",
 					"Equivalent to the Podman `--add-host` option. This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "ContainersConfModule",
@@ -986,6 +1044,7 @@ $0
 					"9.9.9.9",
 					"149.112.112.112",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "DNSOption",
@@ -994,6 +1053,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "DNSSearch",
@@ -1002,6 +1062,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "ExitPolicy",
@@ -1043,19 +1104,22 @@ $0
 					"",
 					"Equivalent to the Podman `--hostname` option. This key can be listed multiple times.",
 				},
-				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
+				MinVersion:  utils.BuildPodmanVersion(5, 5, 0),
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "IP",
 				Hover: []string{
 					"Specify a static IPv4 address for the pod, for example **10.88.64.128**. Equivalent to the Podman `--ip` option.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "IP6",
 				Hover: []string{
 					"Specify a static IPv6 address for the pod, for example **fd46:db93:aa76:ac37::10**. Equivalent to the Podman `--ip6` option.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "Label",
@@ -1064,8 +1128,9 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro:      "Label=\"${1:key}=${2:value}\"\n$0",
-				MinVersion: utils.BuildPodmanVersion(5, 6, 0),
+				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
+				MinVersion:  utils.BuildPodmanVersion(5, 6, 0),
+				FormatGroup: FormatGroupLabel,
 			},
 			{
 				Label: "Network",
@@ -1079,6 +1144,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "NetworkAlias",
@@ -1087,6 +1153,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "PodmanArgs",
@@ -1097,6 +1164,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "PodName",
@@ -1105,6 +1173,7 @@ $0
 					"",
 					"Please note that pods and containers cannot have the same name. So, if PodName is set, it must not conflict with any container.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "PublishPort",
@@ -1119,7 +1188,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
+				Macro:       "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "ServiceName",
@@ -1128,6 +1198,7 @@ $0
 					"",
 					"Note, the name should not include the `.service` file extension",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "ShmSize",
@@ -1182,7 +1253,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Volume=${1:destination}:${2:source}\n$0",
+				Macro:       "Volume=${1:destination}:${2:source}\n$0",
+				FormatGroup: FormatGroupStorage,
 			},
 		},
 		"Kube": {
@@ -1194,7 +1266,8 @@ $0
 					"- `local`: Tells Podman to compare the image a container is using to the image with its raw name in local storage. If an image is updated locally, Podman simply restarts the systemd unit executing the Kubernetes Quadlet.",
 					"- `name/(local|registry)`: Tells Podman to perform the `local` or `registry` autoupdate on the specified container name.",
 				},
-				Parameters: []string{"registry", "local"},
+				Parameters:  []string{"registry", "local"},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "ConfigMap",
@@ -1265,6 +1338,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 			{
 				Label: "PublishPort",
@@ -1277,7 +1351,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
+				Macro:       "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
+				FormatGroup: FormatGroupNetwork,
 			},
 			{
 				Label: "SetWorkingDirectory",
@@ -1304,6 +1379,7 @@ $0
 				Hover: []string{
 					"The path, absolute or relative to the location of the unit file, to the Kubernetes YAML file to use.",
 				},
+				FormatGroup: FormatGroupBase,
 			},
 		},
 		"Network": {
