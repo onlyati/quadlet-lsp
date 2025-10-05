@@ -228,3 +228,100 @@ Label="env.server=app01"
 		"wrongly calculated references",
 	)
 }
+
+func Test_ParseQuadletImageOverride(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create foo.container
+	createTempFile(
+		t,
+		tmpDir,
+		"foo.container",
+		` [Container]
+Image=foo.image
+`)
+
+	// Create foo-.container.d/network.conf
+	createTempDir(t, tmpDir, "foo.container.d")
+	createTempFile(
+		t,
+		path.Join(tmpDir, "foo.container.d"),
+		"image.conf",
+		`
+[Container]
+Image=docker.io/library/debian
+`)
+
+	expected := parser.Quadlet{
+		Name:        "foo.container",
+		References:  nil,
+		DisabledQSR: nil,
+		Properties: map[string][]parser.QuadletProperty{
+			"Container": {
+				{
+					"Image", "foo.image",
+				},
+			},
+		},
+		Dropins: []parser.Dropin{
+			{
+				FileName:  "image.conf",
+				Directory: "foo.container.d",
+				Properties: map[string][]parser.QuadletProperty{
+					"Container": {
+						{
+							"Image", "docker.io/library/debian",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	result, err := parser.ParseQuadlet(parser.ParseQuadletConfig{
+		RootDirectory: tmpDir,
+		FileName:      "foo.container",
+	})
+
+	require.NoError(
+		t,
+		err,
+		"error happened during quadlet scan",
+	)
+	assert.Equal(
+		t,
+		expected.Name,
+		result.Name,
+		"quadlet name does not match",
+	)
+	assert.Equal(
+		t,
+		expected.DisabledQSR,
+		result.DisabledQSR,
+		"wrongly parsed disabled QSRs",
+	)
+	assert.Equal(
+		t,
+		expected.Header,
+		result.Header,
+		"wrongly parsed header",
+	)
+	assert.Equal(
+		t,
+		expected.Properties,
+		result.Properties,
+		"wrongly parsed properties",
+	)
+	require.Equal(
+		t,
+		expected.Dropins,
+		result.Dropins,
+		"wrongly parsed dropins",
+	)
+	assert.ElementsMatch(
+		t,
+		expected.References,
+		result.References,
+		"wrongly calculated references",
+	)
+}
