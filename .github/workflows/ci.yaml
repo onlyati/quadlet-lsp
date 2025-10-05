@@ -31,7 +31,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.25.1
+          go-version: 1.24.4
 
       - name: Run Unit Tests
         run: go test ./... -v
