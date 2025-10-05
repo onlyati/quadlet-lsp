@@ -22,12 +22,13 @@ const (
 )
 
 type PropertyMapItem struct {
-	Label       string
-	Hover       []string
-	Parameters  []string
-	Macro       string
-	MinVersion  utils.PodmanVersion
-	FormatGroup FormatGroup
+	Label       string              // Name of the property
+	Hover       []string            // Value for hover action
+	Parameters  []string            // Values for completion
+	Macro       string              // Snippet for completion
+	MinVersion  utils.PodmanVersion // Minimun version for property
+	FormatGroup FormatGroup         // When formatting, this tells where the property is placed
+	MultipleAdd bool                // Property can be repeated multiple times
 }
 
 type CategoryPropertyItem struct {
@@ -264,6 +265,7 @@ $0
 					"AddCapability=CAP_DAC_OVERRIDE CAP_IPC_OWNER",
 					"```",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "AddDevice",
@@ -272,6 +274,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "AddHost",
@@ -282,6 +285,7 @@ $0
 				},
 				Macro:       "AddHost=${1:hostname}:${2:ip}\n$0",
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "Annotation",
@@ -290,7 +294,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Annotation=\"${1:key}=${2:value}\"\n$0",
+				Macro:       "Annotation=\"${1:key}=${2:value}\"\n$0",
+				MultipleAdd: true,
 			},
 			{
 				Label: "AutoUpdate",
@@ -327,6 +332,7 @@ $0
 					"",
 					"This key can be listed multiple times",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNS",
@@ -350,6 +356,7 @@ $0
 					"149.112.112.112",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNSOption",
@@ -359,6 +366,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNSSearch",
@@ -368,6 +376,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "DropCapability",
@@ -381,6 +390,7 @@ $0
 					"DropCapability=CAP_DAC_OVERRIDE CAP_IPC_OWNER",
 					"```",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Entrypoint",
@@ -401,6 +411,7 @@ $0
 				},
 				Macro:       "Environment=\"${1:name}=${2:value}\"\n$0",
 				FormatGroup: FormatGroupEnvironment,
+				MultipleAdd: true,
 			},
 			{
 				Label: "EnvironmentFile",
@@ -437,6 +448,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "GIDMap",
@@ -445,6 +457,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "GlobalArgs",
@@ -455,6 +468,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Group",
@@ -576,6 +590,7 @@ $0
 					"Sets the host name that is available inside the container. Equivalent to the Podman --hostname option.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "Image",
@@ -618,6 +633,7 @@ $0
 				},
 				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
 				FormatGroup: FormatGroupLabel,
+				MultipleAdd: true,
 			},
 			{
 				Label: "LogDriver",
@@ -630,6 +646,7 @@ $0
 				Hover: []string{
 					"Set the log-opt (logging options) used by Podman when running the container. Equivalent to the Podman `--log-opt` option. This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Mask",
@@ -658,6 +675,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupStorage,
+				MultipleAdd: true,
 			},
 			{
 				Label: "Network",
@@ -672,6 +690,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "NetworkAlias",
@@ -681,6 +700,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "NoNewPrivileges",
@@ -724,6 +744,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupBase,
+				MultipleAdd: true,
 			},
 			{
 				Label: "PublishPort",
@@ -738,6 +759,7 @@ $0
 				},
 				Macro:       "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "Pull",
@@ -926,6 +948,7 @@ $0
 					"Sysctl=net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.use_tempaddr=1",
 					"```",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Timezone",
@@ -940,6 +963,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "UIDMap",
@@ -948,6 +972,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Ulimit",
@@ -956,6 +981,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Unmask",
@@ -1001,6 +1027,7 @@ $0
 				},
 				Macro:       "Volume=${1:destination}:${2:source}\n$0",
 				FormatGroup: FormatGroupStorage,
+				MultipleAdd: true,
 			},
 			{
 				Label: "WorkingDir",
@@ -1028,6 +1055,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNS",
@@ -1045,6 +1073,7 @@ $0
 					"149.112.112.112",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNSOption",
@@ -1054,6 +1083,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNSSearch",
@@ -1063,6 +1093,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "ExitPolicy",
@@ -1084,6 +1115,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "GlobalArgs",
@@ -1094,6 +1126,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "HostName",
@@ -1106,6 +1139,7 @@ $0
 				},
 				MinVersion:  utils.BuildPodmanVersion(5, 5, 0),
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "IP",
@@ -1131,6 +1165,7 @@ $0
 				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
 				MinVersion:  utils.BuildPodmanVersion(5, 6, 0),
 				FormatGroup: FormatGroupLabel,
+				MultipleAdd: true,
 			},
 			{
 				Label: "Network",
@@ -1145,6 +1180,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "NetworkAlias",
@@ -1154,6 +1190,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "PodmanArgs",
@@ -1165,6 +1202,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupBase,
+				MultipleAdd: true,
 			},
 			{
 				Label: "PodName",
@@ -1190,6 +1228,7 @@ $0
 				},
 				Macro:       "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "ServiceName",
@@ -1226,6 +1265,7 @@ $0
 				Hover: []string{
 					"Create the pod in a new user namespace using the supplied UID mapping. Equivalent to the Podman `--uidmap` option.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "UserNS",
@@ -1255,6 +1295,7 @@ $0
 				},
 				Macro:       "Volume=${1:destination}:${2:source}\n$0",
 				FormatGroup: FormatGroupStorage,
+				MultipleAdd: true,
 			},
 		},
 		"Kube": {
@@ -1284,6 +1325,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "ExitCodePropagation",
@@ -1305,6 +1347,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "KubeDownForce",
@@ -1328,6 +1371,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "PodmanArgs",
@@ -1339,6 +1383,7 @@ $0
 					"This key can be listed multiple times.",
 				},
 				FormatGroup: FormatGroupBase,
+				MultipleAdd: true,
 			},
 			{
 				Label: "PublishPort",
@@ -1353,6 +1398,7 @@ $0
 				},
 				Macro:       "PublishPort=${1:interface}:${2:exposed}:${3:source}\n$0",
 				FormatGroup: FormatGroupNetwork,
+				MultipleAdd: true,
 			},
 			{
 				Label: "SetWorkingDirectory",
@@ -1390,6 +1436,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "DisableDNS",
@@ -1406,7 +1453,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Parameters: []string{"1.1.1.1", "8.8.8.8"},
+				Parameters:  []string{"1.1.1.1", "8.8.8.8"},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Driver",
@@ -1425,6 +1473,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "GlobalArgs",
@@ -1435,6 +1484,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "InterfaceName",
@@ -1470,6 +1520,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "IPv6",
@@ -1486,7 +1537,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
+				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
+				MultipleAdd: true,
 			},
 			{
 				Label: "NetworkDeleteOnStop",
@@ -1518,6 +1570,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Subnet",
@@ -1538,6 +1591,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Copy",
@@ -1568,6 +1622,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Group",
@@ -1593,7 +1648,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
+				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
+				MultipleAdd: true,
 			},
 			{
 				Label: "Options",
@@ -1610,6 +1666,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Type",
@@ -1665,6 +1722,7 @@ $0
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Creds",
@@ -1704,6 +1762,7 @@ $0
 					"- `Image=docker-archive:/tmp/archive-file.tar`",
 					"- `ImageTag=quay.io/podman/stable:latest`",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "OS",
@@ -1721,6 +1780,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Policy",
@@ -1792,6 +1852,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNS",
@@ -1802,7 +1863,8 @@ $0
 					"",
 					"This is equivalent to the `--dns` option of `podman build`.",
 				},
-				Parameters: []string{"1.1.1.1", "8.8.8.8"},
+				Parameters:  []string{"1.1.1.1", "8.8.8.8"},
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNSOption",
@@ -1811,6 +1873,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "DNSSearch",
@@ -1819,6 +1882,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Environment",
@@ -1830,7 +1894,8 @@ $0
 					"Environment=APP_USERNAME=appuser",
 					"```",
 				},
-				Macro: "Environment=\"${1:name}=${2:value}\"\n$0",
+				Macro:       "Environment=\"${1:name}=${2:value}\"\n$0",
+				MultipleAdd: true,
 			},
 			{
 				Label: "File",
@@ -1859,6 +1924,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "GroupAdd",
@@ -1885,7 +1951,8 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
-				Macro: "Label=\"${1:key}=${2:value}\"\n$0",
+				Macro:       "Label=\"${1:key}=${2:value}\"\n$0",
+				MultipleAdd: true,
 			},
 			{
 				Label: "Network",
@@ -1899,6 +1966,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "PodmanArgs",
@@ -1909,6 +1977,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 			{
 				Label: "Pull",
@@ -1990,6 +2059,7 @@ $0
 					"",
 					"This key can be listed multiple times.",
 				},
+				MultipleAdd: true,
 			},
 		},
 	}
