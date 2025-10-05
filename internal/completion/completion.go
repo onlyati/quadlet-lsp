@@ -5,6 +5,8 @@
 package completion
 
 import (
+	"strings"
+
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -41,6 +43,11 @@ func NewCompletion(
 
 func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.CompletionItem {
 	s.config = config
+
+	// Ignore comment lines
+	if strings.HasPrefix(s.text[s.line], "#") || strings.HasPrefix(s.text[s.line], ";") {
+		return nil
+	}
 
 	// Section suggestions, things that are between '[]'
 	if isItSectionLine(s.text[s.line]) {
