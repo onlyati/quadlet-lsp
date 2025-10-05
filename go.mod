@@ -1,11 +1,11 @@
 module github.com/onlyati/quadlet-lsp
 
-go 1.25.1
+go 1.24.4
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/stretchr/testify v1.11.1
-	github.com/tliron/commonlog v0.2.21
+	github.com/tliron/commonlog v0.2.20
 	github.com/tliron/glsp v0.2.2
 )
 
@@ -24,7 +24,7 @@ require (
 	github.com/sasha-s/go-deadlock v0.3.6 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/sourcegraph/jsonrpc2 v0.2.1 // indirect
-	github.com/tliron/go-kutil v0.4.0 // indirect
+	github.com/tliron/kutil v0.3.27 // indirect
 	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
