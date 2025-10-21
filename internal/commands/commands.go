@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 type EditorCommandExecutor struct {
@@ -19,7 +20,7 @@ type EditorCommandExecutor struct {
 }
 
 type allowedCommand struct {
-	fn      func(command string, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander)
+	fn      func(command *protocol.ExecuteCommandParams, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander)
 	running bool
 }
 
@@ -44,12 +45,12 @@ func NewEditorCommandExecutor(rootDir string) EditorCommandExecutor {
 	}
 }
 
-func (e *EditorCommandExecutor) Run(command string, messenger utils.Messenger, executor utils.Commander) error {
+func (e *EditorCommandExecutor) Run(command *protocol.ExecuteCommandParams, messenger utils.Messenger, executor utils.Commander) error {
 	err := e.tryRun(command, messenger, executor)
 	if err != nil {
 		messenger.SendMessage(
 			utils.MessengerError,
-			"Command failed: "+command+", reason: "+err.Error(),
+			"Command failed: "+command.Command+", reason: "+err.Error(),
 		)
 		return nil
 	}
@@ -57,10 +58,10 @@ func (e *EditorCommandExecutor) Run(command string, messenger utils.Messenger, e
 	return nil
 }
 
-func (e *EditorCommandExecutor) tryRun(command string, messenger utils.Messenger, executor utils.Commander) error {
+func (e *EditorCommandExecutor) tryRun(command *protocol.ExecuteCommandParams, messenger utils.Messenger, executor utils.Commander) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	v, found := e.commands[command]
+	v, found := e.commands[command.Command]
 	if !found {
 		return errors.New("not found")
 	}

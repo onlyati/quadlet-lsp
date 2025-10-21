@@ -246,59 +246,5 @@ func wrapLine(s string, width int) string {
 		}
 	}
 
-	// for len(s) >= width-offset {
-	// 	pos := width - offset
-	// 	part := ""
-	// 	if s[width-offset] == ' ' {
-	// 		part = s[:pos] + " \\"
-	// 	} else {
-	// 		reachedZero := false
-	// 		for i := pos; ; i-- {
-	// 			if i == 0 {
-	// 				pos = 0
-	// 				reachedZero = true
-	// 				break
-	// 			}
-	// 			if s[i] == ' ' {
-	// 				pos = i
-	// 				break
-	// 			}
-	// 		}
-	//
-	// 		contSign := true
-	// 		if reachedZero {
-	// 			for i := pos; i < len(s); i++ {
-	// 				if i == len(s)-1 {
-	// 					contSign = false
-	// 					pos = len(s)
-	// 				}
-	// 				if s[i] == ' ' {
-	// 					pos = i
-	// 					break
-	// 				}
-	// 			}
-	// 		}
-	//
-	// 		if contSign {
-	// 			part = s[:pos] + " \\"
-	// 		} else {
-	// 			part = s[:pos]
-	// 		}
-	// 	}
-	//
-	// 	if offset == 4 {
-	// 		o += " " + part + "\n"
-	// 	} else {
-	// 		o += part + "\n"
-	// 	}
-	//
-	// 	s = s[pos:]
-	//
-	// 	offset = 4 // For further lines line start with '  '
-	// }
-	//
-	// if len(s) != 0 {
-	// 	o += " " + s + "\n"
-	// }
 	return o
 }

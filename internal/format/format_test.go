@@ -178,7 +178,7 @@ Memory=512M
 	}
 }
 
-func Test_WarpLine(t *testing.T) {
+func Test_WrapLine(t *testing.T) {
 	source := `[Container]
 # Healthcheck options
 HealthCmd=/bin/curlcurl -k --fail --connect-timeout 5 https://127.0.0.1:3000/api/healthz
@@ -229,7 +229,7 @@ HealthTimeout=15s
 	}
 }
 
-func Test_Warp(t *testing.T) {
+func Test_Wrap(t *testing.T) {
 	sources := []string{
 		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nunc mauris, pharetra quis nisi in, eleifend vulputate nisl. Fusce justo mauris, aliquam sed urna feugiat, accumsan egestas tellus. Maecenas ut felis a leo tincidunt volutpat eget a nibh.",
 		"HealthCmd=/bin/curl -k --fail  --connect-timeout 5 https://127.0.0.1:3000/api/healthz",
@@ -255,6 +255,6 @@ func Test_Warp(t *testing.T) {
 
 	for i, s := range sources {
 		r := wrapLine(s, 80)
-		require.Equal(t, expected[i], r, "invalid warp")
+		require.Equal(t, expected[i], r, "invalid wrap")
 	}
 }
