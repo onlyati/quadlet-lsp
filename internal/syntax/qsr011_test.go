@@ -46,7 +46,7 @@ func (m mockCommanderQSR011) Run(name string, args ...string) ([]string, error) 
 func createTempFile(t *testing.T, dir, name, content string) string {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	assert.NoError(t, err)
 	return path
 }
@@ -54,7 +54,7 @@ func createTempFile(t *testing.T, dir, name, content string) string {
 func createTempDir(t *testing.T, dir, name string) string {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	err := os.Mkdir(path, 0755)
+	err := os.Mkdir(path, 0o755)
 	assert.NoError(t, err)
 	return path
 }
@@ -302,5 +302,36 @@ func TestQSR011_ValidPodDropins(t *testing.T) {
 
 	if len(diags) != 0 {
 		t.Fatalf("expected 0 diags, but got %d", len(diags))
+	}
+}
+
+func TestQSR011_MoreOption(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
+
+	createTempFile(
+		t,
+		tmpDir,
+		"test1.container",
+		"[Container]\nImage=mock1\nPublishPort=42069:8080/tcp",
+	)
+
+	cases := []SyntaxChecker{
+		NewSyntaxChecker(
+			"[Container]\nImage=mock1\nPublishPort=42069:8080/tcp",
+			"file://"+tmpDir+"/test1.container",
+		),
+	}
+
+	for _, s := range cases {
+		s.commander = mockCommanderQSR011{}
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+		}
+		diags := qsr011(s)
+
+		if len(diags) != 0 {
+			t.Fatalf("Exptected 0 diagnostics, but got %d at %s", len(diags), s.uri)
+		}
 	}
 }
