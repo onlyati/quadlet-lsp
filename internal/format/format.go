@@ -181,37 +181,124 @@ func FormatDocument(text string) string {
 
 func wrapLine(s string, width int) string {
 	offset := 2 // The ' \' continuation sign
+	width -= offset
+	lastPossibleCutPoint := 0
+	lastCutPoint := 0
 	o := ""
-	for len(s) >= width-offset {
-		pos := width - offset
-		part := ""
-		if s[width-offset] == ' ' {
-			part = s[:pos] + " \\"
-		} else {
-			for i := pos; ; i-- {
-				if i == 0 {
-					pos = 0
-					break
+	cutUrgent := false
+
+	for i, c := range s {
+		if i == 0 {
+			continue
+		}
+
+		if c == ' ' && s[i-1] != ' ' {
+			if cutUrgent {
+				if offset == 2 {
+					offset = 4
+					width -= 2
+					o = s[lastPossibleCutPoint:i] + " \\\n"
+					lastCutPoint = i
+				} else {
+					o += " " + s[lastPossibleCutPoint:i] + " \\\n"
 				}
-				if s[i] == ' ' {
-					pos = i
-					break
-				}
+				lastCutPoint = i
+				lastPossibleCutPoint = i
+				continue
 			}
-			part = s[:pos] + " \\"
+			lastPossibleCutPoint = i
 		}
 
-		if offset == 4 {
-			o += " " + part + "\n"
-		} else {
-			o += part + "\n"
+		t := (i - lastCutPoint) % width
+		if t == 0 {
+			if c == ' ' {
+				if offset == 2 {
+					offset = 4
+					width -= 2
+					o = s[lastCutPoint:i] + " \\\n"
+					lastCutPoint = i
+				} else {
+					o += " " + s[lastCutPoint:i] + " \\\n"
+				}
+				lastCutPoint = i
+			} else {
+				if lastCutPoint == lastPossibleCutPoint {
+					cutUrgent = true
+					continue
+				}
+				if offset == 2 {
+					offset = 4
+					width -= 2
+					o = s[lastCutPoint:lastPossibleCutPoint] + " \\\n"
+				} else {
+					o += " " + s[lastCutPoint:lastPossibleCutPoint] + " \\\n"
+				}
+				lastCutPoint = lastPossibleCutPoint
+			}
 		}
-
-		s = s[pos:]
-
-		offset = 4 // For further lines line start with '  '
 	}
 
-	o += " " + s + "\n"
+	if lastCutPoint != len(s) {
+		if offset == 2 {
+			o = s[lastCutPoint:] + "\n"
+		} else {
+			o += " " + s[lastCutPoint:] + "\n"
+		}
+	}
+
+	// for len(s) >= width-offset {
+	// 	pos := width - offset
+	// 	part := ""
+	// 	if s[width-offset] == ' ' {
+	// 		part = s[:pos] + " \\"
+	// 	} else {
+	// 		reachedZero := false
+	// 		for i := pos; ; i-- {
+	// 			if i == 0 {
+	// 				pos = 0
+	// 				reachedZero = true
+	// 				break
+	// 			}
+	// 			if s[i] == ' ' {
+	// 				pos = i
+	// 				break
+	// 			}
+	// 		}
+	//
+	// 		contSign := true
+	// 		if reachedZero {
+	// 			for i := pos; i < len(s); i++ {
+	// 				if i == len(s)-1 {
+	// 					contSign = false
+	// 					pos = len(s)
+	// 				}
+	// 				if s[i] == ' ' {
+	// 					pos = i
+	// 					break
+	// 				}
+	// 			}
+	// 		}
+	//
+	// 		if contSign {
+	// 			part = s[:pos] + " \\"
+	// 		} else {
+	// 			part = s[:pos]
+	// 		}
+	// 	}
+	//
+	// 	if offset == 4 {
+	// 		o += " " + part + "\n"
+	// 	} else {
+	// 		o += part + "\n"
+	// 	}
+	//
+	// 	s = s[pos:]
+	//
+	// 	offset = 4 // For further lines line start with '  '
+	// }
+	//
+	// if len(s) != 0 {
+	// 	o += " " + s + "\n"
+	// }
 	return o
 }
