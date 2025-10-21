@@ -229,6 +229,7 @@ func Test_Warp(t *testing.T) {
 	sources := []string{
 		"HealthCmd=/bin/curl -k --fail  --connect-timeout 5 https://127.0.0.1:3000/api/healthz",
 		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nunc mauris, pharetra quis nisi in, eleifend vulputate nisl. Fusce justo mauris, aliquam sed urna feugiat, accumsan egestas tellus. Maecenas ut felis a leo tincidunt volutpat eget a nibh.",
+		"ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:41eacbe83eca995561fe43814fd4891e16e39632806253848efaf04d3c8a8b84",
 	}
 	expected := []string{
 		`HealthCmd=/bin/curl -k --fail  --connect-timeout 5 \
@@ -239,6 +240,7 @@ func Test_Warp(t *testing.T) {
   sed urna feugiat, accumsan egestas tellus. Maecenas ut felis a leo \
   tincidunt volutpat eget a nibh.
 `,
+		"ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:41eacbe83eca995561fe43814fd4891e16e39632806253848efaf04d3c8a8b84",
 	}
 
 	for i, s := range sources {

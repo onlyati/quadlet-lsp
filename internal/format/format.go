@@ -189,6 +189,10 @@ func wrapLine(s string, width int) string {
 			part = s[:pos] + " \\"
 		} else {
 			for i := pos; ; i-- {
+				if i == 0 {
+					pos = 0
+					break
+				}
 				if s[i] == ' ' {
 					pos = i
 					break

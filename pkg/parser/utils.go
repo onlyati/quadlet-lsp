@@ -1,6 +1,8 @@
 package parser
 
-import "strings"
+import (
+	"strings"
+)
 
 func isItComment(s string) bool {
 	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, ";")
