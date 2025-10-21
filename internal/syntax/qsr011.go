@@ -70,6 +70,9 @@ func qsr011Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 	tmp := strings.Split(q.Value, ":")
 	usedPort := tmp[len(tmp)-1]
 
+	tmp = strings.Split(usedPort, "/")
+	usedPort = tmp[0]
+
 	if !slices.Contains(qsr011Ports, usedPort) {
 		if len(qsr011FailedCheck) == 0 {
 			return []protocol.Diagnostic{
