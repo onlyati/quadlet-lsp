@@ -41,6 +41,8 @@ var (
 			Details: utils.ReturnAsStringPtr("define a new container"),
 			InsertText: utils.ReturnAsStringPtr(`[Unit]
 Description=${1:description}
+StartLimitBurst=5
+StartLimitIntervalSec=90
 
 [Container]
 Image=${2:image}
@@ -49,8 +51,7 @@ $0
 
 [Service]
 Restart=on-failure
-RestartSec=5
-StartLimitBurst=5
+RestartSec=2
 
 [Install]
 WantedBy=default.target
@@ -249,6 +250,38 @@ $0
 					"Note that those settings are independent of and orthogonal to the requirement dependencies as configured by Requires=, Wants=, Requisite=, or BindsTo=. It is a common pattern to include a unit name in both the After= and Wants= options, in which case the unit listed will be started before the unit that is configured with these options.",
 					"",
 					"Note that Before= dependencies on device units have no effect and are not supported. Devices generally become available as a result of an external hotplug event, and systemd creates the corresponding device unit without delay.",
+				},
+			},
+			{
+				Label: "StartLimitBurst",
+				Hover: []string{
+					"Configure unit start rate limiting. Units which are started more than burst times within an interval time span are not permitted to start any more. Use StartLimitIntervalSec= to configure the checking interval and StartLimitBurst= to configure how many starts per interval are allowed.",
+					"",
+					"interval is a time span with the default unit of seconds, but other units may be specified, see systemd.time(7). The special value \"infinity\" can be used to limit the total number of start attempts, even if they happen at large time intervals. Defaults to DefaultStartLimitIntervalSec= in manager configuration file, and may be set to 0 to disable any kind of rate limiting.  burst is a number and defaults to DefaultStartLimitBurst= in manager configuration file.",
+					"",
+					"These configuration options are particularly useful in conjunction with the service setting Restart= (see systemd.service(5)); however, they apply to all kinds of starts (including manual), not just those triggered by the Restart= logic.",
+					"",
+					"Note that units which are configured for Restart=, and which reach the start limit are not attempted to be restarted anymore; however, they may still be restarted manually or from a timer or socket at a later point, after the interval has passed. From that point on, the restart logic is activated again.  systemctl reset-failed will cause the restart rate counter for a service to be flushed, which is useful if the administrator wants to manually start a unit and the start limit interferes with that. Rate-limiting is enforced after any unit condition checks are executed, and hence unit activations with failing conditions do not count towards the rate limit.",
+					"",
+					"When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously has no effect.",
+					"",
+					"This setting does not apply to slice, target, device, and scope units, since they are unit types whose activation may either never fail, or may succeed only a single time.",
+				},
+			},
+			{
+				Label: "StartLimitIntervalSec",
+				Hover: []string{
+					"Configure unit start rate limiting. Units which are started more than burst times within an interval time span are not permitted to start any more. Use StartLimitIntervalSec= to configure the checking interval and StartLimitBurst= to configure how many starts per interval are allowed.",
+					"",
+					"interval is a time span with the default unit of seconds, but other units may be specified, see systemd.time(7). The special value \"infinity\" can be used to limit the total number of start attempts, even if they happen at large time intervals. Defaults to DefaultStartLimitIntervalSec= in manager configuration file, and may be set to 0 to disable any kind of rate limiting.  burst is a number and defaults to DefaultStartLimitBurst= in manager configuration file.",
+					"",
+					"These configuration options are particularly useful in conjunction with the service setting Restart= (see systemd.service(5)); however, they apply to all kinds of starts (including manual), not just those triggered by the Restart= logic.",
+					"",
+					"Note that units which are configured for Restart=, and which reach the start limit are not attempted to be restarted anymore; however, they may still be restarted manually or from a timer or socket at a later point, after the interval has passed. From that point on, the restart logic is activated again.  systemctl reset-failed will cause the restart rate counter for a service to be flushed, which is useful if the administrator wants to manually start a unit and the start limit interferes with that. Rate-limiting is enforced after any unit condition checks are executed, and hence unit activations with failing conditions do not count towards the rate limit.",
+					"",
+					"When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously has no effect.",
+					"",
+					"This setting does not apply to slice, target, device, and scope units, since they are unit types whose activation may either never fail, or may succeed only a single time.",
 				},
 			},
 		},
