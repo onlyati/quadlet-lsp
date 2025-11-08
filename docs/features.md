@@ -28,6 +28,7 @@ Features below are implemented to support following file extensions:
 - `*.kube`
 - `*.pod`
 - `*.build`
+- `*.artifact`
 
 Language server also support the drop-ins directories. For example having
 `foo.container`. Settings can be override or added in a drop-ins file like
