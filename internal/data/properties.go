@@ -1947,6 +1947,7 @@ $0
 					"",
 					"This is equivalent to the `--ignorefile` option of `podman build`.",
 				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
 			},
 			{
 				Label: "ImageTag",
