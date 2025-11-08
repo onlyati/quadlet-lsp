@@ -105,6 +105,16 @@ File=${2:file}
 $0
 `),
 		},
+		"newArtifacet": {
+			Details: utils.ReturnAsStringPtr("define new build"),
+			InsertText: utils.ReturnAsStringPtr(`[Unit]
+Description=${1:description}
+
+[Artifact]
+Artifact=${2:file}
+$0
+`),
+		},
 	}
 
 	PropertiesMap = map[string][]PropertyMapItem{
@@ -299,6 +309,48 @@ $0
 					"```",
 				},
 				MultipleAdd: true,
+				Parameters: []string{
+					"CAP_DAC_OVERRIDE",
+					"CAP_DAC_READ_SEARCH",
+					"CAP_FOWNER",
+					"CAP_FSETID",
+					"CAP_KILL",
+					"CAP_SETGID",
+					"CAP_SETUID",
+					"CAP_SETPCAP",
+					"CAP_LINUX_IMMUTABLE",
+					"CAP_NET_BIND_SERVICE",
+					"CAP_NET_BROADCAST",
+					"CAP_NET_ADMIN",
+					"CAP_NET_RAW",
+					"CAP_IPC_LOCK",
+					"CAP_IPC_OWNER",
+					"CAP_SYS_MODULE",
+					"CAP_SYS_RAWIO",
+					"CAP_SYS_CHROOT",
+					"CAP_SYS_PTRACE",
+					"CAP_SYS_PACCT",
+					"CAP_SYS_ADMIN",
+					"CAP_SYS_BOOT",
+					"CAP_SYS_NICE",
+					"CAP_SYS_RESOURCE",
+					"CAP_SYS_TIME",
+					"CAP_SYS_TTY_CONFIG",
+					"CAP_MKNOD",
+					"CAP_LEASE",
+					"CAP_AUDIT_WRITE",
+					"CAP_AUDIT_CONTROL",
+					"CAP_SETFCAP",
+					"CAP_MAC_OVERRIDE",
+					"CAP_MAC_ADMIN",
+					"CAP_SYSLOG",
+					"CAP_WAKE_ALARM",
+					"CAP_BLOCK_SUSPEND",
+					"CAP_AUDIT_READ",
+					"CAP_PERFMON",
+					"CAP_BPF",
+					"CAP_CHECKPOINT_RESTORE",
+				},
 			},
 			{
 				Label: "AddDevice",
@@ -2141,6 +2193,135 @@ $0
 					"This key can be listed multiple times.",
 				},
 				MultipleAdd: true,
+			},
+		},
+		"Artifact": {
+			{
+				Label: "Artifact",
+				Hover: []string{
+					"The artifact to pull from a registry onto the local machine. This is the only required key for artifact units.",
+					"",
+					"It is required to use a fully qualified artifact name rather than a short name, both for",
+					"performance and robustness reasons.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "AuthFile",
+				Hover: []string{
+					"Path of the authentication file.",
+					"",
+					"This is equivalent to the Podman `--authfile` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "CertDir",
+				Hover: []string{
+					"Use certificates at path (*.crt, *.cert, *.key) to connect to the registry.",
+					"",
+					"This is equivalent to the Podman `--cert-dir` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "ContainersConfModule",
+				Hover: []string{
+					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
+					"",
+					"This key can be listed multiple times.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "Creds",
+				Hover: []string{
+					"The credentials to use when contacting the registry in the format `[username[:password]]`.",
+					"",
+					"This is equivalent to the Podman `--creds` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "DecryptionKey",
+				Hover: []string{
+					"The `[key[:passphrase]]` to be used for decryption of artifacts.",
+					"",
+					"This is equivalent to the Podman `--decryption-key` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "GlobalArgs",
+				Hover: []string{
+					"",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "",
+				Hover: []string{
+					"This key contains a list of arguments passed directly between `podman` and `artifact` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
+					"",
+					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
+					"",
+					"This key can be listed multiple times.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "PodmanArgs",
+				Hover: []string{
+					"This key contains a list of arguments passed directly to the end of the `podman artifact pull` command in the generated file (right before the artifact name in the command line). It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
+					"",
+					"The format of this is a space separated list of arguments, which can optionally be individually escaped to allow inclusion of whitespace and other control characters.",
+					"",
+					"This key can be listed multiple times.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "Quiet",
+				Hover: []string{
+					"Suppress output information when pulling artifacts.",
+					"",
+					"This is equivalent to the Podman `--quiet` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+				Parameters: []string{
+					"true",
+					"false",
+				},
+			},
+			{
+				Label: "Retry",
+				Hover: []string{
+					"Number of times to retry the artifact pull when a HTTP error occurs. Equivalent to the Podman `--retry` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "RetryDelay",
+				Hover: []string{
+					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "ServiceName",
+				Hover: []string{
+					"The (optional) name of the systemd service. If this is not specified, the default value is the same name as the unit, but with a `-artifact` suffix, i.e. a `$name.artifact` file creates a `$name-artifact.service` systemd service.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
+				Label: "TLSVerify",
+				Hover: []string{
+					"Require HTTPS and verification of certificates when contacting registries.",
+					"",
+					"This is equivalent to the Podman `--tls-verify` option.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
 			},
 		},
 	}

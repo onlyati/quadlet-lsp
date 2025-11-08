@@ -11,7 +11,7 @@ import (
 
 // Checking for section headers.
 func qsr001(s SyntaxChecker) []protocol.Diagnostic {
-	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build"}
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build", "artifact"}
 	if c := canFileBeApplied(s.uri, allowedFiles); c == "" {
 		return []protocol.Diagnostic{}
 	}
@@ -24,6 +24,7 @@ func qsr001(s SyntaxChecker) []protocol.Diagnostic {
 		"[Kube]",
 		"[Pod]",
 		"[Build]",
+		"[Artifact]",
 	}
 	lines := strings.SplitSeq(s.documentText, "\n")
 	for line := range lines {

@@ -13,6 +13,7 @@ func TestSection_Valid(t *testing.T) {
 		"Volume",
 		"Image",
 		"Container",
+		"Artifact",
 		"Unit",
 		"Install",
 	}

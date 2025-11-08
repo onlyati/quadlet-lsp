@@ -16,14 +16,15 @@ var qsr004FullyQualifiedImage = regexp.MustCompile(
 func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
-	allowedFiles := []string{"container", "image", "volume"}
+	allowedFiles := []string{"container", "image", "volume", "artifact"}
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		diags = utils.ScanQadlet(
 			s.documentText,
 			utils.PodmanVersion{}, // Does not matter just placeholder here
 			map[utils.ScanProperty]struct{}{
-				{Section: c, Property: "Image"}: {},
+				{Section: c, Property: "Image"}:    {},
+				{Section: c, Property: "Artifact"}: {},
 			},
 			qsr004Action,
 		)
@@ -33,7 +34,9 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 }
 
 func qsr004Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
-	if strings.HasSuffix(q.Value, ".image") || strings.HasSuffix(q.Value, ".build") {
+	isItImage := strings.HasSuffix(q.Value, ".image")
+	isItBuild := strings.HasSuffix(q.Value, ".build")
+	if isItBuild || isItImage {
 		return nil
 	}
 	if qsr004FullyQualifiedImage.MatchString(q.Value) {
