@@ -24,6 +24,10 @@ func TestQSR004_Valid(t *testing.T) {
 			"[Container]\nImage=example.com:5000/test",
 			"test3.container",
 		),
+		NewSyntaxChecker(
+			"[Artifact]\nArtifact=example.com:5000/test",
+			"test3.artifact",
+		),
 	}
 
 	for _, s := range cases {
@@ -75,6 +79,10 @@ func TestQSR004_Invalid(t *testing.T) {
 		NewSyntaxChecker(
 			"[Container]\nImage=localhost/",
 			"test1.container",
+		),
+		NewSyntaxChecker(
+			"[Artifact]\nArtifact=localhost/",
+			"test1.artifact",
 		),
 	}
 
