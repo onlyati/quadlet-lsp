@@ -611,6 +611,23 @@ $0
 				FormatGroup: FormatGroupNetwork,
 			},
 			{
+				Label: "HttpProxy",
+				Hover: []string{
+					"Controls whether proxy environment variables (http_proxy, https_proxy, ftp_proxy, no_proxy) are passed from the Podman process into the container during image pulls and builds.",
+					"",
+					"Set to `true` to enable proxy inheritance (default Podman behavior) or `false` to disable it.",
+					"This option is particularly useful on systems that require proxy configuration for internet access but don't want proxy settings passed to the container runtime.",
+					"",
+					"Equivalent to the Podman `--http-proxy` option.",
+				},
+				FormatGroup: FormatGroupNetwork,
+				Parameters: []string{
+					"true",
+					"false",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
 				Label: "Image",
 				Hover: []string{
 					"The image to run in the container. It is recommended to use a fully qualified image name rather than a short name, both for performance and robustness reasons.",
@@ -1234,6 +1251,16 @@ $0
 				FormatGroup: FormatGroupBase,
 			},
 			{
+				Label: "StopTimeout",
+				Hover: []string{
+					"Sets the time in seconds to wait for the pod to gracefully stop.",
+					"This value is equivalent to the `--time` argument in the podman `pod stop` command when the service is stopped.",
+					"After this period expires, any running containers in the pod are forcibly killed.",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
 				Label: "ShmSize",
 				Hover: []string{
 					"Size of /dev/shm.",
@@ -1819,6 +1846,17 @@ $0
 				},
 			},
 			{
+				Label: "BuildArg",
+				Hover: []string{
+					"Specifies a build argument and its value in the same way environment variables are",
+					"(e.g., env=*value*), but it is not added to the environment variable list in the",
+					"resulting image's configuration. Can be listed multiple times.",
+					"",
+					"This is equivalent to the `--build-arg` option of `podman build`.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
 				Label: "ContainersConfModule",
 				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
@@ -1900,6 +1938,16 @@ $0
 					"",
 					"This is equivalent to the `--group-add` option of `podman build`.",
 				},
+			},
+			{
+				Label: "IgnoreFile",
+				Hover: []string{
+					"Path to an alternate .containerignore file to use when building the image.",
+					"Note that when using a relative path you should also set `SetWorkingDirectory=`",
+					"",
+					"This is equivalent to the `--ignorefile` option of `podman build`.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
 			},
 			{
 				Label: "ImageTag",
