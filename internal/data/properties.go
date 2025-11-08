@@ -1251,6 +1251,15 @@ $0
 				FormatGroup: FormatGroupBase,
 			},
 			{
+				Label: "StopTimeout",
+				Hover: []string{
+					"Sets the time in seconds to wait for the pod to gracefully stop.",
+					"This value is equivalent to the `--time` argument in the podman `pod stop` command when the service is stopped.",
+					"After this period expires, any running containers in the pod are forcibly killed.",
+				},
+				FormatGroup: FormatGroupBase,
+			},
+			{
 				Label: "ShmSize",
 				Hover: []string{
 					"Size of /dev/shm.",
