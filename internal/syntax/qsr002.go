@@ -9,7 +9,7 @@ import (
 
 // Checking for unfinihsed lines
 func qsr002(s SyntaxChecker) []protocol.Diagnostic {
-	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build"}
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build", "artifact"}
 	if c := canFileBeApplied(s.uri, allowedFiles); c == "" {
 		return []protocol.Diagnostic{}
 	}

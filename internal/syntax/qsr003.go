@@ -16,7 +16,7 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 	podmanVersion := s.config.Podman
 	s.config.Mu.RUnlock()
 
-	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build"}
+	allowedFiles := []string{"image", "container", "volume", "network", "kube", "pod", "build", "artifact"}
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		diags = utils.ScanQadlet(
 			s.documentText,
