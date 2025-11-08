@@ -1258,6 +1258,7 @@ $0
 					"After this period expires, any running containers in the pod are forcibly killed.",
 				},
 				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(5, 7, 0),
 			},
 			{
 				Label: "ShmSize",
@@ -1845,6 +1846,17 @@ $0
 				},
 			},
 			{
+				Label: "BuildArg",
+				Hover: []string{
+					"Specifies a build argument and its value in the same way environment variables are",
+					"(e.g., env=*value*), but it is not added to the environment variable list in the",
+					"resulting image's configuration. Can be listed multiple times.",
+					"",
+					"This is equivalent to the `--build-arg` option of `podman build`.",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
 				Label: "ContainersConfModule",
 				Hover: []string{
 					"Load the specified containers.conf(5) module. Equivalent to the Podman `--module` option.",
@@ -1925,6 +1937,15 @@ $0
 					"Assign additional groups to the primary user running within the container process. Also supports the `keep-groups` special flag.",
 					"",
 					"This is equivalent to the `--group-add` option of `podman build`.",
+				},
+			},
+			{
+				Label: "IgnoreFile",
+				Hover: []string{
+					"Path to an alternate .containerignore file to use when building the image.",
+					"Note that when using a relative path you should also set `SetWorkingDirectory=`",
+					"",
+					"This is equivalent to the `--ignorefile` option of `podman build`.",
 				},
 			},
 			{
