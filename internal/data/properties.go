@@ -611,6 +611,23 @@ $0
 				FormatGroup: FormatGroupNetwork,
 			},
 			{
+				Label: "HttpProxy",
+				Hover: []string{
+					"Controls whether proxy environment variables (http_proxy, https_proxy, ftp_proxy, no_proxy) are passed from the Podman process into the container during image pulls and builds.",
+					"",
+					"Set to `true` to enable proxy inheritance (default Podman behavior) or `false` to disable it.",
+					"This option is particularly useful on systems that require proxy configuration for internet access but don't want proxy settings passed to the container runtime.",
+					"",
+					"Equivalent to the Podman `--http-proxy` option.",
+				},
+				FormatGroup: FormatGroupNetwork,
+				Parameters: []string{
+					"true",
+					"false",
+				},
+				MinVersion: utils.BuildPodmanVersion(5, 7, 0),
+			},
+			{
 				Label: "Image",
 				Hover: []string{
 					"The image to run in the container. It is recommended to use a fully qualified image name rather than a short name, both for performance and robustness reasons.",
