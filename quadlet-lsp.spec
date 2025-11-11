@@ -1,6 +1,6 @@
 Name:           quadlet-lsp
-Version:        0.5.0
-Release:        0.5.0
+Version:        0.6.0
+Release:        0.6.0
 Summary:        Podman Quadlet Language Server
 
 License:        GPLv3
