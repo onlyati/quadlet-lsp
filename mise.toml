@@ -1,6 +1,6 @@
 [tasks.build]
 description = "Build languager server to your system"
-run = "CGO_ENABLED=0 go build -o bin/quadlet-lsp"
+run = "CGO_ENABLED=0 go build -mod=vendor -o bin/quadlet-lsp"
 
 [tasks.build_all]
 description = "Make an offline release"
