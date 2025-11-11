@@ -1,0 +1,90 @@
+# github.com/aymanbagabas/go-osc52/v2 v2.0.1
+## explicit; go 1.16
+github.com/aymanbagabas/go-osc52/v2
+# github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+## explicit
+github.com/davecgh/go-spew/spew
+# github.com/fsnotify/fsnotify v1.9.0
+## explicit; go 1.17
+github.com/fsnotify/fsnotify
+github.com/fsnotify/fsnotify/internal
+# github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
+## explicit; go 1.20
+github.com/gorilla/websocket
+# github.com/iancoleman/strcase v0.3.0
+## explicit; go 1.16
+github.com/iancoleman/strcase
+# github.com/lucasb-eyer/go-colorful v1.3.0
+## explicit; go 1.12
+github.com/lucasb-eyer/go-colorful
+# github.com/mattn/go-isatty v0.0.20
+## explicit; go 1.15
+github.com/mattn/go-isatty
+# github.com/muesli/termenv v0.16.0
+## explicit; go 1.17
+github.com/muesli/termenv
+# github.com/petermattis/goid v0.0.0-20250904145737-900bdf8bb490
+## explicit; go 1.17
+github.com/petermattis/goid
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
+## explicit
+github.com/pmezard/go-difflib/difflib
+# github.com/rivo/uniseg v0.4.7
+## explicit; go 1.18
+github.com/rivo/uniseg
+# github.com/sasha-s/go-deadlock v0.3.6
+## explicit
+github.com/sasha-s/go-deadlock
+# github.com/segmentio/ksuid v1.0.4
+## explicit; go 1.12
+github.com/segmentio/ksuid
+# github.com/sourcegraph/jsonrpc2 v0.2.1
+## explicit; go 1.12
+github.com/sourcegraph/jsonrpc2
+github.com/sourcegraph/jsonrpc2/websocket
+# github.com/stretchr/testify v1.11.1
+## explicit; go 1.17
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
+github.com/stretchr/testify/require
+# github.com/tliron/commonlog v0.2.20
+## explicit; go 1.24.4
+github.com/tliron/commonlog
+github.com/tliron/commonlog/simple
+# github.com/tliron/glsp v0.2.2
+## explicit; go 1.21
+github.com/tliron/glsp
+github.com/tliron/glsp/protocol_3_16
+github.com/tliron/glsp/server
+# github.com/tliron/kutil v0.3.27
+## explicit; go 1.24.0
+github.com/tliron/kutil/terminal
+github.com/tliron/kutil/util
+# golang.org/x/crypto v0.42.0
+## explicit; go 1.24.0
+golang.org/x/crypto/blowfish
+golang.org/x/crypto/chacha20
+golang.org/x/crypto/curve25519
+golang.org/x/crypto/internal/alias
+golang.org/x/crypto/internal/poly1305
+golang.org/x/crypto/ssh
+golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
+# golang.org/x/net v0.44.0
+## explicit; go 1.24.0
+golang.org/x/net/internal/socks
+golang.org/x/net/proxy
+# golang.org/x/sys v0.36.0
+## explicit; go 1.24.0
+golang.org/x/sys/cpu
+golang.org/x/sys/plan9
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/term v0.35.0
+## explicit; go 1.24.0
+golang.org/x/term
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3
