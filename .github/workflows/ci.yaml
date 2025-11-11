@@ -18,6 +18,7 @@ on:
       - "Makefile"
       - ".goreleaser.yaml"
       - "mise.toml"
+      - "*.spec"
 
 jobs:
   test:
