@@ -27,6 +27,7 @@
 - [`QSR023` - Invalid systemd specifier is used](#qsr023---invalid-systemd-specifier-is-used)
 - [`QSR024` - Not recommended property usage in Service section](#qsr024---not-recommended-property-usage-in-service-section)
 - [`QSR025` - Image is missing in container](#qsr025---image-is-missing-in-container)
+- [`QSR026` - Artifact is missing in artifact](#qsr026---artifact-is-missing-in-artifact)
 
 <!-- tocstop -->
 
@@ -450,3 +451,13 @@ If this is a rootful Podman, you can ignore the message.
 **Explanation**
 
 The `Image` property is mandatory to specify in container Quadlet files.
+
+## `QSR026` - Artifact is missing in artifact
+
+**Message**
+
+> Artifact Quadlet file does not have Artifact property
+
+**Explanation**
+
+The `Artifact` property is mandatory to specify in artifact Quadlet files.
