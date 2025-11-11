@@ -129,6 +129,8 @@ Example formatted file:
 
 [Unit]
 Description=Gitea application
+StartLimitIntervalSec=90
+StartLimitBurst=5
 Wants=gitea-db.service
 
 [Container]
@@ -164,8 +166,7 @@ UserNS=keep-id
 
 [Service]
 Restart=on-failure
-RestartSec=5
-StartLimitBurst=5
+RestartSec=2
 
 [Install]
 WantedBy=default.target
