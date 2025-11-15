@@ -20,13 +20,21 @@
   in {
     packages = forAllSystems (system: let
       pkgs = nixpkgsFor.${system};
+      version = "0.6.0";
     in {
-      default = pkgs.buildGo124Module {
-        pname = "quadlet-lsp";
-        version = "0.6.0";
-        src = ./.;
-        vendorHash = null;
-      };
+      default =
+        pkgs.buildGo124Module
+        {
+          inherit version;
+          pname = "quadlet-lsp";
+          src = pkgs.fetchFromGitHub {
+            owner = "onlyati";
+            repo = "quadlet-lsp";
+            rev = "v${version}";
+            hash = "sha256-XvTkqkNrsZ+qMnreDMKQtC06jZjYAr3Fn2TLofQqTCA=";
+          };
+          vendorHash = null;
+        };
     });
 
     devShells = forAllSystems (
