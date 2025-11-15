@@ -208,6 +208,7 @@ img {
   text-transform: uppercase;
   color: var(--color-text-muted);
   margin-bottom: 0.75rem;
+  cursor: pointer;
 }
 
 .sidebar-nav {
@@ -282,7 +283,7 @@ h1 {
 h2 {
   font-size: 1.4rem;
   font-weight: 600;
-  margin-top: 1.75rem;
+  margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 

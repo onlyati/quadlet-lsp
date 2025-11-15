@@ -13,10 +13,12 @@ type QuadletDirectory struct {
 type Quadlet struct {
 	Name        string                       // Name of the Quadlet file
 	References  []string                     // Which other Quadlet it reference (e.g.: Network=foo.network)
+	PartOf      []string                     // Which other quadlet refer to this Quadlet
 	DisabledQSR []string                     // Disabled Quadlet Syntax Rules
 	Properties  map[string][]QuadletProperty // Properties for each sections in the file
 	Dropins     []Dropin                     // Properties in drop in directories, list in precedence: latest is the effective
 	Header      []string                     // The comment lines at the beginning of the file, ignored in dropins
+	HeaderHTML  string                       // Converted from markdown to HTML
 	SourceFile  string                       // Original content of the file
 }
 

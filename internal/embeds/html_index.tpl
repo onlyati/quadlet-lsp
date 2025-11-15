@@ -22,14 +22,20 @@
     <main class="site-main">
       <div class="site-main-inner">
         <aside class="sidebar">
-          <div class="sidebar-title">Quadlets</div>
-          <ul class="sidebar-nav">
-          {{ range $key, $value := .Quadlets }}
-            <li>
-              <a class="sidebar-link" href="{{ $key }}.html">{{ $key }}</a>
-            </li>
+          {{ range $key, $value := .MenuItems }}
+          {{ if gt (len $value) 0 }}
+          <details>
+            <summary class="sidebar-title">{{ $key }}</summary>
+            <ul class="sidebar-nav">
+              {{ range $value }}
+              <li>
+                <a class="sidebar-link" href="{{ . }}.html">{{ . }}</a>
+              </li>
+              {{ end }}
+            </ul>
+          </details>
           {{ end }}
-          </ul>
+          {{ end }}
         </aside>
 
         <section class="content">

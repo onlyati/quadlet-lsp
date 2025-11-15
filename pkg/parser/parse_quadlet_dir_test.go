@@ -42,6 +42,7 @@ Image=docker.io/library/debian
 				DisabledQSR: nil,
 				Name:        "foo.container",
 				References:  []string{"foo.image"},
+				PartOf:      nil,
 				Dropins:     nil,
 				Header:      nil,
 				Properties: map[string][]parser.QuadletProperty{
@@ -60,6 +61,7 @@ Exec=tail \
 				DisabledQSR: nil,
 				Name:        "foo.image",
 				References:  nil,
+				PartOf:      []string{"foo.container"},
 				Dropins:     nil,
 				Header:      nil,
 				Properties: map[string][]parser.QuadletProperty{

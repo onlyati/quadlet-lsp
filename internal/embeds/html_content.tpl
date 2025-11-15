@@ -22,27 +22,53 @@
     <main class="site-main">
       <div class="site-main-inner">
         <aside class="sidebar">
-          <div class="sidebar-title">Quadlets</div>
-          <ul class="sidebar-nav">
-          {{ range $key, $value := .All.Quadlets }}
-            <li>
-              <a class="sidebar-link" href="{{ $key }}.html">{{ $key }}</a>
-            </li>
+          {{ range $key, $value := .MenuItems }}
+          {{ if gt (len $value) 0 }}
+          <details>
+            <summary class="sidebar-title">{{ $key }}</summary>
+            <ul class="sidebar-nav">
+              {{ range $value }}
+              <li>
+                <a class="sidebar-link" href="{{ . }}.html">{{ . }}</a>
+              </li>
+              {{ end }}
+            </ul>
+          </details>
           {{ end }}
-          </ul>
+          {{ end }}
         </aside>
 
         <section class="content">
           <div class="content-header">
             <h1>{{ .Q.Name }}</h1>
           </div>
-          {{ if .Q.Header }}
+          {{ if .Q.HeaderHTML }}
           <div class="card">
-            <p>
-              {{ range .Q.Header }}
-              {{ . }}
-              {{ end }}
-            </p>
+            <p>{{ .Q.HeaderHTML }}</p>
+          </div>
+          {{ end }}
+          {{ if .Q.PartOf }}
+          <div class="card">
+            <div class="card-header">
+              <h2 class="quadlet-section-title">Part of these units</h2>
+            </div>
+            <div class="flex gap-4">
+            {{ range .Q.PartOf }}
+            <a class="btn btn-ghost" href="{{ . }}.html">{{ . }}</a>
+            {{ end }}
+            </div>
+          </div>
+          {{ end }}
+          {{ if .Q.References }}
+          <div class="card">
+            <div class="card-header">
+              <h2 class="quadlet-section-title">Other unit references</h2>
+            </div>
+            <div class="flex gap-4">
+            {{ range .Q.References }}
+            <a class="btn btn-ghost" href="{{ . }}.html">{{ . }}</a>
+            {{ end }}
+            </div>
           </div>
           {{ end }}
           {{ range $key, $value := .Q.Properties }}

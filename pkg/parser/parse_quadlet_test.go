@@ -257,6 +257,12 @@ Label="env.server=app01"
 		result.Dropins,
 		"wrongly parsed dropins",
 	)
+	require.Equal(
+		t,
+		expected.SourceFile,
+		result.SourceFile,
+		"wrongly parsed dropins",
+	)
 	assert.ElementsMatch(
 		t,
 		expected.References,

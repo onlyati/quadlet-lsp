@@ -56,5 +56,16 @@ func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
 		qd.Quadlets[e.Name()] = q
 	}
 
+	// Check which quadlet refer to specific one (reverse of References)
+	for name := range qd.Quadlets {
+		for _, sq := range qd.Quadlets {
+			if slices.Contains(sq.References, name) {
+				q := qd.Quadlets[name]
+				q.PartOf = append(q.PartOf, sq.Name)
+				qd.Quadlets[name] = q
+			}
+		}
+	}
+
 	return qd, nil
 }

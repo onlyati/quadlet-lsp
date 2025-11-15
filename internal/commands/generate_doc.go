@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/onlyati/quadlet-lsp/internal/embeds"
@@ -175,9 +177,59 @@ func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils
 		return
 	}
 
+	// Get the main menu items
+	menuItems := map[string][]string{
+		"Pods":       {},
+		"Containers": {},
+		"Artifacts":  {},
+		"Networks":   {},
+		"Volumes":    {},
+		"Build":      {},
+		"Images":     {},
+		"Kubes":      {},
+	}
+	for name := range qd.Quadlets {
+		if strings.HasSuffix(name, ".pod") {
+			menuItems["Pods"] = append(menuItems["Pods"], name)
+		}
+		if strings.HasSuffix(name, ".container") {
+			menuItems["Containers"] = append(menuItems["Containers"], name)
+		}
+		if strings.HasSuffix(name, ".artifact") {
+			menuItems["Artifacts"] = append(menuItems["Artifacts"], name)
+		}
+		if strings.HasSuffix(name, ".network") {
+			menuItems["Networks"] = append(menuItems["Networks"], name)
+		}
+		if strings.HasSuffix(name, ".volume") {
+			menuItems["Volumes"] = append(menuItems["Volumes"], name)
+		}
+		if strings.HasSuffix(name, ".build") {
+			menuItems["Builds"] = append(menuItems["Builds"], name)
+		}
+		if strings.HasSuffix(name, ".image") {
+			menuItems["Images"] = append(menuItems["Images"], name)
+		}
+		if strings.HasSuffix(name, ".kube") {
+			menuItems["Kubes"] = append(menuItems["Kubes"], name)
+		}
+	}
+	sort.Strings(menuItems["Pods"])
+	sort.Strings(menuItems["Containers"])
+	sort.Strings(menuItems["Artifacts"])
+	sort.Strings(menuItems["Networks"])
+	sort.Strings(menuItems["Volumes"])
+	sort.Strings(menuItems["Builds"])
+	sort.Strings(menuItems["Images"])
+	sort.Strings(menuItems["Kubes"])
+
 	// Generate index.html
 	buf = bytes.Buffer{}
-	err = t.ExecuteTemplate(&buf, "html_index.tpl", qd)
+	err = t.ExecuteTemplate(&buf, "html_index.tpl", struct {
+		MenuItems map[string][]string
+	}{
+		MenuItems: menuItems,
+	})
 	if err != nil {
 		messenger.SendMessage(
 			utils.MessengerError,
@@ -199,11 +251,11 @@ func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils
 	for name, q := range qd.Quadlets {
 		buf = bytes.Buffer{}
 		err = t.ExecuteTemplate(&buf, "html_content.tpl", struct {
-			All parser.QuadletDirectory
-			Q   parser.Quadlet
+			MenuItems map[string][]string
+			Q         parser.Quadlet
 		}{
-			All: qd,
-			Q:   q,
+			MenuItems: menuItems,
+			Q:         q,
 		})
 		if err != nil {
 			messenger.SendMessage(

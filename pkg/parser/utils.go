@@ -13,7 +13,12 @@ func removeCommentSign(s string) string {
 	if !found {
 		s, _ = strings.CutPrefix(s, ";")
 	}
-	s = strings.TrimSpace(s)
+	s = strings.TrimRight(s, " ")
+	if len(s) > 0 {
+		if s[0] == ' ' {
+			s = s[1:]
+		}
+	}
 	return s
 }
 
