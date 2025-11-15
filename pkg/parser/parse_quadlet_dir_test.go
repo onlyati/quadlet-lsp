@@ -50,6 +50,11 @@ Image=docker.io/library/debian
 						{"Exec", "tail -f /dev/null"},
 					},
 				},
+				SourceFile: ` [Container]
+Image=foo.image
+Exec=tail \
+  -f /dev/null
+`,
 			},
 			"foo.image": {
 				DisabledQSR: nil,
@@ -62,6 +67,9 @@ Image=docker.io/library/debian
 						{"Image", "docker.io/library/debian"},
 					},
 				},
+				SourceFile: `[Image]
+Image=docker.io/library/debian
+`,
 			},
 		},
 	}

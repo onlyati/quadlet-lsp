@@ -17,6 +17,7 @@ type Quadlet struct {
 	Properties  map[string][]QuadletProperty // Properties for each sections in the file
 	Dropins     []Dropin                     // Properties in drop in directories, list in precedence: latest is the effective
 	Header      []string                     // The comment lines at the beginning of the file, ignored in dropins
+	SourceFile  string                       // Original content of the file
 }
 
 // QuadletProperty Key-value pair in Quadlet file
@@ -27,7 +28,9 @@ type QuadletProperty struct {
 
 // Dropin directory to override settings from Quadlet files
 type Dropin struct {
-	Directory  string                       // Name of directory where dropin put
-	FileName   string                       // Name of the file in dropin directory
+	Directory string // Name of directory where dropin put
+	FileName  string // Name of the file in dropin directory
+
 	Properties map[string][]QuadletProperty // Content of the file
+	SourceFile string                       // Original content of the file
 }

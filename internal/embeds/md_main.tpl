@@ -13,36 +13,37 @@
 
 {{ if .References }}
 ### References
+
 {{ range .References }}
 - [{{ . }}](#{{ . }})
 {{- end}}
 {{- end}}
 
 {{ if .Properties }}
-### File
 
-| Section | Property | Value |
-| ------- | -------- | ----- |
 {{- range $key, $value := .Properties }}
+### {{ $key }}
+
 {{- range $value }}
-| {{ $key }} | {{ .Property }} | `{{ .Value }}` |
+- {{ .Property }}: `{{ .Value }}`
 {{- end }}
 
 {{- end }}
 {{- end}}
 
 {{ if .Dropins }}
-### Dropins
 
-| Location | Section | Property | Value |
-| -------- | ------- | -------- | ----- |
 {{- range $dropins := .Dropins }}
+### Dropins - {{ $dropins.Directory }}/{{ $dropins.FileName }}
+
 {{- range $key, $value := .Properties }}
+#### {{ $key }}
+
 {{- range $value }}
-| {{ $dropins.Directory }}/{{ $dropins.FileName }} | {{ $key }} | {{ .Property }} | `{{ .Value }}` |
+- {{ .Property }}: `{{ .Value }}`
 {{- end }}
-{{- end}}
-{{- end}}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{ end }}

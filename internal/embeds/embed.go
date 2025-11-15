@@ -1,4 +1,4 @@
-// Packkage embdes
+// Package embeds
 //
 // Package to store embedded files for templates
 package embeds

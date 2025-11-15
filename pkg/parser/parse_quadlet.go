@@ -26,6 +26,7 @@ func ParseQuadlet(c ParseQuadletConfig) (Quadlet, error) {
 	if err != nil {
 		return Quadlet{}, err
 	}
+	q.SourceFile = string(content)
 
 	recordQSR := true
 	recordHeader := false
@@ -283,6 +284,7 @@ func parseDropins(dirPath, parentDir string, entries []os.DirEntry) ([]Dropin, e
 			FileName:   e.Name(),
 			Directory:  parentDir,
 			Properties: make(map[string][]QuadletProperty),
+			SourceFile: string(content),
 		}
 
 		for l := range strings.SplitSeq(string(content), "\n") {

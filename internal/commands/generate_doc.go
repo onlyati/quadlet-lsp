@@ -41,6 +41,8 @@ func generateDoc(
 				generateDocJSON(qd, rootDir, messenger)
 			case "md":
 				generateDocMd(qd, rootDir, messenger)
+			case "html":
+				generateDocHTML(qd, rootDir, messenger)
 			default:
 				messenger.SendMessage(
 					utils.MessengerError,
@@ -69,8 +71,22 @@ func generateDocJSON(qd parser.QuadletDirectory, rootDir string, messenger utils
 			"failed to generate doc: "+err.Error(),
 		)
 	}
-	os.MkdirAll(path.Join(rootDir, "doc"), os.FileMode(0o755))
-	os.WriteFile(path.Join(rootDir, "doc", "doc.json"), file, 0o644)
+	err = os.MkdirAll(path.Join(rootDir, "doc"), os.FileMode(0o755))
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+	err = os.WriteFile(path.Join(rootDir, "doc", "doc.json"), file, 0o644)
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
 
 	messenger.SendMessage(
 		utils.MessengerInfo,
@@ -98,8 +114,114 @@ func generateDocMd(qd parser.QuadletDirectory, rootDir string, messenger utils.M
 		return
 	}
 
-	os.MkdirAll(path.Join(rootDir, "doc"), os.FileMode(0o755))
-	os.WriteFile(path.Join(rootDir, "doc", "doc.md"), buf.Bytes(), 0o644)
+	err = os.MkdirAll(path.Join(rootDir, "doc"), os.FileMode(0o755))
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+	err = os.WriteFile(path.Join(rootDir, "doc", "doc.md"), buf.Bytes(), 0o644)
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+
+	messenger.SendMessage(
+		utils.MessengerInfo,
+		"Document is generated",
+	)
+}
+
+func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils.Messenger) {
+	t, err := template.ParseFS(embeds.TemplateFs, "*.tpl")
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+
+	// Generate style.css
+	var buf bytes.Buffer
+	err = t.ExecuteTemplate(&buf, "html_style.tpl", qd)
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+
+	err = os.MkdirAll(path.Join(rootDir, "doc"), os.FileMode(0o755))
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+	err = os.WriteFile(path.Join(rootDir, "doc", "style.css"), buf.Bytes(), 0o644)
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+
+	// Generate index.html
+	buf = bytes.Buffer{}
+	err = t.ExecuteTemplate(&buf, "html_index.tpl", qd)
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+
+	err = os.WriteFile(path.Join(rootDir, "doc", "index.html"), buf.Bytes(), 0o644)
+	if err != nil {
+		messenger.SendMessage(
+			utils.MessengerError,
+			"Internal error: "+err.Error(),
+		)
+		return
+	}
+
+	// Generate <content>.html files
+	for name, q := range qd.Quadlets {
+		buf = bytes.Buffer{}
+		err = t.ExecuteTemplate(&buf, "html_content.tpl", struct {
+			All parser.QuadletDirectory
+			Q   parser.Quadlet
+		}{
+			All: qd,
+			Q:   q,
+		})
+		if err != nil {
+			messenger.SendMessage(
+				utils.MessengerError,
+				"Internal error: "+err.Error(),
+			)
+			return
+		}
+
+		err = os.WriteFile(path.Join(rootDir, "doc", name+".html"), buf.Bytes(), 0o644)
+		if err != nil {
+			messenger.SendMessage(
+				utils.MessengerError,
+				"Internal error: "+err.Error(),
+			)
+			return
+		}
+	}
 
 	messenger.SendMessage(
 		utils.MessengerInfo,

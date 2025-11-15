@@ -138,6 +138,28 @@ Label="env.server=app01"
 			"foo-bar.network",
 			"bar.network",
 		},
+		SourceFile: `# disable-qsr: qsr014 qsr014
+# disable-qsr: qsr007
+;
+; # Description
+# Lorem ipsum dolor sit amet.
+
+[Unit]
+Description=Foo container
+
+[Container]
+Pod=foo.pod
+Image=foo.image
+Exec=tail \
+  -f /dev/null
+Volume=foo.volume:/app
+
+# Network options
+Network=foo.network
+
+[Install]
+WantedBy=default.target
+`,
 		Dropins: []parser.Dropin{
 			{
 				Directory: "foo-bar.container.d",
@@ -149,6 +171,10 @@ Label="env.server=app01"
 						},
 					},
 				},
+				SourceFile: `
+[Container]
+Network=foo-bar.network
+`,
 			},
 			{
 				Directory: "foo-.container.d",
@@ -163,6 +189,11 @@ Label="env.server=app01"
 						},
 					},
 				},
+				SourceFile: `
+[Container]
+PublishPort=8080:80
+Network=bar.network
+`,
 			},
 			{
 				Directory: "container.d",
@@ -177,6 +208,11 @@ Label="env.server=app01"
 						},
 					},
 				},
+				SourceFile: `
+[Container]
+Label="env.type=prod"
+Label="env.server=app01"
+`,
 			},
 		},
 	}
@@ -263,6 +299,9 @@ Image=docker.io/library/debian
 				},
 			},
 		},
+		SourceFile: ` [Container]
+Image=foo.image
+`,
 		Dropins: []parser.Dropin{
 			{
 				FileName:  "image.conf",
@@ -274,6 +313,10 @@ Image=docker.io/library/debian
 						},
 					},
 				},
+				SourceFile: `
+[Container]
+Image=docker.io/library/debian
+`,
 			},
 		},
 	}
