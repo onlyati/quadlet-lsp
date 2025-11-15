@@ -1,6 +1,6 @@
 Name:           quadlet-lsp
-Version:        0.5.0
-Release:        0.5.0
+Version:        0.6.0
+Release:        0.6.0
 Summary:        Podman Quadlet Language Server
 
 License:        GPLv3
@@ -27,7 +27,7 @@ Following features are currently available:
 %autosetup -n %{name}-%{version}
 
 %build
-CGO_ENABLED=0 go build -o %{name}
+CGO_ENABLED=0 go build -mod=vendor -o %{name}
 
 %install
 install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
@@ -40,6 +40,8 @@ install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
 %{_bindir}/%{name}
 
 %changelog
+* Tue Nov 11 2025 Attila Molnar <onlyati@pm.me>
+- Release v0.6.0 language server
 * Tue Sep 25 2025 Attila Molnar <onlyati@pm.me>
 - Release v0.5.0 language server
 * Tue Sep 16 2025 Attila Molnar <onlyati@pm.me> 
