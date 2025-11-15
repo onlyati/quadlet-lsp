@@ -130,6 +130,30 @@ sudo apt install quadlet-lsp
 Check GitHub [release page](https://github.com/onlyati/quadlet-lsp/releases) and
 download the version you need, then install it manually.
 
+### Install from Nix flake
+
+Add this repo to your flake's inputs.
+
+```nix
+inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    quadlet-lsp.url = "github:onlyati/quadlet-lsp";
+};
+```
+
+Add the default package to your packages list.
+
+```nix
+environment.systemPackages = [
+    inputs.quadlet-lsp.packages.${system}.default
+];
+
+# Home Manager
+home.packages = [
+    inputs.quadlet-lsp.packages.${system}.default
+];
+```
+
 ### Download the compiled version
 
 Check GitHub [release page](https://github.com/onlyati/quadlet-lsp/releases) and
