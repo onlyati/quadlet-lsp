@@ -1,3 +1,6 @@
 bin
 # Added by goreleaser init:
 dist/
+
+# `nix build`
+result/
