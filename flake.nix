@@ -35,6 +35,19 @@
           };
 
           vendorHash = null;
+
+          meta = {
+            description = "LSP implementation for Podman Quadlet files";
+
+            longDescription = ''
+              This is an implementation of the language server for Podman Quadlet files.
+
+              Features include code completion, hover menu, go to definition/references, syntax checking, and executing built-in commands.
+            '';
+
+            homepage = "https://github.com/onlyati/quadlet-lsp";
+            license = pkgs.lib.licenses.gpl3;
+          };
         };
     });
 
