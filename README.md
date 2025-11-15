@@ -11,6 +11,7 @@
     * [Install from Fedora copr](#install-from-fedora-copr)
     * [Install from Debian registry](#install-from-debian-registry)
     * [Install from .deb and .rpm package](#install-from-deb-and-rpm-package)
+    * [Install from Nix flake](#install-from-nix-flake)
     * [Download the compiled version](#download-the-compiled-version)
     * [Compile with Go](#compile-with-go)
 
