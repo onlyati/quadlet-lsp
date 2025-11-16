@@ -36,7 +36,7 @@ func NewEditorCommandExecutor(rootDir string) EditorCommandExecutor {
 				running: false,
 			},
 			"generateDoc": {
-				fn:      generateDoc,
+				fn:      GenerateDoc,
 				running: false,
 			},
 		},

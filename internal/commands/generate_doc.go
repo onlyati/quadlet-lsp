@@ -15,7 +15,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func generateDoc(
+func GenerateDoc(
 	command *protocol.ExecuteCommandParams,
 	e *EditorCommandExecutor,
 	messenger utils.Messenger,
