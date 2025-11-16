@@ -194,6 +194,7 @@ markdown format.
 ![doc_sample_1](./assets/docs_sample_1.png)
 ![doc_sample_2](./assets/docs_sample_2.png)
 ![doc_sample_3](./assets/docs_sample_3.png)
+![doc_sample_4](./assets/docs_sample_4.png)
 
 ## Hover menu
 
