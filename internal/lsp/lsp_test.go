@@ -23,7 +23,7 @@ func TestRunCLI(t *testing.T) {
 		{"quadlet-lsp", "check", tmpDir},
 	}
 	for _, arg := range args {
-		rc, output := runCLI(arg, utils.CommandExecutor{})
+		rc, output := runCheckCLI(arg, utils.CommandExecutor{})
 
 		if len(output) != 3 {
 			t.Fatalf("expected 2 line output but got %d at %v", len(output), arg)

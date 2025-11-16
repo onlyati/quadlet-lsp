@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 type mockMessenger struct {
@@ -31,7 +32,7 @@ func TestPullAll_ValidListJobs(t *testing.T) {
 	messenger := mockMessenger{}
 
 	err := commandExecutor.Run(
-		"listJobs",
+		&protocol.ExecuteCommandParams{Command: "listJobs"},
 		&messenger,
 		mockCommander{},
 	)
@@ -56,7 +57,7 @@ func TestPullAll_InvalidCommand(t *testing.T) {
 	messenger := mockMessenger{}
 
 	err := commandExecutor.Run(
-		"nonexist",
+		&protocol.ExecuteCommandParams{Command: "nonexist"},
 		&messenger,
 		mockCommander{},
 	)

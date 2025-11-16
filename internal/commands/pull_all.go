@@ -8,10 +8,11 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func pullAll(command string, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander) {
-	defer e.resetRunning(command)
+func pullAll(command *protocol.ExecuteCommandParams, e *EditorCommandExecutor, messenger utils.Messenger, executor utils.Commander) {
+	defer e.resetRunning(command.Command)
 
 	e.mutex.Lock()
 	rootDir := e.rootDir

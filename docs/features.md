@@ -7,6 +7,7 @@
     * [Disable syntax rule per file](#disable-syntax-rule-per-file)
 - [Configuration file](#configuration-file)
 - [Format file](#format-file)
+- [Generate document](#generate-document)
 - [Hover menu](#hover-menu)
     * [Hover on properties](#hover-on-properties)
     * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
@@ -44,10 +45,20 @@ changing the actual Quadlet files.
 
 Language server provides some command that can be called from IDEs.
 
-| Command name | Neovim Command  | VS Code command          | Description                                                |
-| ------------ | --------------- | ------------------------ | ---------------------------------------------------------- |
-| listJobs     | QuadletListJobs | Quadlet: List activities | List which background tasks are running                    |
-| pulAll       | QuadletPullAll  | Quadlet: Pull All        | Looking for all images in the directory and pull them down |
+- List which background tasks are running
+  - Name: listJobs
+  - Neovim command: `QuadletListJobs`
+  - VS Code command: `Quadlet: List activities`
+- Looking for all images in the directory and pull them down
+  - Name: pullAll
+  - Neovim command: `QuadletPullAll`
+  - VS Code command: `Quadlet: Pull All`
+- Generate documentation
+  - Name: generateDoc
+  - Neovim command: `QuadletGenerateHTML`, `QuadletGenerateMd`,
+    `QuadletGenerateJSON`
+  - VS Code command: `Quadlet: Generate HTML`, `Quadlet: Generate Markdown`,
+    `Quadlet: Generate JSON`
 
 ## Syntax checking
 
@@ -172,6 +183,18 @@ RestartSec=2
 WantedBy=default.target
 
 ```
+
+## Generate document
+
+Language server has a feature to generate documentation. Command can be invoked
+from editor using editor commands or CLI using `quadlet-lsp doc` command. The
+comment section at the beginning of the file marked as header. This accept
+markdown format.
+
+![doc_sample_1](./assets/docs_sample_1.png)
+![doc_sample_2](./assets/docs_sample_2.png)
+![doc_sample_3](./assets/docs_sample_3.png)
+![doc_sample_4](./assets/docs_sample_4.png)
 
 ## Hover menu
 
