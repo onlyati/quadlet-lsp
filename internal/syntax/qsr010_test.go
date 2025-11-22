@@ -36,6 +36,29 @@ func TestQSR010_Valid(t *testing.T) {
 			"[Kube]\nPublishPort=10.0.0.1::69",
 			"test8.container",
 		),
+		// Test cases for protocol suffix support
+		// See: https://docs.podman.io/en/v5.0.1/markdown/podman-run.1.html
+		// Format: [[ip:]hostPort:]containerPort[/protocol]
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=22000:22000/tcp",
+			"test9.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=22000:22000/udp",
+			"test10.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=22000:22000/sctp",
+			"test11.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=10.0.0.1:22000:22000/tcp",
+			"test12.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=10.0.0.1:22000:22000/udp",
+			"test13.container",
+		),
 	}
 
 	for _, s := range cases {
