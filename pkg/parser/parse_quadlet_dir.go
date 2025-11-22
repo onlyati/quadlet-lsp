@@ -20,10 +20,7 @@ func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
 		disableRules := struct {
 			Disabled []string `json:"disabled"`
 		}{}
-		err := json.Unmarshal(content, &disableRules)
-		if err != nil {
-			return QuadletDirectory{}, err
-		}
+		_ = json.Unmarshal(content, &disableRules)
 		qd.DisabledQSR = disableRules.Disabled
 	}
 

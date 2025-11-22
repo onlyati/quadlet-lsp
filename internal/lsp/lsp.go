@@ -5,11 +5,11 @@ package lsp
 
 import (
 	"fmt"
-	"os"
 	"path"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/commands"
+	"github.com/onlyati/quadlet-lsp/internal/data"
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	_ "github.com/tliron/commonlog/simple"
@@ -21,7 +21,7 @@ import (
 const lsName = "quadlet"
 
 var (
-	version   = "0.7.0rc1"
+	version   = data.ProgramVersion
 	handler   protocol.Handler
 	config    *utils.QuadletConfig
 	documents = utils.NewDocuments()
@@ -30,33 +30,6 @@ var (
 
 // Start Entry point of the language server
 func Start() {
-	// To download automatically during extension install,
-	// I've made a simple `version` subcommand, so it is easy
-	// to verify which version is downloaded and need to download newer one
-	args := os.Args
-	if len(args) >= 2 {
-		if args[1] == "version" {
-			fmt.Println(version)
-			return
-		}
-
-		if args[1] == "check" {
-			rc, output := runCheckCLI(args, utils.CommandExecutor{})
-			for _, l := range output {
-				fmt.Println(l)
-			}
-			os.Exit(rc)
-		}
-
-		if args[1] == "doc" {
-			rc, output := runDocCLI(args, utils.CommandExecutor{})
-			for _, l := range output {
-				fmt.Println(l)
-			}
-			os.Exit(rc)
-		}
-	}
-
 	handler = protocol.Handler{
 		// The `hello` and `goodbye` handlers
 		Initialize:  initialize,
@@ -144,7 +117,10 @@ func Start() {
 
 	server := server.NewServer(&handler, lsName, false)
 
-	server.RunStdio()
+	err := server.RunStdio()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, error) {
