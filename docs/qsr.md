@@ -232,6 +232,9 @@ Valid formats for `PublishPort`:
 ```ini
 PublishPort=10.0.0.1:10069:69
 PublishPort=10420:420
+PublishPort=443:443/tcp
+PublishPort=443:443/udp
+PublishPort=127.0.0.1:3000:3000/tcp
 ```
 
 ## `QSR011` - Port is not exposed in image
