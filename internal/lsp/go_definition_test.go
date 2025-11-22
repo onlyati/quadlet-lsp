@@ -11,22 +11,14 @@ import (
 func createTestFile(t *testing.T, dir, name, content string) string {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0644)
-	assert.NoError(t, err)
-	return path
-}
-
-func createTempDir(t *testing.T, dir, name string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.Mkdir(path, 0755)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	assert.NoError(t, err)
 	return path
 }
 
 func TestFindQuadlets_MatchingFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTestFile(t, tmpDir, "mypod.pod", "dummy content")
 
@@ -37,7 +29,7 @@ func TestFindQuadlets_MatchingFile(t *testing.T) {
 
 func TestFindQuadlets_VolumeColonSuffix(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTestFile(t, tmpDir, "myvol.volume", "dummy content")
 
@@ -48,7 +40,7 @@ func TestFindQuadlets_VolumeColonSuffix(t *testing.T) {
 
 func TestFindQuadlets_NoMatch(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTestFile(t, tmpDir, "somethingelse.network", "dummy content")
 

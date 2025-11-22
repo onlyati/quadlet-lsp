@@ -2,8 +2,8 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"os"
-	"path"
 	"slices"
 	"strings"
 
@@ -25,7 +25,7 @@ func ParseQuadlet(c ParseQuadletConfig) (Quadlet, error) {
 	q.Name = c.FileName
 
 	// First parse the file itself
-	qPath := path.Join(c.RootDirectory, c.FileName)
+	qPath := fmt.Sprintf("%s%c%s", c.RootDirectory, os.PathSeparator, c.FileName)
 	content, err := os.ReadFile(qPath)
 	if err != nil {
 		return Quadlet{}, err
@@ -102,7 +102,10 @@ func ParseQuadlet(c ParseQuadletConfig) (Quadlet, error) {
 		}
 		dirPath += "." + extension + ".d"
 		parentDir := dirPath
-		dirPath = path.Join(c.RootDirectory, dirPath)
+		dirPath = fmt.Sprintf(
+			"%s%c%s",
+			c.RootDirectory, os.PathSeparator, dirPath,
+		)
 
 		entries, err := os.ReadDir(dirPath)
 		if err != nil {
@@ -117,7 +120,7 @@ func ParseQuadlet(c ParseQuadletConfig) (Quadlet, error) {
 	}
 
 	// Then looking for the generic <extension>.d directory
-	dirPath := path.Join(c.RootDirectory, extension+".d")
+	dirPath := fmt.Sprintf("%s%c%s.d", c.RootDirectory, os.PathSeparator, extension)
 	parentDir := extension + ".d"
 	entries, err := os.ReadDir(dirPath)
 	if err == nil {
@@ -287,7 +290,7 @@ func parseDropins(dirPath, parentDir string, entries []os.DirEntry) ([]Dropin, e
 			continue
 		}
 
-		content, err := os.ReadFile(path.Join(dirPath, e.Name()))
+		content, err := os.ReadFile(fmt.Sprintf("%s%c%s", dirPath, os.PathSeparator, e.Name()))
 		if err != nil {
 			return nil, err
 		}
