@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -42,9 +41,18 @@ func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 		if strings.Contains(volName, "@") {
 			volName = utils.ConvertTemplateNameToFile(volName)
 		}
-		_, err := os.Stat("./" + volName)
+		cwd, _ := os.Getwd()
+		quadlets, err := utils.ListQuadletFiles("volume", cwd)
+		exists := false
 
-		if errors.Is(err, os.ErrNotExist) {
+		for _, q := range quadlets {
+			if volName == q.Label {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
 			return []protocol.Diagnostic{
 				{
 					Range: protocol.Range{

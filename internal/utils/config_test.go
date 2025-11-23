@@ -51,7 +51,7 @@ func TestConfig_Default(t *testing.T) {
 
 func TestConfig_FromFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	createTestFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] }")
+	createTempFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] }")
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
@@ -76,7 +76,7 @@ func TestConfig_FromFile(t *testing.T) {
 
 func TestConfig_InvalidJson(t *testing.T) {
 	tmpDir := t.TempDir()
-	createTestFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] ")
+	createTempFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] ")
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)

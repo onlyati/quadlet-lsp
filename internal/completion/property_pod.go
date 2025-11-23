@@ -10,7 +10,7 @@ import (
 func propertyListPods(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
-	pods, err := utils.ListQuadletFiles("*.pod")
+	pods, err := utils.ListQuadletFiles("pod", s.config.WorkspaceRoot)
 	if err != nil {
 		log.Println(err.Error())
 	} else {

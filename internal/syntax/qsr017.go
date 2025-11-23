@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -34,9 +33,18 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
 	podName := q.Value
 	if strings.HasSuffix(podName, ".pod") {
-		_, err := os.Stat("./" + podName)
+		cwd, _ := os.Getwd()
+		quadlets, err := utils.ListQuadletFiles("pod", cwd)
+		exists := false
 
-		if errors.Is(err, os.ErrNotExist) {
+		for _, q := range quadlets {
+			if podName == q.Label {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
 			return []protocol.Diagnostic{
 				{
 					Range: protocol.Range{
