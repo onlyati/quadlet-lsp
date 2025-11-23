@@ -6,6 +6,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,14 +19,14 @@ func (c imageMockCommander) Run(name string, args ...string) ([]string, error) {
 func createTempFile(t *testing.T, dir, name, content string) string {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	assert.NoError(t, err)
 	return path
 }
 
 func TestPropertyImage_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.image", "[Image]")
 	createTempFile(t, tmpDir, "foo.build", "[Build]")
@@ -33,6 +34,8 @@ func TestPropertyImage_Valid(t *testing.T) {
 
 	s := Completion{}
 	s.commander = imageMockCommander{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListImages(s)
 

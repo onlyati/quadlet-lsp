@@ -26,13 +26,14 @@ func qsr020(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: propertyName + "Name"}: {},
 			},
 			qsr020Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr020Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr020Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	match := qsr020NamingConvention.MatchString(q.Value)
 	if match {
 		return nil

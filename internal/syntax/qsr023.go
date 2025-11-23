@@ -21,12 +21,13 @@ func qsr023(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: "*", Property: "*"}: {},
 			},
 			qsr023Action,
+			nil,
 		)
 	}
 	return diags
 }
 
-func qsr023Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr023Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	offset := uint32(len(q.Property)) + 1 // +1 is the '=' sign
 	diags := []protocol.Diagnostic{}
 

@@ -55,7 +55,7 @@ func propertyListVolumes(s Completion) []protocol.CompletionItem {
 
 	// Here we are after the '=' but before any ','
 	// Suggest volumes from file and from the system
-	volumes, err := utils.ListQuadletFiles("*.volume")
+	volumes, err := utils.ListQuadletFiles("volume", s.config.WorkspaceRoot)
 	if err != nil {
 		log.Println(err.Error())
 	} else {

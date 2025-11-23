@@ -22,13 +22,14 @@ func qsr024(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: "[Service]", Property: "DynamicUser"}: {},
 			},
 			qsr024Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr024Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr024Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	return []protocol.Diagnostic{
 		{
 			Range: protocol.Range{

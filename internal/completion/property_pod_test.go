@@ -4,17 +4,21 @@ import (
 	"os"
 	"slices"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 func TestPropertyPod_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.pod", "[Pod]")
 	createTempFile(t, tmpDir, "bar.pod", "[Pod]")
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := Completion{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListPods(s)
 

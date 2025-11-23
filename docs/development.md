@@ -101,6 +101,7 @@ following parameters:
   map must have a `utils.ScanProperty{ Section: "*", Property: "*" }` element.
 - _action_: This action doing the main part of the syntax check. This action is
   called every line that is filtered by line.
+- _extraInfo_: Via this parameter any data can be passed to action.
 
 Example for syntax rule:
 
@@ -128,6 +129,7 @@ func qsr024(s SyntaxChecker) []protocol.Diagnostic {
                 {Section: "[Service]", Property: "DynamicUser"}: {},
             },
             qsr024Action,
+            nil,
         )
     }
 
@@ -138,7 +140,7 @@ func qsr024(s SyntaxChecker) []protocol.Diagnostic {
 The action function must have parameters like this.
 
 ```go
-func qsr024Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr024Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
     // Do syntax validation logic here
 
     // One or more diagnostic element can be send back, sample:

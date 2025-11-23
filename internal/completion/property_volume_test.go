@@ -4,6 +4,8 @@ import (
 	"os"
 	"slices"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 type volumeMockCommnander struct{}
@@ -14,7 +16,7 @@ func (c volumeMockCommnander) Run(name string, args ...string) ([]string, error)
 
 func TestPropertyVolume_ListVolume(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
@@ -26,6 +28,8 @@ func TestPropertyVolume_ListVolume(t *testing.T) {
 		uint32(len("Volume=")),
 	)
 	s.commander = volumeMockCommnander{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListVolumes(s)
 
@@ -55,7 +59,7 @@ func TestPropertyVolume_ListVolume(t *testing.T) {
 
 func TestPropertyVolume_NoList(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
@@ -67,6 +71,8 @@ func TestPropertyVolume_NoList(t *testing.T) {
 		uint32(len("Volume=foo.volume:")),
 	)
 	s.commander = volumeMockCommnander{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListVolumes(s)
 
@@ -77,7 +83,7 @@ func TestPropertyVolume_NoList(t *testing.T) {
 
 func TestPropertyVolume_ListFlags(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
@@ -89,6 +95,8 @@ func TestPropertyVolume_ListFlags(t *testing.T) {
 		uint32(len("Volume=foo.volume:/app/:")),
 	)
 	s.commander = volumeMockCommnander{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListVolumes(s)
 
@@ -115,7 +123,7 @@ func TestPropertyVolume_ListFlags(t *testing.T) {
 
 func TestPropertyVolume_ListVolumeWithCursor(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
@@ -127,6 +135,8 @@ func TestPropertyVolume_ListVolumeWithCursor(t *testing.T) {
 		uint32(len("Volume=")),
 	)
 	s.commander = volumeMockCommnander{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListVolumes(s)
 

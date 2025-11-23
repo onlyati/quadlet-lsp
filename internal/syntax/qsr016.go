@@ -29,13 +29,14 @@ func qsr016(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "UserNS"}: {},
 			},
 			qsr016Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr016Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr016Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	tmp := strings.Split(q.Value, ":")
 
 	if len(tmp) == 0 {

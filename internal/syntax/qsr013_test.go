@@ -3,6 +3,8 @@ package syntax
 import (
 	"os"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 func TestQSR013_Valid(t *testing.T) {
@@ -48,6 +50,8 @@ func TestQSR013_Valid(t *testing.T) {
 	}
 
 	for _, s := range cases {
+		s.config = &utils.QuadletConfig{}
+		s.config.WorkspaceRoot = tmpDir
 		diags := qsr013(s)
 
 		if len(diags) != 0 {
@@ -76,6 +80,8 @@ func TestQSR013_Invalid(t *testing.T) {
 	}
 
 	for _, s := range cases {
+		s.config = &utils.QuadletConfig{}
+		s.config.WorkspaceRoot = tmpDir
 		diags := qsr013(s)
 
 		if len(diags) != 2 {

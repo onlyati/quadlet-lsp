@@ -24,13 +24,14 @@ func qsr010(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "PublishPort"}: {},
 			},
 			qsr010Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr010Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr010Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	if qsr010PortRegexp.MatchString(q.Value) {
 		return nil
 	}

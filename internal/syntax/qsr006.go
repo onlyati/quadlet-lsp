@@ -29,13 +29,14 @@ func qsr006(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Image"}: {},
 			},
 			qsr006Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr006Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr006Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	if !qsr006AnotherQuadlet.MatchString(q.Value) {
 		return nil
 	}

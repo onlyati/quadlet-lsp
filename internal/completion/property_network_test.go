@@ -4,6 +4,8 @@ import (
 	"os"
 	"slices"
 	"testing"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 type networkMockCommnander struct{}
@@ -14,7 +16,7 @@ func (c networkMockCommnander) Run(name string, args ...string) ([]string, error
 
 func TestPropertyNetwork_ListNetwork(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
 	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
@@ -26,6 +28,8 @@ func TestPropertyNetwork_ListNetwork(t *testing.T) {
 		uint32(len("Network=")),
 	)
 	s.commander = networkMockCommnander{}
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	comps := propertyListNetworks(s)
 

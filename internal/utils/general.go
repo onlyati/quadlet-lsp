@@ -4,7 +4,7 @@
 package utils
 
 import (
-	"os"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"unicode"
@@ -24,24 +24,27 @@ func FirstCharacterToUpper(s string) string {
 }
 
 // ListQuadletFiles List quadlet files from the current work directory based on extenstion
-func ListQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
+func ListQuadletFiles(ext, rootDir string) ([]protocol.CompletionItem, error) {
 	dirs := []protocol.CompletionItem{}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	cwd = filepath.Join(cwd, ext)
-	files, err := filepath.Glob(cwd)
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range files {
-		chunks := strings.Split(file, string(os.PathSeparator))
+	err := filepath.WalkDir(rootDir, func(p string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !strings.HasSuffix(entry.Name(), "."+ext) {
+			return nil
+		}
+
 		dirs = append(dirs, protocol.CompletionItem{
-			Label:         chunks[len(chunks)-1],
-			Documentation: "From work directory: " + cwd,
+			Label:         entry.Name(),
+			Documentation: "From work directory: " + p,
 		})
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return dirs, nil

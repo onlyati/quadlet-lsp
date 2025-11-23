@@ -129,7 +129,7 @@ StartLimitBurst=5
 		v string
 		c string
 	}{}
-	mockFn := func(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+	mockFn := func(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 		findings = append(findings, struct {
 			p string
 			v string
@@ -146,6 +146,7 @@ StartLimitBurst=5
 			{Section: "[Container]", Property: "Exec"}:        {},
 		},
 		mockFn,
+		nil,
 	)
 
 	if len(findings) != 3 {
@@ -192,7 +193,7 @@ NoExist=true
 		v string
 		c string
 	}{}
-	mockFn := func(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+	mockFn := func(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 		findings = append(findings, struct {
 			p string
 			v string
@@ -208,6 +209,7 @@ NoExist=true
 			{Section: "*", Property: "*"}: {},
 		},
 		mockFn,
+		nil,
 	)
 
 	if len(findings) != 10 {

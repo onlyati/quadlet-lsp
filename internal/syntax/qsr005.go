@@ -21,13 +21,14 @@ func qsr005(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "AutoUpdate"}: {},
 			},
 			qsr005Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr005Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr005Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	if q.Value == "registry" || q.Value == "local" {
 		return nil
 	}

@@ -25,13 +25,14 @@ func qsr009(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Label"}: {},
 			},
 			qsr009Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr009Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr009Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	tokens, err := splitQuoted(q.Value)
 	if err != nil {
 		return []protocol.Diagnostic{

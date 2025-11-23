@@ -31,7 +31,8 @@ func ScanQadlet(
 	text string,
 	podmanVer PodmanVersion,
 	properties map[ScanProperty]struct{},
-	action func(q QuadletLine, p PodmanVersion) []protocol.Diagnostic,
+	action func(q QuadletLine, p PodmanVersion, extraInfo any) []protocol.Diagnostic,
+	extraInfo any,
 ) []protocol.Diagnostic {
 	var returnValue []protocol.Diagnostic
 
@@ -56,7 +57,7 @@ func ScanQadlet(
 			lineValue.Value += " " + strings.TrimSpace(partialValue)
 			if !contSign {
 				readContinue = false
-				diag := action(lineValue, podmanVer)
+				diag := action(lineValue, podmanVer, extraInfo)
 				if diag != nil {
 					returnValue = append(returnValue, diag...)
 				}
@@ -88,7 +89,7 @@ func ScanQadlet(
 						continue
 					}
 
-					diag := action(lineValue, podmanVer)
+					diag := action(lineValue, podmanVer, extraInfo)
 					if diag != nil {
 						returnValue = append(returnValue, diag...)
 					}
@@ -106,7 +107,7 @@ func ScanQadlet(
 					Value:      "",
 					RawLine:    rawLine,
 					Section:    currentSection,
-				}, podmanVer)
+				}, podmanVer, extraInfo)
 				if diag != nil {
 					returnValue = append(returnValue, diag...)
 				}

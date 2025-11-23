@@ -27,13 +27,14 @@ func qsr004(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Artifact"}: {},
 			},
 			qsr004Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr004Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr004Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	isItImage := strings.HasSuffix(q.Value, ".image")
 	isItBuild := strings.HasSuffix(q.Value, ".build")
 	if isItBuild || isItImage {

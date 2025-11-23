@@ -31,13 +31,14 @@ func qsr007(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Environment"}: {},
 			},
 			qsr007Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr007Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnostic {
+func qsr007Action(q utils.QuadletLine, p utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	tokens, err := splitQuoted(q.Value)
 	if err != nil {
 		return []protocol.Diagnostic{

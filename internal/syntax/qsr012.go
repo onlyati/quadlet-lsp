@@ -22,13 +22,14 @@ func qsr012(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Secret"}: {},
 			},
 			qsr012Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr012Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr012Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	tmp := strings.Split(q.Value, ",")
 
 	secretParms := map[string]string{}
