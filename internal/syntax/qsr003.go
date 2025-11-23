@@ -25,13 +25,14 @@ func qsr003(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: "*", Property: "*"}: {},
 			},
 			qsr003Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnostic {
+func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	section := q.Section[1 : len(q.Section)-1]
 	if section == "Service" {
 		// The [Service] is not implemented

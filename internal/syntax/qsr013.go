@@ -3,7 +3,6 @@ package syntax
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -15,6 +14,9 @@ func qsr013(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod", "build"}
+	s.config.Mu.RLock()
+	rootDir := s.config.WorkspaceRoot
+	s.config.Mu.RUnlock()
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		diags = utils.ScanQadlet(
@@ -24,15 +26,24 @@ func qsr013(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Volume"}: {},
 			},
 			qsr013Action,
+			rootDir,
 		)
 	}
 
 	return diags
 }
 
-func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []protocol.Diagnostic {
 	tmp := strings.Split(q.Value, ":")
 	if len(tmp) == 0 {
+		return nil
+	}
+
+	rootDir := ""
+	switch v := extraInfo.(type) {
+	case string:
+		rootDir = v
+	default:
 		return nil
 	}
 
@@ -41,8 +52,7 @@ func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 		if strings.Contains(volName, "@") {
 			volName = utils.ConvertTemplateNameToFile(volName)
 		}
-		cwd, _ := os.Getwd()
-		quadlets, err := utils.ListQuadletFiles("volume", cwd)
+		quadlets, err := utils.ListQuadletFiles("volume", rootDir)
 		exists := false
 
 		for _, q := range quadlets {

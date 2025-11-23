@@ -3,7 +3,6 @@ package syntax
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -15,6 +14,9 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container"}
+	s.config.Mu.RLock()
+	rootDir := s.config.WorkspaceRoot
+	s.config.Mu.RUnlock()
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		diags = utils.ScanQadlet(
@@ -24,17 +26,25 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Pod"}: {},
 			},
 			qsr017Action,
+			rootDir,
 		)
 	}
 
 	return diags
 }
 
-func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []protocol.Diagnostic {
+	rootDir := ""
+	switch v := extraInfo.(type) {
+	case string:
+		rootDir = v
+	default:
+		return nil
+	}
+
 	podName := q.Value
 	if strings.HasSuffix(podName, ".pod") {
-		cwd, _ := os.Getwd()
-		quadlets, err := utils.ListQuadletFiles("pod", cwd)
+		quadlets, err := utils.ListQuadletFiles("pod", rootDir)
 		exists := false
 
 		for _, q := range quadlets {
