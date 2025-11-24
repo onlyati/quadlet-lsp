@@ -5,6 +5,6 @@
 
 
 **Checklist**
-- [ ] Fetaure implementation
+- [ ] Feature implementation
 - [ ] Update documents
 - [ ] Write unit tests
