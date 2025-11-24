@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"os"
+	"path"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -44,6 +45,48 @@ func TestQSR025_ValidDropins(t *testing.T) {
 		"[Container]\nLabel=app=foo",
 		"file://"+tmpDir+string(os.PathSeparator)+"foo.container")
 	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
+
+	diags := qsr025(s)
+
+	if len(diags) != 0 {
+		t.Fatalf("expected 0 diagnostics, but got %d", len(diags))
+	}
+}
+
+func TestQSR025_ValidNestedDropins(t *testing.T) {
+	tmpDir := t.TempDir()
+	os.Chdir(tmpDir)
+
+	createTempDir(
+		t,
+		tmpDir,
+		"foo-app",
+	)
+
+	createTempFile(
+		t,
+		path.Join(tmpDir, "foo-app"),
+		"foo.container",
+		"[Container]\nLabel=app=foo",
+	)
+	createTempDir(
+		t,
+		path.Join(tmpDir, "foo-app"),
+		"foo.container.d",
+	)
+	createTempFile(
+		t,
+		path.Join(tmpDir, "foo-app", "foo.container.d"),
+		"image.conf",
+		"[Container]\nImage=foo.image",
+	)
+
+	s := NewSyntaxChecker(
+		"[Container]\nLabel=app=foo",
+		"file://"+path.Join(tmpDir, "foo-app", "foo-container"))
+	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	diags := qsr025(s)
 
