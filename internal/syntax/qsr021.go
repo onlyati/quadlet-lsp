@@ -42,13 +42,14 @@ func qsr021(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: "[Unit]", Property: "After"}:     {},
 			},
 			qsr021Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr021Action(q utils.QuadletLine, p utils.PodmanVersion) []protocol.Diagnostic {
+func qsr021Action(q utils.QuadletLine, p utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	if qsr021ServiceNamingConvention.MatchString(q.Value) {
 		return nil
 	}

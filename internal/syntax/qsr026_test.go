@@ -44,6 +44,7 @@ func TestQSR026_ValidDropins(t *testing.T) {
 		"[Artifact]\nAuthFile=/etc/registry/auth.json",
 		"file://"+tmpDir+string(os.PathSeparator)+"foo.artifact")
 	s.config = &utils.QuadletConfig{}
+	s.config.WorkspaceRoot = tmpDir
 
 	diags := qsr026(s)
 

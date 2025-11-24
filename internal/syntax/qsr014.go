@@ -1,10 +1,8 @@
 package syntax
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -16,6 +14,9 @@ func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod", "build", "kube"}
+	s.config.Mu.RLock()
+	rootDir := s.config.WorkspaceRoot
+	s.config.Mu.RUnlock()
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
 		diags = utils.ScanQadlet(
@@ -25,18 +26,35 @@ func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Network"}: {},
 			},
 			qsr014Action,
+			rootDir,
 		)
 	}
 
 	return diags
 }
 
-func qsr014Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr014Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []protocol.Diagnostic {
+	rootDir := ""
+	switch v := extraInfo.(type) {
+	case string:
+		rootDir = v
+	default:
+		return nil
+	}
+
 	netName := q.Value
 	if strings.HasSuffix(netName, ".network") {
-		_, err := os.Stat("./" + netName)
+		quadlets, err := utils.ListQuadletFiles("network", rootDir)
+		exists := false
 
-		if errors.Is(err, os.ErrNotExist) {
+		for _, q := range quadlets {
+			if netName == q.Label {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
 			return []protocol.Diagnostic{
 				{
 					Range: protocol.Range{

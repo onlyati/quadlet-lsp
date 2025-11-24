@@ -25,13 +25,14 @@ func qsr008(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Annotation"}: {},
 			},
 			qsr008Action,
+			nil,
 		)
 	}
 
 	return diags
 }
 
-func qsr008Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnostic {
+func qsr008Action(q utils.QuadletLine, _ utils.PodmanVersion, _ any) []protocol.Diagnostic {
 	tokens, err := splitQuoted(q.Value)
 	if err != nil {
 		return []protocol.Diagnostic{

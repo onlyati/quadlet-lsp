@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -31,7 +31,8 @@ func ScanQadlet(
 	text string,
 	podmanVer PodmanVersion,
 	properties map[ScanProperty]struct{},
-	action func(q QuadletLine, p PodmanVersion) []protocol.Diagnostic,
+	action func(q QuadletLine, p PodmanVersion, extraInfo any) []protocol.Diagnostic,
+	extraInfo any,
 ) []protocol.Diagnostic {
 	var returnValue []protocol.Diagnostic
 
@@ -56,7 +57,7 @@ func ScanQadlet(
 			lineValue.Value += " " + strings.TrimSpace(partialValue)
 			if !contSign {
 				readContinue = false
-				diag := action(lineValue, podmanVer)
+				diag := action(lineValue, podmanVer, extraInfo)
 				if diag != nil {
 					returnValue = append(returnValue, diag...)
 				}
@@ -88,7 +89,7 @@ func ScanQadlet(
 						continue
 					}
 
-					diag := action(lineValue, podmanVer)
+					diag := action(lineValue, podmanVer, extraInfo)
 					if diag != nil {
 						returnValue = append(returnValue, diag...)
 					}
@@ -106,7 +107,7 @@ func ScanQadlet(
 					Value:      "",
 					RawLine:    rawLine,
 					Section:    currentSection,
-				}, podmanVer)
+				}, podmanVer, extraInfo)
 				if diag != nil {
 					returnValue = append(returnValue, diag...)
 				}
@@ -162,31 +163,39 @@ func FindItems(params FindItemProperty) []QuadletLine {
 }
 
 func findItemsInDir(params FindItemProperty, dirPath string) []QuadletLine {
-	entries, err := os.ReadDir(dirPath)
-	if err == nil {
-		for _, e := range entries {
-			if e.IsDir() {
-				continue
-			}
+	lines := []QuadletLine{}
+	err := filepath.WalkDir(params.RootDirectory, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 
-			if !strings.HasSuffix(e.Name(), ".conf") {
-				continue
-			}
+		if !strings.HasSuffix(d.Name(), ".conf") {
+			return nil
+		}
 
-			file, err := os.ReadFile(path.Join(dirPath, e.Name()))
+		// Check what is parent's directory name, it should match with the one on the
+		// parameters.
+		pathSplit := strings.Split(path, string(os.PathSeparator))
+		if len(pathSplit) < 2 {
+			return nil
+		}
+		if pathSplit[len(pathSplit)-2] == dirPath {
+			f, err := os.ReadFile(path)
 			if err != nil {
-				fmt.Printf("failed to open file: %s", err.Error())
-				return nil
+				return err
 			}
-
-			q := readItems(string(file), params.Property, params.Section)
+			q := readItems(string(f), params.Property, params.Section)
 			if len(q) > 0 {
-				return q
+				lines = append(lines, q...)
 			}
 		}
-	}
 
-	return nil
+		return nil
+	})
+	if err != nil {
+		return nil
+	}
+	return lines
 }
 
 func readItems(text, property, section string) []QuadletLine {

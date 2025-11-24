@@ -9,10 +9,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createTestFile(t *testing.T, dir, name, content string) string {
+func createTempFile(t *testing.T, dir, name, content string) string {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0o644)
+	assert.NoError(t, err)
+	return path
+}
+
+func createTempDir(t *testing.T, dir, name string) string {
+	t.Helper()
+	path := filepath.Join(dir, name)
+	err := os.Mkdir(path, 0o755)
 	assert.NoError(t, err)
 	return path
 }
@@ -27,18 +35,35 @@ func TestFirstCharacterToUpper(t *testing.T) {
 
 func TestListQuadletFiles(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
-	createTestFile(t, tmpDir, "foo.pod", "placeholder")
-	createTestFile(t, tmpDir, "foo.network", "placeholder")
-	createTestFile(t, tmpDir, "bar.pod", "placeholder")
+	createTempFile(t, tmpDir, "foo.pod", "placeholder")
+	createTempFile(t, tmpDir, "foo.network", "placeholder")
+	createTempFile(t, tmpDir, "bar.pod", "placeholder")
 
-	items, err := utils.ListQuadletFiles("*.pod")
+	createTempDir(t, tmpDir, "foobar")
+	createTempFile(
+		t,
+		tmpDir+string(os.PathSeparator)+"foobar",
+		"foobar.pod",
+		"placeholder",
+	)
+
+	createTempDir(
+		t,
+		tmpDir+string(os.PathSeparator)+"foobar",
+		"foo",
+	)
+	createTempFile(
+		t,
+		tmpDir+string(os.PathSeparator)+"foobar"+string(os.PathSeparator)+"foo",
+		"foo.pod",
+		"placeholder",
+	)
+
+	items, err := utils.ListQuadletFiles("pod", tmpDir)
 	assert.NoError(t, err)
-
-	if len(items) != 2 {
-		t.Fatalf("Expected 2 items, but got %d", len(items))
-	}
+	assert.Equal(t, 4, len(items))
 }
 
 func TestTemplateNameConversion(t *testing.T) {
