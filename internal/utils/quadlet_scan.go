@@ -20,6 +20,7 @@ type QuadletLine struct {
 	Value      string
 	RawLine    string
 	Section    string
+	FilePath   string
 }
 
 type ScanProperty struct {
@@ -184,9 +185,10 @@ func findItemsInDir(params FindItemProperty, dirPath string) []QuadletLine {
 			if err != nil {
 				return err
 			}
-			q := readItems(string(f), params.Property, params.Section)
-			if len(q) > 0 {
-				lines = append(lines, q...)
+			qs := readItems(string(f), params.Property, params.Section)
+			for _, q := range qs {
+				q.FilePath = path
+				lines = append(lines, q)
 			}
 		}
 

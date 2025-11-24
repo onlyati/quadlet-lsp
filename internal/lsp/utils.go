@@ -1,9 +1,6 @@
 package lsp
 
 import (
-	"bufio"
-	"os"
-	"path/filepath"
 	"strings"
 
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -25,65 +22,4 @@ func findSection(lines []string, lineNumber protocol.UInteger) string {
 		}
 	}
 	return section
-}
-
-// Walk through on each file in a directory and looking for lines
-// that starts with the specified parameter. Used, for example, when
-// try to find references for a quadlet file.
-func findLineStartWith(prefix string) ([]protocol.Location, error) {
-	var locations []protocol.Location
-
-	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		absPath, err := filepath.Abs(path)
-		if err != nil {
-			return err
-		}
-
-		scanner := bufio.NewScanner(file)
-		lineNum := 0
-		for scanner.Scan() {
-			line := scanner.Text()
-
-			condition := false
-			if strings.Contains(prefix, "@") {
-				tmp := strings.SplitN(prefix, "@", 2)
-				condition = strings.HasPrefix(line, tmp[0]) && strings.Contains(line, tmp[1])
-			} else {
-				condition = strings.HasPrefix(line, prefix)
-			}
-
-			if condition {
-				locations = append(locations, protocol.Location{
-					URI: protocol.DocumentUri("file://" + absPath),
-					Range: protocol.Range{
-						Start: protocol.Position{Line: protocol.UInteger(lineNum), Character: 0},
-						End:   protocol.Position{Line: protocol.UInteger(lineNum), Character: protocol.UInteger(len(line) - 1)},
-					},
-				})
-			}
-
-			lineNum++
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return locations, nil
 }
