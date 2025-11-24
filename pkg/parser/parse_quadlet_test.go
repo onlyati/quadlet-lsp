@@ -162,23 +162,27 @@ WantedBy=default.target
 `,
 		Dropins: []parser.Dropin{
 			{
-				Directory: "foo-bar.container.d",
-				FileName:  "network.conf",
+				Directory: "container.d",
+				FileName:  "container.d/labels.conf",
 				Properties: map[string][]parser.QuadletProperty{
 					"Container": {
 						{
-							"Network", "foo-bar.network",
+							"Label", "\"env.type=prod\"",
+						},
+						{
+							"Label", "\"env.server=app01\"",
 						},
 					},
 				},
 				SourceFile: `
 [Container]
-Network=foo-bar.network
+Label="env.type=prod"
+Label="env.server=app01"
 `,
 			},
 			{
 				Directory: "foo-.container.d",
-				FileName:  "network.conf",
+				FileName:  "foo-.container.d/network.conf",
 				Properties: map[string][]parser.QuadletProperty{
 					"Container": {
 						{
@@ -196,30 +200,27 @@ Network=bar.network
 `,
 			},
 			{
-				Directory: "container.d",
-				FileName:  "labels.conf",
+				Directory: "foo-bar.container.d",
+				FileName:  "foo-bar.container.d/network.conf",
 				Properties: map[string][]parser.QuadletProperty{
 					"Container": {
 						{
-							"Label", "\"env.type=prod\"",
-						},
-						{
-							"Label", "\"env.server=app01\"",
+							"Network", "foo-bar.network",
 						},
 					},
 				},
 				SourceFile: `
 [Container]
-Label="env.type=prod"
-Label="env.server=app01"
+Network=foo-bar.network
 `,
 			},
 		},
 	}
 
 	result, err := parser.ParseQuadlet(parser.ParseQuadletConfig{
-		RootDirectory: tmpDir,
-		FileName:      "foo-bar.container",
+		RootDirectory:  tmpDir,
+		FileName:       "foo-bar.container",
+		CollectDropins: true,
 	})
 
 	require.NoError(
@@ -310,7 +311,7 @@ Image=foo.image
 `,
 		Dropins: []parser.Dropin{
 			{
-				FileName:  "image.conf",
+				FileName:  "foo.container.d/image.conf",
 				Directory: "foo.container.d",
 				Properties: map[string][]parser.QuadletProperty{
 					"Container": {
@@ -328,8 +329,9 @@ Image=docker.io/library/debian
 	}
 
 	result, err := parser.ParseQuadlet(parser.ParseQuadletConfig{
-		RootDirectory: tmpDir,
-		FileName:      "foo.container",
+		RootDirectory:  tmpDir,
+		FileName:       "foo.container",
+		CollectDropins: true,
 	})
 
 	require.NoError(
