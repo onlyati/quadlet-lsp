@@ -66,9 +66,11 @@ func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 
 	completionItems = append(completionItems, protocol.CompletionItem{
 		Label: "uid=" + user,
+		Kind:  &valueKind,
 	})
 	completionItems = append(completionItems, protocol.CompletionItem{
 		Label: "gid=" + user,
+		Kind:  &valueKind,
 	})
 
 	return completionItems

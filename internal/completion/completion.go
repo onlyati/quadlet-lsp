@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	insertFormat = protocol.InsertTextFormatSnippet
-	itemKind     = protocol.CompletionItemKindSnippet
+	insertFormat   = protocol.InsertTextFormatSnippet
+	itemKind       = protocol.CompletionItemKindSnippet
+	completionKind = protocol.CompletionItemKindKeyword
+	valueKind      = protocol.CompletionItemKindValue
 )
 
 type Completion struct {
@@ -61,7 +63,7 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 
 	// If user type '%' suggest systemd specifiers
 	if isItSystemSpecifier(s.text[s.line], s.char) {
-		return listSystemdSoecifier(s)
+		return listSystemdSpecifier(s)
 	}
 
 	// There is a '=' in the line, so check for property's value

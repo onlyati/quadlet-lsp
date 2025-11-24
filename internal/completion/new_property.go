@@ -23,6 +23,7 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 					Kind:  protocol.MarkupKindMarkdown,
 					Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
 				},
+				Kind: &completionKind,
 			})
 		}
 	}

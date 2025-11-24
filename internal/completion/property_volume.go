@@ -27,29 +27,29 @@ func propertyListVolumes(s Completion) []protocol.CompletionItem {
 	if numberOfColons == 2 {
 		// Suggest some flag
 		return []protocol.CompletionItem{
-			{Label: "rw"},
-			{Label: "ro"},
-			{Label: "z"},
-			{Label: "Z"},
-			{Label: "O"},
-			{Label: "copy"},
-			{Label: "nocopy"},
-			{Label: "dev"},
-			{Label: "nodev"},
-			{Label: "exec"},
-			{Label: "noexec"},
-			{Label: "suid"},
-			{Label: "nosuid"},
-			{Label: "bind"},
-			{Label: "rbind"},
-			{Label: "slave"},
-			{Label: "rslave"},
-			{Label: "shared"},
-			{Label: "rshared"},
-			{Label: "private"},
-			{Label: "rprivate"},
-			{Label: "unbindable"},
-			{Label: "runbindable"},
+			{Label: "rw", Kind: &valueKind},
+			{Label: "ro", Kind: &valueKind},
+			{Label: "z", Kind: &valueKind},
+			{Label: "Z", Kind: &valueKind},
+			{Label: "O", Kind: &valueKind},
+			{Label: "copy", Kind: &valueKind},
+			{Label: "nocopy", Kind: &valueKind},
+			{Label: "dev", Kind: &valueKind},
+			{Label: "nodev", Kind: &valueKind},
+			{Label: "exec", Kind: &valueKind},
+			{Label: "noexec", Kind: &valueKind},
+			{Label: "suid", Kind: &valueKind},
+			{Label: "nosuid", Kind: &valueKind},
+			{Label: "bind", Kind: &valueKind},
+			{Label: "rbind", Kind: &valueKind},
+			{Label: "slave", Kind: &valueKind},
+			{Label: "rslave", Kind: &valueKind},
+			{Label: "shared", Kind: &valueKind},
+			{Label: "rshared", Kind: &valueKind},
+			{Label: "private", Kind: &valueKind},
+			{Label: "rprivate", Kind: &valueKind},
+			{Label: "unbindable", Kind: &valueKind},
+			{Label: "runbindable", Kind: &valueKind},
 		}
 	}
 
@@ -72,6 +72,7 @@ func propertyListVolumes(s Completion) []protocol.CompletionItem {
 		for _, volume := range output {
 			completionItems = append(completionItems, protocol.CompletionItem{
 				Label: volume,
+				Kind:  &valueKind,
 			})
 		}
 	}
