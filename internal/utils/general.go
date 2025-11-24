@@ -36,9 +36,11 @@ func ListQuadletFiles(ext, rootDir string) ([]protocol.CompletionItem, error) {
 			return nil
 		}
 
+		valueKind := protocol.CompletionItemKindValue
 		dirs = append(dirs, protocol.CompletionItem{
 			Label:         entry.Name(),
 			Documentation: "From work directory: " + p,
+			Kind:          &valueKind,
 		})
 
 		return nil

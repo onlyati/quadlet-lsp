@@ -32,6 +32,7 @@ func propertyListImages(s Completion) []protocol.CompletionItem {
 		for _, image := range output {
 			completionItems = append(completionItems, protocol.CompletionItem{
 				Label: image,
+				Kind:  &valueKind,
 			})
 		}
 	}

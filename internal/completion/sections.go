@@ -19,6 +19,7 @@ func listSections(_ Completion) []protocol.CompletionItem {
 		log.Println(k)
 		completionItems = append(completionItems, protocol.CompletionItem{
 			Label: k,
+			Kind:  &completionKind,
 		})
 	}
 

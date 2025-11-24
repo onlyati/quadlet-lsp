@@ -27,6 +27,7 @@ func propertyListNetworks(s Completion) []protocol.CompletionItem {
 		for _, network := range output {
 			completionItems = append(completionItems, protocol.CompletionItem{
 				Label: network,
+				Kind:  &valueKind,
 			})
 		}
 	}

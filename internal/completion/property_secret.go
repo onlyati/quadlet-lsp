@@ -18,12 +18,15 @@ func propertyListSecrets(s Completion) []protocol.CompletionItem {
 		return []protocol.CompletionItem{
 			{
 				Label: "type=mount",
+				Kind:  &valueKind,
 			},
 			{
 				Label: "type=env",
+				Kind:  &valueKind,
 			},
 			{
 				Label: "target=",
+				Kind:  &valueKind,
 			},
 		}
 	}
@@ -39,6 +42,7 @@ func propertyListSecrets(s Completion) []protocol.CompletionItem {
 		for _, secret := range output {
 			completionItems = append(completionItems, protocol.CompletionItem{
 				Label: secret,
+				Kind:  &valueKind,
 			})
 		}
 	}
