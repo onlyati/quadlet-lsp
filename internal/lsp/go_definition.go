@@ -1,9 +1,6 @@
 package lsp
 
 import (
-	"errors"
-	"os"
-	"path"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -36,24 +33,27 @@ func textDefinition(
 	// looking for different file extension, then find the file.
 	// Probably there is a cleaner way, but it works.
 	keywords := map[string]string{
-		"Volume":  "*.volume",
-		"Pod":     "*.pod",
-		"Network": "*.network",
-		"Image":   "*.image",
+		"Volume":  "volume",
+		"Pod":     "pod",
+		"Network": "network",
+		"Image":   "image",
 	}
 
+	config.Mu.RLock()
+	rootDir := config.WorkspaceRoot
+	config.Mu.RUnlock()
 	if prop, ok := keywords[props[0]]; ok {
-		return findQuadlets(prop, props[1])
+		return findQuadlets(prop, props[1], rootDir)
 	}
 
 	return location, nil
 }
 
 // Just check if file exists
-func findQuadlets(mask, value string) (protocol.Location, error) {
+func findQuadlets(mask, value, rootDir string) (protocol.Location, error) {
 	var location protocol.Location
 
-	if mask == "*.volume" {
+	if mask == "volume" {
 		volParts := strings.Split(value, ":")
 		value = volParts[0]
 	}
@@ -63,16 +63,25 @@ func findQuadlets(mask, value string) (protocol.Location, error) {
 		value = utils.ConvertTemplateNameToFile(value)
 	}
 
-	currDir, err := os.Getwd()
+	files, err := utils.ListQuadletFiles(mask, rootDir)
 	if err != nil {
 		return location, err
 	}
-	defPath := path.Join(currDir, value)
 
-	if _, err := os.Stat(defPath); !errors.Is(err, os.ErrNotExist) {
-		return protocol.Location{
-			URI: protocol.DocumentUri("file://" + defPath),
-		}, nil
+	for _, f := range files {
+		if f.Label == value {
+			p := ""
+			switch v := f.Documentation.(type) {
+			case string:
+				p = v
+			default:
+				return location, nil
+			}
+			p, _ = strings.CutPrefix(p, "From work directory: ")
+			return protocol.Location{
+				URI: protocol.DocumentUri("file://" + p),
+			}, nil
+		}
 	}
 
 	return location, nil

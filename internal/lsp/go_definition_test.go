@@ -22,7 +22,7 @@ func TestFindQuadlets_MatchingFile(t *testing.T) {
 
 	createTestFile(t, tmpDir, "mypod.pod", "dummy content")
 
-	loc, err := findQuadlets("*.pod", "mypod.pod")
+	loc, err := findQuadlets("pod", "mypod.pod", tmpDir)
 	assert.NoError(t, err)
 	assert.Contains(t, string(loc.URI), "mypod.pod")
 }
@@ -33,7 +33,7 @@ func TestFindQuadlets_VolumeColonSuffix(t *testing.T) {
 
 	createTestFile(t, tmpDir, "myvol.volume", "dummy content")
 
-	loc, err := findQuadlets("*.volume", "myvol.volume:ro")
+	loc, err := findQuadlets("volume", "myvol.volume:ro", tmpDir)
 	assert.NoError(t, err)
 	assert.Contains(t, string(loc.URI), "myvol.volume")
 }
@@ -44,7 +44,7 @@ func TestFindQuadlets_NoMatch(t *testing.T) {
 
 	createTestFile(t, tmpDir, "somethingelse.network", "dummy content")
 
-	loc, err := findQuadlets("*.network", "notfound.network")
+	loc, err := findQuadlets("network", "notfound.network", tmpDir)
 	assert.NoError(t, err)
 	assert.Equal(t, "", string(loc.URI))
 }
