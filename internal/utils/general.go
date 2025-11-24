@@ -36,11 +36,13 @@ func ListQuadletFiles(ext string) ([]protocol.CompletionItem, error) {
 	if err != nil {
 		return nil, err
 	}
+	valueKind := protocol.CompletionItemKindValue
 	for _, file := range files {
 		chunks := strings.Split(file, string(os.PathSeparator))
 		dirs = append(dirs, protocol.CompletionItem{
 			Label:         chunks[len(chunks)-1],
 			Documentation: "From work directory: " + cwd,
+			Kind:          &valueKind,
 		})
 	}
 

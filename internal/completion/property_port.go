@@ -32,6 +32,7 @@ func propertyListPorts(s Completion) []protocol.CompletionItem {
 	for _, port := range ports {
 		completionItems = append(completionItems, protocol.CompletionItem{
 			Label: port,
+			Kind:  &valueKind,
 		})
 	}
 

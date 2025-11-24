@@ -47,6 +47,7 @@ func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 			for _, parm := range p.Parameters {
 				completionItems = append(completionItems, protocol.CompletionItem{
 					Label: parm,
+					Kind:  &completionKind,
 				})
 			}
 		}

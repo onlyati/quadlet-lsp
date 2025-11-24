@@ -31,7 +31,7 @@ func isItSystemSpecifier(line string, charPos protocol.UInteger) bool {
 	return percentageCount%2 == 1
 }
 
-func listSystemdSoecifier(s Completion) []protocol.CompletionItem {
+func listSystemdSpecifier(s Completion) []protocol.CompletionItem {
 	var completions []protocol.CompletionItem
 
 	for k, v := range data.SystemdSpecifierSet {
@@ -44,7 +44,7 @@ func listSystemdSoecifier(s Completion) []protocol.CompletionItem {
 		}
 		completions = append(completions, protocol.CompletionItem{
 			Label:            k,
-			Kind:             &itemKind,
+			Kind:             &valueKind,
 			TextEdit:         textEdit,
 			InsertTextFormat: &insertFormat,
 			Documentation: protocol.MarkupContent{
