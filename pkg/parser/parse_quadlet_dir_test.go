@@ -32,7 +32,7 @@ Image=docker.io/library/debian
 		t,
 		tmpDir,
 		".quadletrc.json",
-		`{ "disabled": ["qsr001", "qsr002"] }`,
+		`{ "disable": ["qsr001", "qsr002"] }`,
 	)
 
 	expected := parser.QuadletDirectory{
