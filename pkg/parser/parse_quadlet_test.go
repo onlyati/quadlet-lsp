@@ -93,6 +93,14 @@ Label="env.type=prod"
 Label="env.server=app01"
 `)
 
+	// Create app/foo-bar.container.d/labels.conf
+	createTempDir(t, tmpDir, "app")
+	createTempDir(t, path.Join(tmpDir, "app"), "foo-bar.container.d")
+	createTempFile(t, path.Join(tmpDir, "app", "foo-bar.container.d"), "labels.conf", `
+[Container]
+Label="env.name=app"
+`)
+
 	expected := parser.Quadlet{
 		DisabledQSR: []string{"qsr014", "qsr007"},
 		Header: []string{
@@ -161,6 +169,19 @@ Network=foo.network
 WantedBy=default.target
 `,
 		Dropins: []parser.Dropin{
+			{
+				Directory: "foo-bar.container.d",
+				FileName:  "app/foo-bar.container.d/labels.conf",
+				Properties: map[string][]parser.QuadletProperty{
+					"Container": {
+						{"Label", "\"env.name=app\""},
+					},
+				},
+				SourceFile: `
+[Container]
+Label="env.name=app"
+`,
+			},
 			{
 				Directory: "container.d",
 				FileName:  "container.d/labels.conf",

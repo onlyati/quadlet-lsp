@@ -108,7 +108,8 @@ func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
 
 		found := false
 		for _, sq := range qd.Quadlets {
-			if isDropinsBelongsToQuadlet(sq.Name, parentDir) {
+			tmpPaths := strings.Split(sq.Name, string(os.PathSeparator))
+			if isDropinsBelongsToQuadlet(tmpPaths[len(tmpPaths)-1], parentDir) {
 				sq.Dropins = append(sq.Dropins, dropin)
 				qd.Quadlets[sq.Name] = sq
 				found = true
