@@ -23,7 +23,7 @@ func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
 	content, err := os.ReadFile(path.Join(rootDir, ".quadletrc.json"))
 	if err == nil {
 		disableRules := struct {
-			Disabled []string `json:"disabled"`
+			Disabled []string `json:"disable"`
 		}{}
 		_ = json.Unmarshal(content, &disableRules)
 		qd.DisabledQSR = disableRules.Disabled

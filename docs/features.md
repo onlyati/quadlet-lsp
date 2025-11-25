@@ -103,7 +103,7 @@ Description=...
 If `.quadletrc.json` file exists in the current working directory, then some
 settings can be override.
 
-- `disabled`: A string array, if any syntax checker source can be found here
+- `disable`: A string array, if any syntax checker source can be found here
   that is ignored.
 - `podmanVersion`: Podman version can be specified. It can be useful if you want
   to make Quadlets to another system where older Podman running than on your
@@ -115,7 +115,7 @@ Example for file:
 
 ```json
 {
-  "disabled": ["qsr013", "qsr004"],
+  "disable": ["qsr013", "qsr004"],
   "podmanVersion": "5.4.0"
 }
 ```
