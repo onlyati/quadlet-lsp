@@ -22,7 +22,7 @@ var qsr015ValidFlags = []string{
 	"exec", "noexec",
 	"suid", "nosuid",
 	"bind", "rbind",
-	"shared", "shared",
+	"shared", "rshared",
 	"slave", "rslave",
 	"private", "rprivate",
 	"unbindable", "runbindable",
