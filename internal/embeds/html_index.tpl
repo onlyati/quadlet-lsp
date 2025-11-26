@@ -29,7 +29,7 @@
             <ul class="sidebar-nav">
               {{ range $value }}
               <li>
-                <a class="sidebar-link" href="{{ . }}.html">{{ . }}</a>
+                <a class="sidebar-link" href="{{ replaceSlash . }}.html">{{ . }}</a>
               </li>
               {{ end }}
             </ul>

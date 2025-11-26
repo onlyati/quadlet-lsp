@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"encoding/json"
+	htemplate "html/template"
 	"os"
 	"path"
 	"sort"
@@ -140,7 +141,11 @@ func generateDocMd(qd parser.QuadletDirectory, rootDir string, messenger utils.M
 }
 
 func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils.Messenger) {
-	t, err := template.ParseFS(embeds.TemplateFs, "*.tpl")
+	t, err := htemplate.New("root").Funcs(htemplate.FuncMap{
+		"replaceSlash": func(s string) string {
+			return strings.ReplaceAll(s, "/", "_")
+		},
+	}).ParseFS(embeds.TemplateFs, "*.tpl")
 	if err != nil {
 		messenger.SendMessage(
 			utils.MessengerError,
@@ -155,7 +160,7 @@ func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils
 	if err != nil {
 		messenger.SendMessage(
 			utils.MessengerError,
-			"Internal error: "+err.Error(),
+			"Internal error at html_style.tpl: "+err.Error(),
 		)
 		return
 	}
@@ -233,7 +238,7 @@ func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils
 	if err != nil {
 		messenger.SendMessage(
 			utils.MessengerError,
-			"Internal error: "+err.Error(),
+			"Internal error at html_index.tpl: "+err.Error(),
 		)
 		return
 	}
@@ -260,12 +265,13 @@ func generateDocHTML(qd parser.QuadletDirectory, rootDir string, messenger utils
 		if err != nil {
 			messenger.SendMessage(
 				utils.MessengerError,
-				"Internal error: "+err.Error(),
+				"Internal error at html_content.tpl: "+err.Error(),
 			)
 			return
 		}
 
-		err = os.WriteFile(path.Join(rootDir, "doc", name+".html"), buf.Bytes(), 0o644)
+		outFileName := strings.ReplaceAll(name, "/", "_")
+		err = os.WriteFile(path.Join(rootDir, "doc", outFileName+".html"), buf.Bytes(), 0o644)
 		if err != nil {
 			messenger.SendMessage(
 				utils.MessengerError,
