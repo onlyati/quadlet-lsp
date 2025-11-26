@@ -29,7 +29,7 @@
             <ul class="sidebar-nav">
               {{ range $value }}
               <li>
-                <a class="sidebar-link" href="{{ . }}.html">{{ . }}</a>
+                <a class="sidebar-link" href="{{ replaceSlash . }}.html">{{ . }}</a>
               </li>
               {{ end }}
             </ul>
@@ -94,7 +94,7 @@
 
           {{ if .Q.Dropins }}
           {{ range .Q.Dropins }}
-          <div class="content-header"><h1>{{ .Directory }}/{{ .FileName }}</h1></div>
+          <div class="content-header"><h1>{{ .FileName }}</h1></div>
 
           {{ range $key, $value := .Properties }}
           <section class="quadlet-section">

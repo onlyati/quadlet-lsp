@@ -34,7 +34,7 @@
 {{ if .Dropins }}
 
 {{- range $dropins := .Dropins }}
-### Dropins - {{ $dropins.Directory }}/{{ $dropins.FileName }}
+### Dropins - {{ $dropins.FileName }}
 
 {{- range $key, $value := .Properties }}
 #### {{ $key }}
