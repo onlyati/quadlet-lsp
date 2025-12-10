@@ -67,7 +67,7 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 	}
 
 	// There is a '=' in the line, so check for property's value
-	if isItPropertyCompletion(s.text[s.line]) {
+	if isItPropertyCompletion(s) {
 		return listPropertyCompletions(s)
 	}
 
@@ -77,6 +77,7 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 	}
 
 	// If this point is reached, then user probably type something
-	// at the beginning of a file, let's suggest some property
+	// at the beginning of a file, let's suggest some property.
+	// Or typing before the '=' sign in a line
 	return listNewProperties(s)
 }
