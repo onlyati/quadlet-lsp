@@ -4,6 +4,7 @@
 package lsp
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -124,6 +125,15 @@ func Start() {
 }
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, error) {
+	// If no RootURI, it means no directory open, do not initialize lsp
+	if params.RootURI == nil {
+		context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
+			Type:    protocol.MessageTypeWarning,
+			Message: "Open directory to be able to use quadlet-lsp",
+		})
+		return nil, errors.New("open directory to use quadlet-lsp")
+	}
+
 	// Read and parse configuration
 	workspaceDir := *params.RootURI
 
