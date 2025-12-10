@@ -7,9 +7,10 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func isItPropertyCompletion(line string, pos protocol.UInteger) bool {
-	idxEquale := uint32(strings.Index(line, "="))
-	return pos > idxEquale
+func isItPropertyCompletion(s Completion) bool {
+	// Check we are after '=' or after
+	idxEquale := uint32(strings.Index(s.text[s.line], "="))
+	return s.char > idxEquale
 }
 
 func listPropertyCompletions(s Completion) []protocol.CompletionItem {
