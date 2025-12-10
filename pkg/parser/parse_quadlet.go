@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -14,8 +15,9 @@ import (
 
 // ParseQuadletConfig Configuration for ParseQuadlet function
 type ParseQuadletConfig struct {
-	FileName      string // Name of the file (with extenstion) what should be parsed
-	RootDirectory string // Directory where the Quadlet files are located
+	FileName       string // Name of the file (with extenstion) what should be parsed
+	RootDirectory  string // Directory where the Quadlet files are located
+	CollectDropins bool   // Want to collect dropins information too?
 }
 
 // ParseQuadlet This function parse Quadlet file, including its dropins
@@ -87,48 +89,61 @@ func ParseQuadlet(c ParseQuadletConfig) (Quadlet, error) {
 	//
 	// Now parse the dropins
 	//
-	fileName := q.Name[strings.LastIndex(q.Name, "/")+1:]
-	extension := fileName[strings.LastIndex(fileName, ".")+1:]
-	fileName = fileName[:strings.LastIndex(fileName, ".")]
+	// Now check for all dropins
 
-	// First looking for the unit related dropins
-	parts := strings.Split(fileName, "-")
-	for i := range parts {
-		p := parts[0 : len(parts)-i]
-		dirPath := strings.Join(p, "-")
+	if c.CollectDropins {
+		err = filepath.WalkDir(c.RootDirectory, func(p string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
 
-		if i != 0 {
-			dirPath += "-"
-		}
-		dirPath += "." + extension + ".d"
-		parentDir := dirPath
-		dirPath = fmt.Sprintf(
-			"%s%c%s",
-			c.RootDirectory, os.PathSeparator, dirPath,
-		)
+			if !strings.HasSuffix(d.Name(), ".conf") {
+				return nil
+			}
 
-		entries, err := os.ReadDir(dirPath)
+			fName, _ := strings.CutPrefix(p, c.RootDirectory+"/")
+			pathsTmp := strings.Split(fName, string(os.PathSeparator))
+			if len(pathsTmp) < 2 {
+				return nil
+			}
+			parentDir := pathsTmp[len(pathsTmp)-2]
+
+			f, err := os.ReadFile(p)
+			if err != nil {
+				return err
+			}
+
+			lastSection := ""
+			lastLine := ""
+			dropin := Dropin{
+				FileName:   fName,
+				Directory:  parentDir,
+				Properties: make(map[string][]QuadletProperty),
+				SourceFile: string(f),
+			}
+
+			for l := range strings.SplitSeq(string(f), "\n") {
+				err := parseQuadletContent(
+					l,
+					ParseQuadletConfig{},
+					&dropin.Properties,
+					&lastSection,
+					&lastLine,
+				)
+				if err != nil {
+					return err
+				}
+			}
+
+			if isDropinsBelongsToQuadlet(q.Name, parentDir) {
+				q.Dropins = append(q.Dropins, dropin)
+			}
+
+			return nil
+		})
 		if err != nil {
-			continue // Directory probably just does not exists, skip
+			return q, err
 		}
-
-		d, err := parseDropins(dirPath, parentDir, entries)
-		if err != nil {
-			return Quadlet{}, err
-		}
-		q.Dropins = append(q.Dropins, d...)
-	}
-
-	// Then looking for the generic <extension>.d directory
-	dirPath := fmt.Sprintf("%s%c%s.d", c.RootDirectory, os.PathSeparator, extension)
-	parentDir := extension + ".d"
-	entries, err := os.ReadDir(dirPath)
-	if err == nil {
-		d, err := parseDropins(dirPath, parentDir, entries)
-		if err != nil {
-			return Quadlet{}, err
-		}
-		q.Dropins = append(q.Dropins, d...)
 	}
 
 	//
