@@ -18,7 +18,7 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 		checkVersion := podVer.GreaterOrEqual(p.MinVersion)
 		if checkVersion {
 			completionItems = append(completionItems, protocol.CompletionItem{
-				Label: p.Label + "=",
+				Label: p.Label,
 				Documentation: protocol.MarkupContent{
 					Kind:  protocol.MarkupKindMarkdown,
 					Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),

@@ -67,7 +67,7 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 	}
 
 	// There is a '=' in the line, so check for property's value
-	if isItPropertyCompletion(s.text[s.line]) {
+	if isItPropertyCompletion(s.text[s.line], s.char) {
 		return listPropertyCompletions(s)
 	}
 
