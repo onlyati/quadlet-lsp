@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path"
 	"strings"
@@ -9,11 +10,17 @@ import (
 )
 
 type QuadletConfig struct {
-	Mu            sync.RWMutex  `json:"-"`
-	Disable       []string      `json:"disable"`
-	PodmanVersion string        `json:"podmanVersion"`
-	Podman        PodmanVersion `json:"-"`
-	WorkspaceRoot string        `json:"-"`
+	Mu            sync.RWMutex    `json:"-"`
+	Disable       []string        `json:"disable"`
+	PodmanVersion string          `json:"podmanVersion"`
+	Project       ProjectProperty `json:"project"`
+	Podman        PodmanVersion   `json:"-"`
+	WorkspaceRoot string          `json:"-"`
+}
+
+type ProjectProperty struct {
+	DirLevel *int   `json:"dirLevel"`
+	RootDir  string `json:"rootDir"`
 }
 
 func LoadConfig(workspaceRoot string, c Commander) (*QuadletConfig, error) {
@@ -37,9 +44,21 @@ func LoadConfig(workspaceRoot string, c Commander) (*QuadletConfig, error) {
 		pVersion, err := NewPodmanVersion(c)
 		if err != nil {
 			config.Podman = BuildPodmanVersion(5, 4, 0)
-			return &config, err
+		} else {
+			config.Podman = pVersion
 		}
-		config.Podman = pVersion
+	}
+
+	// Check project properties
+	if config.Project.RootDir == "" {
+		config.Project.RootDir = config.WorkspaceRoot
+	}
+	if config.Project.DirLevel == nil {
+		config.Project.DirLevel = ReturnAsPtr(2)
+	}
+
+	if *config.Project.DirLevel < 0 {
+		return &config, errors.New("config.project.dirLevel must be greater than 0")
 	}
 
 	return &config, nil

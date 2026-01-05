@@ -17,6 +17,11 @@ func ReturnAsStringPtr(s string) *string {
 	return &s
 }
 
+// Return pointer of any
+func ReturnAsPtr[T any](s T) *T {
+	return &s
+}
+
 func FirstCharacterToUpper(s string) string {
 	runes := []rune(s)
 	runes[0] = unicode.ToUpper(runes[0])
