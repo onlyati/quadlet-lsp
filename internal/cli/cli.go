@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
-	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 type CliCommand struct {
@@ -23,10 +22,6 @@ func (c CliCommand) Execute() error {
 	switch c.Command {
 	case "help":
 		help()
-	case "check":
-		output, err = runCheckCLI(c.Parms, utils.CommandExecutor{})
-	case "doc":
-		output, err = runDocCLI(c.Parms, utils.CommandExecutor{})
 	case "version":
 		output = []string{data.ProgramVersion}
 	default:
@@ -50,7 +45,4 @@ func help() {
 	fmt.Println("")
 	fmt.Println("Run syntax checks: quadlet-lsp check <dir>")
 	fmt.Println("    <dir>: Directory which should be scanned")
-	fmt.Println("")
-	fmt.Println("Generate documents: quadlet-lsp doc <type>")
-	fmt.Println("    <type>: can be: html, md or json")
 }

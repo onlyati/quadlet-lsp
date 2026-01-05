@@ -35,10 +35,6 @@ func NewEditorCommandExecutor(rootDir string) EditorCommandExecutor {
 				fn:      listJobs,
 				running: false,
 			},
-			"generateDoc": {
-				fn:      GenerateDoc,
-				running: false,
-			},
 		},
 		mutex:   sync.Mutex{},
 		rootDir: rootDir,

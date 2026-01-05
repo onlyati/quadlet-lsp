@@ -5,13 +5,15 @@ package parser
 
 // QuadletDirectory Represent a directory with Quadlets
 type QuadletDirectory struct {
-	Quadlets    map[string]Quadlet // Map about Quadlets in the directory
-	DisabledQSR []string           // Globally disabled Quadlet Syntax Rules
+	Quadlets      map[string]Quadlet // Map about Quadlets in the directory
+	DisabledQSR   []string           // Globally disabled Quadlet Syntax Rules
+	OprhanDropins []Dropin           // Those dropin directories that has no existsing Quadlet
 }
 
 // Quadlet Represent a Quadlet file including its dropins
 type Quadlet struct {
 	Name        string                       // Name of the Quadlet file
+	FullPath    string                       // Full path from the root directory
 	References  []string                     // Which other Quadlet it reference (e.g.: Network=foo.network)
 	PartOf      []string                     // Which other quadlet refer to this Quadlet
 	DisabledQSR []string                     // Disabled Quadlet Syntax Rules
