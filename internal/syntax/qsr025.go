@@ -25,6 +25,7 @@ func qsr025(s SyntaxChecker) []protocol.Diagnostic {
 			Text:          s.documentText,
 			Section:       "[Container]",
 			Property:      "Image",
+			DirLevel:      *s.config.Project.DirLevel,
 		})
 
 		if len(lines) == 0 {

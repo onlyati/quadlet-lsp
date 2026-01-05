@@ -51,8 +51,7 @@ func QuadletWalkDir(root string, level int, fn fs.WalkDirFunc) error {
 		}
 
 		// Call the original function
-		fn(path, d, err)
-		return nil
+		return fn(path, d, err)
 	})
 }
 

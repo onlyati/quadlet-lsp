@@ -20,6 +20,9 @@ func TestQSR019_Valid(t *testing.T) {
 	for _, s := range cases {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr019(s)
 
@@ -42,6 +45,9 @@ func TestQSR019_Invalid(t *testing.T) {
 	for _, s := range cases {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr019(s)
 

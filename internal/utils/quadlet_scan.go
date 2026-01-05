@@ -2,11 +2,11 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"io/fs"
 	"log"
 	"os"
 	"path"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -127,6 +127,7 @@ type FindItemProperty struct {
 	Text          string // Text of the current document
 	Section       string // Section we are looking for
 	Property      string // Property we are looking for within the section
+	DirLevel      int    // How deep we want to search
 }
 
 // FindItems This function scanning the passed text and looking for property in specific section.
@@ -165,7 +166,7 @@ func FindItems(params FindItemProperty) []QuadletLine {
 
 func findItemsInDir(params FindItemProperty, dirPath string) []QuadletLine {
 	lines := []QuadletLine{}
-	err := filepath.WalkDir(params.RootDirectory, func(path string, d fs.DirEntry, err error) error {
+	err := QuadletWalkDir(params.RootDirectory, params.DirLevel, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -251,16 +252,17 @@ func readItems(text, property, section string) []QuadletLine {
 	return findings
 }
 
-func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
+func findImageInContainerUnit(f []byte, props FindImageExposedPortsProperty) []string {
 	var images []string
 
 	lines := FindItems(
 		FindItemProperty{
-			RootDirectory: rootDir,
+			RootDirectory: props.RootDir,
 			Text:          string(f),
 			Section:       "[Container]",
 			Property:      "Image",
-			URI:           uri,
+			URI:           props.URI,
+			DirLevel:      props.DirLevel,
 		},
 	)
 
@@ -272,11 +274,12 @@ func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
 			}
 			lines := FindItems(
 				FindItemProperty{
-					RootDirectory: rootDir,
+					RootDirectory: props.RootDir,
 					Text:          string(f),
 					Section:       "[Image]",
 					Property:      "Image",
-					URI:           uri,
+					URI:           props.URI,
+					DirLevel:      props.DirLevel,
 				},
 			)
 
@@ -300,12 +303,20 @@ func findImageInContainerUnit(f []byte, rootDir, uri string) []string {
 	return images
 }
 
+type FindImageExposedPortsProperty struct {
+	C        Commander
+	Name     string
+	RootDir  string
+	URI      string
+	DirLevel int
+}
+
 // FindImageExposedPorts This function looking around the current working directory and looking
 // for references of the specified name
-func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
+func FindImageExposedPorts(props FindImageExposedPortsProperty) []string {
 	var ports []string
 
-	name, _ = strings.CutPrefix(name, "file://")
+	name := strings.TrimPrefix(props.Name, "file://")
 	var images []string
 
 	if strings.HasSuffix(name, ".container") {
@@ -314,51 +325,51 @@ func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
 			log.Printf("failed to read file: %+v", err.Error())
 			return ports
 		}
-		images = findImageInContainerUnit(f, rootDir, uri)
+		images = findImageInContainerUnit(f, props)
 	}
 
 	if strings.HasSuffix(name, ".pod") {
 		tmp := strings.Split(name, string(os.PathSeparator))
 		podFileName := tmp[len(tmp)-1]
-
-		err := filepath.Walk(".", func(p string, info os.FileInfo, err error) error {
+		refs, err := FindReferences(
+			GoReferenceProperty{
+				Property: "Pod",
+				SearchIn: []string{"container"},
+				DirLevel: props.DirLevel,
+			},
+			podFileName,
+			props.RootDir,
+		)
+		for _, r := range refs {
+			f, err := os.ReadFile(strings.TrimPrefix(r.URI, "file://"))
 			if err != nil {
-				return err
+				continue
 			}
-
-			isItQuadletFile := strings.HasSuffix(p, ".container")
-			if info.IsDir() || !isItQuadletFile {
-				return nil
-			}
-
-			f, err := os.ReadFile(p)
-			if err != nil {
-				return err
-			}
-
 			lines := FindItems(
 				FindItemProperty{
-					RootDirectory: rootDir,
+					RootDirectory: props.RootDir,
 					Text:          string(f),
 					Section:       "[Container]",
 					Property:      "Pod",
-					URI:           "file://" + path.Join(rootDir, info.Name()),
+					URI:           r.URI,
 				},
 			)
-
 			if len(lines) > 0 {
 				if lines[0].Value == podFileName {
 					tmp := findImageInContainerUnit(
 						f,
-						rootDir,
-						"file://"+path.Join(rootDir, info.Name()),
+						FindImageExposedPortsProperty{
+							C:       props.C,
+							Name:    r.URI,
+							RootDir: props.RootDir,
+							URI:     r.URI,
+						},
 					)
 					images = append(images, tmp...)
 				}
 			}
+		}
 
-			return nil
-		})
 		if err != nil {
 			log.Printf("failed to walk to find container files: %+v", err.Error())
 			return ports
@@ -367,7 +378,7 @@ func FindImageExposedPorts(c Commander, name, rootDir, uri string) []string {
 
 	// We have the images, check the exposed ports
 	for _, img := range images {
-		output, err := c.Run(
+		output, err := props.C.Run(
 			"podman",
 			"image", "inspect", img,
 		)
@@ -421,4 +432,77 @@ func FindSection(lines []string, lineNumber uint32) string {
 		}
 	}
 	return section
+}
+
+type GoReferenceProperty struct {
+	Property string
+	SearchIn []string
+	DirLevel int
+}
+
+// FindReferences in other Quadlet files for the specific file
+func FindReferences(prop GoReferenceProperty, currentFileName, rootDir string) ([]protocol.Location, error) {
+	var locations []protocol.Location
+	files := []protocol.CompletionItem{}
+
+	for _, d := range prop.SearchIn {
+		filesTmp, err := ListQuadletFiles(d, rootDir)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, filesTmp...)
+	}
+
+	for _, f := range files {
+		p := ""
+		switch v := f.Documentation.(type) {
+		case string:
+			p = v
+		default:
+			return nil, errors.New("unexpected error: documentation is not string")
+		}
+
+		p, _ = strings.CutPrefix(p, "From work directory: ")
+		content, err := os.ReadFile(p)
+		if err != nil {
+			return nil, err
+		}
+
+		fname := p[strings.LastIndex(p, string(os.PathSeparator))+1:]
+		section := FirstCharacterToUpper(fname[strings.LastIndex(fname, ".")+1:])
+
+		items := FindItems(FindItemProperty{
+			URI:           p,
+			RootDirectory: rootDir,
+			Text:          string(content),
+			Section:       "[" + section + "]",
+			Property:      prop.Property,
+			DirLevel:      prop.DirLevel,
+		})
+		for _, item := range items {
+			if prop.Property == "Volume" {
+				volParts := strings.Split(item.Value, ":")
+				item.Value = volParts[0]
+			}
+			if strings.Contains(item.Value, "@") {
+				// If contains '@' then it is a systemd template
+				item.Value = ConvertTemplateNameToFile(item.Value)
+			}
+			if item.Value == currentFileName {
+				uri := p
+				if item.FilePath != "" {
+					uri = item.FilePath
+				}
+				locations = append(locations, protocol.Location{
+					URI: protocol.DocumentUri("file://" + uri),
+					Range: protocol.Range{
+						Start: protocol.Position{Line: item.LineNumber, Character: 0},
+						End:   protocol.Position{Line: item.LineNumber, Character: item.Length},
+					},
+				})
+			}
+		}
+	}
+
+	return locations, nil
 }

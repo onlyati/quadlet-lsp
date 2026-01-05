@@ -28,12 +28,14 @@ func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 	qsr011Ports = nil
 
 	allowedFiles := []string{"container", "pod"}
-	qsr011PortsRaw = utils.FindImageExposedPorts(
-		s.commander,
-		s.uri,
-		s.config.WorkspaceRoot,
-		s.uri,
-	)
+	props := utils.FindImageExposedPortsProperty{
+		C:        s.commander,
+		Name:     s.uri,
+		URI:      s.uri,
+		RootDir:  s.config.WorkspaceRoot,
+		DirLevel: *s.config.Project.DirLevel,
+	}
+	qsr011PortsRaw = utils.FindImageExposedPorts(props)
 
 	for _, s := range qsr011PortsRaw {
 		if strings.HasPrefix(s, "failed-check-") {
@@ -54,6 +56,7 @@ func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 				Text:          s.documentText,
 				Section:       c,
 				Property:      "PublishPort",
+				DirLevel:      *s.config.Project.DirLevel,
 			},
 		)
 

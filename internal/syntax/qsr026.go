@@ -25,6 +25,7 @@ func qsr026(s SyntaxChecker) []protocol.Diagnostic {
 			Text:          s.documentText,
 			Section:       "[Artifact]",
 			Property:      "Artifact",
+			DirLevel:      *s.config.Project.DirLevel,
 		})
 
 		if len(lines) == 0 {

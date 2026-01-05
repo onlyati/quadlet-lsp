@@ -9,10 +9,16 @@ import (
 )
 
 func TestQSR025_ValidBase(t *testing.T) {
+	tmpDir := t.TempDir()
 	s := NewSyntaxChecker(
 		"[Container]\nImage=foo.image",
 		"foo.container")
-	s.config = &utils.QuadletConfig{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	diags := qsr025(s)
 
@@ -44,8 +50,12 @@ func TestQSR025_ValidDropins(t *testing.T) {
 	s := NewSyntaxChecker(
 		"[Container]\nLabel=app=foo",
 		"file://"+tmpDir+string(os.PathSeparator)+"foo.container")
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	diags := qsr025(s)
 
@@ -85,8 +95,12 @@ func TestQSR025_ValidNestedDropins(t *testing.T) {
 	s := NewSyntaxChecker(
 		"[Container]\nLabel=app=foo",
 		"file://"+path.Join(tmpDir, "foo-app", "foo-container"))
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	diags := qsr025(s)
 
@@ -118,7 +132,12 @@ func TestQSR025_Invalid(t *testing.T) {
 	s := NewSyntaxChecker(
 		"[Container]\nLabel=app=foo",
 		"file://"+tmpDir+string(os.PathSeparator)+"foo.container")
-	s.config = &utils.QuadletConfig{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	diags := qsr025(s)
 

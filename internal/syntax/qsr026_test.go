@@ -43,8 +43,12 @@ func TestQSR026_ValidDropins(t *testing.T) {
 	s := NewSyntaxChecker(
 		"[Artifact]\nAuthFile=/etc/registry/auth.json",
 		"file://"+tmpDir+string(os.PathSeparator)+"foo.artifact")
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	diags := qsr026(s)
 
@@ -76,7 +80,12 @@ func TestQSR026_Invalid(t *testing.T) {
 	s := NewSyntaxChecker(
 		"[Artifact]\nAuthFile=/etc/registry/auth.json",
 		"file://"+tmpDir+string(os.PathSeparator)+"foo.artifact")
-	s.config = &utils.QuadletConfig{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	diags := qsr026(s)
 

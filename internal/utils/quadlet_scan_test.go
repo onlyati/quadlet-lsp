@@ -2,6 +2,8 @@ package utils_test
 
 import (
 	"os"
+	"path"
+	"strings"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -238,4 +240,88 @@ NoExist=true
 			t.Fatalf("unexpected finding: %+v", findings[0])
 		}
 	}
+}
+
+func TestFindReferences(t *testing.T) {
+	tmpDir := t.TempDir()
+	_ = os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "example.container", "[Container]\nNetwork=example.network\nAnotherLine")
+
+	locations, err := findReferences(
+		utils.GoReferenceProperty{
+			Property: "Network",
+			SearchIn: []string{"container", "pod", "kube"},
+			DirLevel: 2,
+		}, "example.network", tmpDir)
+	assert.NoError(t, err)
+	assert.Len(t, locations, 1)
+	assert.Contains(t, string(locations[0].URI), "example.container")
+	assert.Equal(t, uint32(1), locations[0].Range.Start.Line)
+}
+
+func TestFindReferencesTemplate(t *testing.T) {
+	tmpDir := t.TempDir()
+	_ = os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "web@.container", "[Container]\nVolume=web@%i.volume:/app")
+	createTempFile(t, tmpDir, "builder@.container", "[Container]\nVolume=web@%i.volume:/app")
+
+	locations, err := findReferences(
+		utils.GoReferenceProperty{
+			Property: "Volume",
+			SearchIn: []string{"container", "pod"},
+			DirLevel: 2,
+		}, "web@.volume", tmpDir)
+	assert.NoError(t, err)
+	assert.Len(t, locations, 2)
+
+	for _, loc := range locations {
+		if !strings.Contains(loc.URI, "web@.container") && !strings.Contains(loc.URI, "builder@.container") {
+			t.Fatalf("Unexpected finding: %+v", loc)
+		}
+	}
+}
+
+func TestFindReferencesDropIns(t *testing.T) {
+	tmpDir := t.TempDir()
+	_ = os.Chdir(tmpDir)
+
+	createTempFile(t, tmpDir, "foo.container", "[Container]\nImage=foo.image\n")
+	createTempFile(t, tmpDir, "foo.pod", "[Pod]\n")
+	createTempDir(t, tmpDir, "foo.container.d")
+	createTempFile(t, path.Join(tmpDir, "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
+
+	locations, err := findReferences(
+		utils.GoReferenceProperty{
+			Property: "Pod",
+			SearchIn: []string{"container", "kube", "volume", "network", "image", "build"},
+			DirLevel: 2,
+		}, "foo.pod", tmpDir)
+	assert.NoError(t, err)
+	assert.Len(t, locations, 1)
+	assert.Contains(t, string(locations[0].URI), "foo.container.d/pod.conf")
+	assert.Equal(t, uint32(1), locations[0].Range.Start.Line)
+}
+
+func TestFindReferencesNested(t *testing.T) {
+	tmpDir := t.TempDir()
+	_ = os.Chdir(tmpDir)
+
+	createTempDir(t, tmpDir, "foo")
+	createTempFile(t, path.Join(tmpDir, "foo"), "foo.container", "[Container]\nImage=foo.image\n")
+	createTempFile(t, path.Join(tmpDir, "foo"), "foo.pod", "[Pod]\n")
+	createTempDir(t, path.Join(tmpDir, "foo"), "foo.container.d")
+	createTempFile(t, path.Join(tmpDir, "foo", "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
+
+	locations, err := findReferences(
+		utils.GoReferenceProperty{
+			Property: "Pod",
+			SearchIn: []string{"container", "kube", "volume", "network", "image", "build"},
+			DirLevel: 2,
+		}, "foo.pod", tmpDir)
+	assert.NoError(t, err)
+	assert.Len(t, locations, 1)
+	assert.Contains(t, string(locations[0].URI), "foo/foo.container.d/pod.conf")
+	assert.Equal(t, uint32(1), locations[0].Range.Start.Line)
 }
