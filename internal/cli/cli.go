@@ -6,8 +6,10 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 type CliCommand struct {
@@ -24,6 +26,8 @@ func (c CliCommand) Execute() error {
 		help()
 	case "version":
 		output = []string{data.ProgramVersion}
+	case "check":
+		output, err = runCheckCLI(os.Args, utils.CommandExecutor{})
 	default:
 		err = errors.New("invalid command, see 'quadlet-lsp help'")
 	}

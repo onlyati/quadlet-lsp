@@ -9,13 +9,21 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+type qsr014ActionParms struct {
+	rootDir  string
+	dirLevel int
+}
+
 // Network file does not exist
 func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod", "build", "kube"}
 	s.config.Mu.RLock()
-	rootDir := s.config.WorkspaceRoot
+	parm := qsr014ActionParms{
+		rootDir:  s.config.WorkspaceRoot,
+		dirLevel: *s.config.Project.DirLevel,
+	}
 	s.config.Mu.RUnlock()
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
@@ -26,7 +34,7 @@ func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Network"}: {},
 			},
 			qsr014Action,
-			rootDir,
+			parm,
 		)
 	}
 
@@ -34,17 +42,17 @@ func qsr014(s SyntaxChecker) []protocol.Diagnostic {
 }
 
 func qsr014Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []protocol.Diagnostic {
-	rootDir := ""
+	actionParm := qsr014ActionParms{}
 	switch v := extraInfo.(type) {
-	case string:
-		rootDir = v
+	case qsr014ActionParms:
+		actionParm = v
 	default:
 		return nil
 	}
 
 	netName := q.Value
 	if strings.HasSuffix(netName, ".network") {
-		quadlets, err := utils.ListQuadletFiles("network", rootDir)
+		quadlets, err := utils.ListQuadletFiles("network", actionParm.rootDir, actionParm.dirLevel)
 		exists := false
 
 		for _, q := range quadlets {

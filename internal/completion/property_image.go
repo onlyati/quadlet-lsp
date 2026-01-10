@@ -10,13 +10,13 @@ import (
 func propertyListImages(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
-	images, err := utils.ListQuadletFiles("image", s.config.WorkspaceRoot)
+	images, err := utils.ListQuadletFiles("image", s.config.WorkspaceRoot, *s.config.Project.DirLevel)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	completionItems = append(completionItems, images...)
 
-	builds, err := utils.ListQuadletFiles("build", s.config.WorkspaceRoot)
+	builds, err := utils.ListQuadletFiles("build", s.config.WorkspaceRoot, *s.config.Project.DirLevel)
 	if err != nil {
 		log.Println(err.Error())
 	}

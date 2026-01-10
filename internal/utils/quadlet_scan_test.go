@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -248,7 +249,7 @@ func TestFindReferences(t *testing.T) {
 
 	createTempFile(t, tmpDir, "example.container", "[Container]\nNetwork=example.network\nAnotherLine")
 
-	locations, err := findReferences(
+	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
 			Property: "Network",
 			SearchIn: []string{"container", "pod", "kube"},
@@ -267,7 +268,7 @@ func TestFindReferencesTemplate(t *testing.T) {
 	createTempFile(t, tmpDir, "web@.container", "[Container]\nVolume=web@%i.volume:/app")
 	createTempFile(t, tmpDir, "builder@.container", "[Container]\nVolume=web@%i.volume:/app")
 
-	locations, err := findReferences(
+	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
 			Property: "Volume",
 			SearchIn: []string{"container", "pod"},
@@ -292,7 +293,7 @@ func TestFindReferencesDropIns(t *testing.T) {
 	createTempDir(t, tmpDir, "foo.container.d")
 	createTempFile(t, path.Join(tmpDir, "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
 
-	locations, err := findReferences(
+	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
 			Property: "Pod",
 			SearchIn: []string{"container", "kube", "volume", "network", "image", "build"},
@@ -314,7 +315,7 @@ func TestFindReferencesNested(t *testing.T) {
 	createTempDir(t, path.Join(tmpDir, "foo"), "foo.container.d")
 	createTempFile(t, path.Join(tmpDir, "foo", "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
 
-	locations, err := findReferences(
+	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
 			Property: "Pod",
 			SearchIn: []string{"container", "kube", "volume", "network", "image", "build"},

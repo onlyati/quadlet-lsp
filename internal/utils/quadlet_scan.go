@@ -359,10 +359,11 @@ func FindImageExposedPorts(props FindImageExposedPortsProperty) []string {
 					tmp := findImageInContainerUnit(
 						f,
 						FindImageExposedPortsProperty{
-							C:       props.C,
-							Name:    r.URI,
-							RootDir: props.RootDir,
-							URI:     r.URI,
+							C:        props.C,
+							Name:     r.URI,
+							RootDir:  props.RootDir,
+							URI:      r.URI,
+							DirLevel: props.DirLevel,
 						},
 					)
 					images = append(images, tmp...)
@@ -446,7 +447,7 @@ func FindReferences(prop GoReferenceProperty, currentFileName, rootDir string) (
 	files := []protocol.CompletionItem{}
 
 	for _, d := range prop.SearchIn {
-		filesTmp, err := ListQuadletFiles(d, rootDir)
+		filesTmp, err := ListQuadletFiles(d, rootDir, prop.DirLevel)
 		if err != nil {
 			return nil, err
 		}

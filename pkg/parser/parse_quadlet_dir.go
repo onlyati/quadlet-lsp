@@ -4,18 +4,19 @@ import (
 	"encoding/json"
 	"os"
 	"path"
-	"path/filepath"
 	"slices"
 	"strings"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 // ParseQuadletDir List all files in the directory and if found any Quadlet
 // then parse it.
-func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
+func ParseQuadletDir(rootDir string, dirLevel int) (QuadletDirectory, error) {
 	qd := QuadletDirectory{}
 	qd.Quadlets = make(map[string]Quadlet)
 
@@ -35,7 +36,7 @@ func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
 		"image", "container", "volume", "network", "kube", "pod", "build",
 	}
 
-	err = filepath.WalkDir(rootDir, func(p string, d os.DirEntry, err error) error {
+	err = utils.QuadletWalkDir(rootDir, dirLevel, func(p string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -63,7 +64,7 @@ func ParseQuadletDir(rootDir string) (QuadletDirectory, error) {
 	}
 
 	// Now check for all dropins
-	err = filepath.WalkDir(rootDir, func(p string, d os.DirEntry, err error) error {
+	err = utils.QuadletWalkDir(rootDir, dirLevel, func(p string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

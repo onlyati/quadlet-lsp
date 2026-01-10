@@ -41,16 +41,17 @@ func textDefinition(
 
 	config.Mu.RLock()
 	rootDir := config.WorkspaceRoot
+	level := config.Project.DirLevel
 	config.Mu.RUnlock()
 	if prop, ok := keywords[props[0]]; ok {
-		return findQuadlets(prop, props[1], rootDir)
+		return findQuadlets(prop, props[1], rootDir, *level)
 	}
 
 	return location, nil
 }
 
 // Just check if file exists
-func findQuadlets(mask, value, rootDir string) (protocol.Location, error) {
+func findQuadlets(mask, value, rootDir string, level int) (protocol.Location, error) {
 	var location protocol.Location
 
 	if mask == "volume" {
@@ -63,7 +64,7 @@ func findQuadlets(mask, value, rootDir string) (protocol.Location, error) {
 		value = utils.ConvertTemplateNameToFile(value)
 	}
 
-	files, err := utils.ListQuadletFiles(mask, rootDir)
+	files, err := utils.ListQuadletFiles(mask, rootDir, level)
 	if err != nil {
 		return location, err
 	}

@@ -9,13 +9,21 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+type qsr017ActionParms struct {
+	rootDir  string
+	dirLevel int
+}
+
 // Pod file does not exist
 func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container"}
 	s.config.Mu.RLock()
-	rootDir := s.config.WorkspaceRoot
+	parm := qsr017ActionParms{
+		rootDir:  s.config.WorkspaceRoot,
+		dirLevel: *s.config.Project.DirLevel,
+	}
 	s.config.Mu.RUnlock()
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
@@ -26,7 +34,7 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Pod"}: {},
 			},
 			qsr017Action,
-			rootDir,
+			parm,
 		)
 	}
 
@@ -34,17 +42,17 @@ func qsr017(s SyntaxChecker) []protocol.Diagnostic {
 }
 
 func qsr017Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []protocol.Diagnostic {
-	rootDir := ""
+	actionParm := qsr017ActionParms{}
 	switch v := extraInfo.(type) {
-	case string:
-		rootDir = v
+	case qsr017ActionParms:
+		actionParm = v
 	default:
 		return nil
 	}
 
 	podName := q.Value
 	if strings.HasSuffix(podName, ".pod") {
-		quadlets, err := utils.ListQuadletFiles("pod", rootDir)
+		quadlets, err := utils.ListQuadletFiles("pod", actionParm.rootDir, actionParm.dirLevel)
 		exists := false
 
 		for _, q := range quadlets {

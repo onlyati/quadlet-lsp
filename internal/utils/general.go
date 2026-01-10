@@ -56,10 +56,10 @@ func QuadletWalkDir(root string, level int, fn fs.WalkDirFunc) error {
 }
 
 // ListQuadletFiles List quadlet files from the current work directory based on extenstion
-func ListQuadletFiles(ext, rootDir string) ([]protocol.CompletionItem, error) {
+func ListQuadletFiles(ext, rootDir string, level int) ([]protocol.CompletionItem, error) {
 	dirs := []protocol.CompletionItem{}
 
-	err := filepath.WalkDir(rootDir, func(p string, entry fs.DirEntry, err error) error {
+	err := QuadletWalkDir(rootDir, level, func(p string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

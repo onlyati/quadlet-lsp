@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
 // ParseQuadletConfig Configuration for ParseQuadlet function
@@ -18,6 +19,7 @@ type ParseQuadletConfig struct {
 	FileName       string // Name of the file (with extenstion) what should be parsed
 	RootDirectory  string // Directory where the Quadlet files are located
 	CollectDropins bool   // Want to collect dropins information too?
+	DirLevel       int    // How deep in the tree dropins shoold searched
 }
 
 // ParseQuadlet This function parse Quadlet file, including its dropins
@@ -92,7 +94,7 @@ func ParseQuadlet(c ParseQuadletConfig) (Quadlet, error) {
 	// Now check for all dropins
 
 	if c.CollectDropins {
-		err = filepath.WalkDir(c.RootDirectory, func(p string, d os.DirEntry, err error) error {
+		err = utils.QuadletWalkDir(c.RootDirectory, c.DirLevel, func(p string, d os.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}

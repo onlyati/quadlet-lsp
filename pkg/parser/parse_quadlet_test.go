@@ -242,6 +242,7 @@ Network=foo-bar.network
 		RootDirectory:  tmpDir,
 		FileName:       "foo-bar.container",
 		CollectDropins: true,
+		DirLevel:       2,
 	})
 
 	require.NoError(
@@ -353,6 +354,7 @@ Image=docker.io/library/debian
 		RootDirectory:  tmpDir,
 		FileName:       "foo.container",
 		CollectDropins: true,
+		DirLevel:       2,
 	})
 
 	require.NoError(

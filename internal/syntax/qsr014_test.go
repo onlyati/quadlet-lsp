@@ -44,8 +44,12 @@ func TestQSR014_Valid(t *testing.T) {
 	}
 
 	for _, s := range cases {
-		s.config = &utils.QuadletConfig{}
-		s.config.WorkspaceRoot = tmpDir
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
+		}
 		diags := qsr014(s)
 
 		if len(diags) != 0 {
@@ -78,8 +82,12 @@ func TestQSR014_Invalid(t *testing.T) {
 	}
 
 	for _, s := range cases {
-		s.config = &utils.QuadletConfig{}
-		s.config.WorkspaceRoot = tmpDir
+		s.config = &utils.QuadletConfig{
+			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
+		}
 		diags := qsr014(s)
 
 		if len(diags) != 2 {

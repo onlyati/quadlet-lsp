@@ -10,7 +10,7 @@ import (
 func propertyListNetworks(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
-	volumes, err := utils.ListQuadletFiles("network", s.config.WorkspaceRoot)
+	volumes, err := utils.ListQuadletFiles("network", s.config.WorkspaceRoot, *s.config.Project.DirLevel)
 	if err != nil {
 		log.Println(err.Error())
 	} else {

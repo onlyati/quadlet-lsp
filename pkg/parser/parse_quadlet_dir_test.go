@@ -183,7 +183,7 @@ Image=docker.io/library/debian
 		},
 	}
 
-	result, err := parser.ParseQuadletDir(tmpDir)
+	result, err := parser.ParseQuadletDir(tmpDir, 2)
 
 	require.NoError(
 		t,

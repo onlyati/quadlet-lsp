@@ -47,7 +47,7 @@ func runCheckCLI(args []string, commander utils.Commander) ([]string, error) {
 		return nil, errors.New("parameter must be a directory")
 	}
 
-	quadletDir, err := parser.ParseQuadletDir(workEntity)
+	quadletDir, err := parser.ParseQuadletDir(workEntity, *checkCfg.Project.DirLevel)
 	if err != nil {
 		return nil, err
 	}

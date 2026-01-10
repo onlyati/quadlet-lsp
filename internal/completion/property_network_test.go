@@ -28,8 +28,12 @@ func TestPropertyNetwork_ListNetwork(t *testing.T) {
 		uint32(len("Network=")),
 	)
 	s.commander = networkMockCommnander{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListNetworks(s)
 

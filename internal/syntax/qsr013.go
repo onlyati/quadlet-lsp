@@ -9,13 +9,21 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+type qsr013ActionParms struct {
+	rootDir  string
+	dirLevel int
+}
+
 // Volume file does not exists
 func qsr013(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
 	allowedFiles := []string{"container", "pod", "build"}
 	s.config.Mu.RLock()
-	rootDir := s.config.WorkspaceRoot
+	parm := qsr013ActionParms{
+		rootDir:  s.config.WorkspaceRoot,
+		dirLevel: *s.config.Project.DirLevel,
+	}
 	s.config.Mu.RUnlock()
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
@@ -26,7 +34,7 @@ func qsr013(s SyntaxChecker) []protocol.Diagnostic {
 				{Section: c, Property: "Volume"}: {},
 			},
 			qsr013Action,
-			rootDir,
+			parm,
 		)
 	}
 
@@ -39,10 +47,10 @@ func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []p
 		return nil
 	}
 
-	rootDir := ""
+	actionParm := qsr013ActionParms{}
 	switch v := extraInfo.(type) {
-	case string:
-		rootDir = v
+	case qsr013ActionParms:
+		actionParm = v
 	default:
 		return nil
 	}
@@ -52,7 +60,7 @@ func qsr013Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []p
 		if strings.Contains(volName, "@") {
 			volName = utils.ConvertTemplateNameToFile(volName)
 		}
-		quadlets, err := utils.ListQuadletFiles("volume", rootDir)
+		quadlets, err := utils.ListQuadletFiles("volume", actionParm.rootDir, actionParm.dirLevel)
 		exists := false
 
 		for _, q := range quadlets {

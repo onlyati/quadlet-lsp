@@ -84,7 +84,7 @@ func TestListQuadletFiles(t *testing.T) {
 	createTempDir(t, tmpDir+string(os.PathSeparator)+"foobar", "foo")
 	createTempFile(t, tmpDir+string(os.PathSeparator)+"foobar"+string(os.PathSeparator)+"foo", "foo.pod", "placeholder")
 
-	items, err := utils.ListQuadletFiles("pod", tmpDir)
+	items, err := utils.ListQuadletFiles("pod", tmpDir, 2)
 	assert.NoError(t, err)
 	assert.Equal(t, 4, len(items))
 }

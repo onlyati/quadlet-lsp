@@ -28,8 +28,12 @@ func TestPropertyVolume_ListVolume(t *testing.T) {
 		uint32(len("Volume=")),
 	)
 	s.commander = volumeMockCommnander{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListVolumes(s)
 
@@ -71,8 +75,12 @@ func TestPropertyVolume_NoList(t *testing.T) {
 		uint32(len("Volume=foo.volume:")),
 	)
 	s.commander = volumeMockCommnander{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListVolumes(s)
 
@@ -95,8 +103,12 @@ func TestPropertyVolume_ListFlags(t *testing.T) {
 		uint32(len("Volume=foo.volume:/app/:")),
 	)
 	s.commander = volumeMockCommnander{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListVolumes(s)
 
@@ -135,8 +147,12 @@ func TestPropertyVolume_ListVolumeWithCursor(t *testing.T) {
 		uint32(len("Volume=")),
 	)
 	s.commander = volumeMockCommnander{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListVolumes(s)
 
