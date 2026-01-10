@@ -81,6 +81,9 @@ func TestQSR011_ValidContainer(t *testing.T) {
 		s.commander = mockCommanderQSR011{}
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr011(s)
 
@@ -112,6 +115,9 @@ func TestQSR011_InvalidContainer(t *testing.T) {
 		s.commander = mockCommanderQSR011{}
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr011(s)
 
@@ -165,6 +171,9 @@ func TestQSR011_ValidPod(t *testing.T) {
 		s.commander = mockCommanderQSR011{}
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr011(s)
 
@@ -210,6 +219,9 @@ func TestQSR011_InvalidPod(t *testing.T) {
 		s.commander = mockCommanderQSR011{}
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr011(s)
 
@@ -242,6 +254,9 @@ func TestQSR011_InvalidDropins(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Mu:            sync.RWMutex{},
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
 	}
 	s.commander = mockCommanderQSR011{}
 
@@ -268,7 +283,10 @@ func TestQSR011_InvalidMultiDropins(t *testing.T) {
 	)
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
-		Mu:            sync.RWMutex{},
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+		Mu: sync.RWMutex{},
 	}
 	s.commander = mockCommanderQSR011{}
 
@@ -281,7 +299,6 @@ func TestQSR011_InvalidMultiDropins(t *testing.T) {
 
 func TestQSR011_ValidPodDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.pod", "[Pod]\nPublishPort=10080:8080")
 	createTempFile(t, tmpDir, "foo-bar-baz.container", "[Container]\nPod=foo.pod")
@@ -294,7 +311,10 @@ func TestQSR011_ValidPodDropins(t *testing.T) {
 	)
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
-		Mu:            sync.RWMutex{},
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+		Mu: sync.RWMutex{},
 	}
 	s.commander = mockCommanderQSR011{}
 
@@ -327,6 +347,9 @@ func TestQSR011_MoreOption(t *testing.T) {
 		s.commander = mockCommanderQSR011{}
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
+			Project: utils.ProjectProperty{
+				DirLevel: utils.ReturnAsPtr(2),
+			},
 		}
 		diags := qsr011(s)
 

@@ -6,6 +6,8 @@
 - [Syntax checking](#syntax-checking)
     * [Disable syntax rule per file](#disable-syntax-rule-per-file)
 - [Configuration file](#configuration-file)
+    * [Project settings](#project-settings)
+    * [Example for file](#example-for-file)
 - [Format file](#format-file)
 - [Generate document](#generate-document)
 - [Hover menu](#hover-menu)
@@ -103,20 +105,35 @@ Description=...
 If `.quadletrc.json` file exists in the current working directory, then some
 settings can be override.
 
-- `disable`: A string array, if any syntax checker source can be found here
-  that is ignored.
+- `disable`: A string array, if any syntax checker source can be found here that
+  is ignored.
 - `podmanVersion`: Podman version can be specified. It can be useful if you want
   to make Quadlets to another system where older Podman running than on your
   current machine. If omitted, then it try to automatically discover based on
   `podman version` command. If failed, then assumes you are using the highest
   version.
 
-Example for file:
+### Project settings
+
+If the project itself is not just a Quadlet project, a root directory can be
+specified as `project.rootDir` in the configuration file. Result is, that the
+root directory where the language server work and looking for files will be a
+subdirectory of the project. This is useful, if you just provide Quadlets for
+installation but this is an application project.
+
+There is another settings, called `project.dirLevel`, which defaults to 2.
+Language server recursively looking for Quadlet files. Without any limitation,
+this could be end like an expensive and slow search. For this reason this
+settings has been made.
+
+### Example for file
 
 ```json
 {
   "disable": ["qsr013", "qsr004"],
   "podmanVersion": "5.4.0"
+  "project": {
+    "rootDir": "container/quadlets",
 }
 ```
 

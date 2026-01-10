@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -16,9 +15,10 @@ func pullAll(command *protocol.ExecuteCommandParams, e *EditorCommandExecutor, m
 
 	e.mutex.Lock()
 	rootDir := e.rootDir
+	dirLevel := e.dirLevel
 	e.mutex.Unlock()
 
-	filepath.WalkDir(rootDir, func(p string, entry fs.DirEntry, err error) error {
+	utils.QuadletWalkDir(rootDir, dirLevel, func(p string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

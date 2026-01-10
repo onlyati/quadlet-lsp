@@ -30,6 +30,7 @@ func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 			Text:          strings.Join(s.text, "\n"),
 			Section:       "[" + utils.FirstCharacterToUpper(ext) + "]",
 			Property:      "Image",
+			DirLevel:      *s.config.Project.DirLevel,
 		},
 	)
 

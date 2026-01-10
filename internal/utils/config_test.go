@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"errors"
+	"path"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -35,18 +36,11 @@ func TestConfig_Default(t *testing.T) {
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
 	assert.NoError(t, err)
-
-	if cfg.WorkspaceRoot != tmpDir {
-		t.Fatalf("Expected WorkspaceRoot '%s', but got '%s'", tmpDir, cfg.WorkspaceRoot)
-	}
-
-	if cfg.Podman != utils.BuildPodmanVersion(5, 5, 2) {
-		t.Fatalf("Expected Podman 5.5.2, but got: %+v", cfg.Podman)
-	}
-
-	if cfg.Disable != nil {
-		t.Fatalf("Expected nil, but got %v", cfg.Disable)
-	}
+	assert.Equal(t, tmpDir, cfg.WorkspaceRoot, "workspace root should be the current directory")
+	assert.Equal(t, utils.BuildPodmanVersion(5, 5, 2), cfg.Podman, "wrong podman version gathered")
+	assert.Nil(t, cfg.Disable, "cfg.disable should be nil")
+	assert.Equal(t, cfg.WorkspaceRoot, cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
+	assert.Equal(t, 2, *cfg.Project.DirLevel, "dirLevel default is 2")
 }
 
 func TestConfig_FromFile(t *testing.T) {
@@ -56,22 +50,26 @@ func TestConfig_FromFile(t *testing.T) {
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
 	assert.NoError(t, err)
+	assert.Equal(t, tmpDir, cfg.WorkspaceRoot, "workspace root should be the current directory")
+	assert.Equal(t, utils.BuildPodmanVersion(5, 4, 0), cfg.Podman, "wrong podman version gathered")
+	assert.Len(t, cfg.Disable, 1, "wrong disable array length")
+	assert.Equal(t, "qsr003", cfg.Disable[0], "expected qsr003 rule")
+	assert.Equal(t, cfg.WorkspaceRoot, cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
+	assert.Equal(t, 2, *cfg.Project.DirLevel, "dirLevel default is 2")
+}
 
-	if cfg.WorkspaceRoot != tmpDir {
-		t.Fatalf("Expected WorkspaceRoot '%s', but got '%s'", tmpDir, cfg.WorkspaceRoot)
-	}
+func TestConfig_WithProjectProps(t *testing.T) {
+	tmpDir := t.TempDir()
+	createTempFile(t, tmpDir, ".quadletrc.json", `{ "project" : { "rootDir": "containers", "dirLevel": 4 } }`)
 
-	if cfg.Podman != utils.BuildPodmanVersion(5, 4, 0) {
-		t.Fatalf("Expected Podman 5.4.0, but got: %+v", cfg.Podman)
-	}
-
-	if len(cfg.Disable) != 1 {
-		t.Fatalf("Expected 1 disabled rule but got %d", len(cfg.Disable))
-	}
-
-	if cfg.Disable[0] != "qsr003" {
-		t.Fatalf("Expected qsr003 disable rule, but got %s", cfg.Disable[0])
-	}
+	c := configMockCommander{}
+	cfg, err := utils.LoadConfig(tmpDir, c)
+	assert.NoError(t, err)
+	assert.Equal(t, path.Join(tmpDir, "containers"), cfg.WorkspaceRoot, "workspace root should be the current directory")
+	assert.Equal(t, utils.BuildPodmanVersion(5, 5, 2), cfg.Podman, "wrong podman version gathered")
+	assert.Nil(t, cfg.Disable, "wrong disable array length")
+	assert.Equal(t, "containers", cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
+	assert.Equal(t, 4, *cfg.Project.DirLevel, "dirLevel default is 2")
 }
 
 func TestConfig_InvalidJson(t *testing.T) {
@@ -81,10 +79,7 @@ func TestConfig_InvalidJson(t *testing.T) {
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
 	assert.Error(t, err)
-
-	if cfg != nil {
-		t.Fatalf("Expected a nil config but got: %+v", cfg)
-	}
+	assert.Nil(t, cfg, "config should be nil")
 }
 
 func TestConfig_PodmanNotFound(t *testing.T) {
@@ -92,37 +87,25 @@ func TestConfig_PodmanNotFound(t *testing.T) {
 
 	c := configNotFoundMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
-	assert.Error(t, err)
-
-	if cfg == nil {
-		t.Fatal("Expected but got nil")
-	}
-
-	if cfg.Podman != utils.BuildPodmanVersion(5, 4, 0) {
-		t.Fatalf("Expected Podman 5.4.0, but got: %+v", cfg.Podman)
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, cfg, "config should be nil")
+	assert.Equal(t, tmpDir, cfg.WorkspaceRoot, "workspace root should be the current directory")
+	assert.Equal(t, utils.BuildPodmanVersion(5, 4, 0), cfg.Podman, "If podman not found then 5.4.0 is the default")
+	assert.Nil(t, cfg.Disable, "cfg.disable should be nil")
+	assert.Equal(t, cfg.WorkspaceRoot, cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
+	assert.Equal(t, 2, *cfg.Project.DirLevel, "dirLevel default is 2")
 }
 
-func TestCOnfig_NoConfigFile(t *testing.T) {
+func TestConfig_NoConfigFile(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
 	assert.NoError(t, err)
-
-	if cfg == nil {
-		t.Fatal("Expected but got nil")
-	}
-
-	if cfg.WorkspaceRoot != tmpDir {
-		t.Fatalf("Expected WorkspaceRoot '%s', but got '%s'", tmpDir, cfg.WorkspaceRoot)
-	}
-
-	if cfg.Podman != utils.BuildPodmanVersion(5, 5, 2) {
-		t.Fatalf("Expected Podman 5.5.2, but got: %+v", cfg.Podman)
-	}
-
-	if cfg.Disable != nil {
-		t.Fatalf("Expected nil, but got %v", cfg.Disable)
-	}
+	assert.NotNil(t, cfg, "config should be nil")
+	assert.Equal(t, tmpDir, cfg.WorkspaceRoot, "workspace root should be the current directory")
+	assert.Equal(t, utils.BuildPodmanVersion(5, 5, 2), cfg.Podman, "5.5.2 should be read from mock")
+	assert.Nil(t, cfg.Disable, "cfg.disable should be nil")
+	assert.Equal(t, cfg.WorkspaceRoot, cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
+	assert.Equal(t, 2, *cfg.Project.DirLevel, "dirLevel default is 2")
 }

@@ -21,6 +21,7 @@ func qsr019(s SyntaxChecker) []protocol.Diagnostic {
 				Text:          s.documentText,
 				Section:       c,
 				Property:      "Network",
+				DirLevel:      *s.config.Project.DirLevel,
 			},
 		)
 		podFindings := utils.FindItems(
@@ -30,6 +31,7 @@ func qsr019(s SyntaxChecker) []protocol.Diagnostic {
 				Text:          s.documentText,
 				Section:       c,
 				Property:      "Pod",
+				DirLevel:      *s.config.Project.DirLevel,
 			},
 		)
 

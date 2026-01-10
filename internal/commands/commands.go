@@ -16,6 +16,7 @@ type EditorCommandExecutor struct {
 	commands map[string]*allowedCommand
 	mutex    sync.Mutex
 	rootDir  string
+	dirLevel int
 	syncCall bool
 }
 
@@ -24,7 +25,7 @@ type allowedCommand struct {
 	running bool
 }
 
-func NewEditorCommandExecutor(rootDir string) EditorCommandExecutor {
+func NewEditorCommandExecutor(rootDir string, dirLevel int) EditorCommandExecutor {
 	return EditorCommandExecutor{
 		commands: map[string]*allowedCommand{
 			"pullAll": {
@@ -36,8 +37,9 @@ func NewEditorCommandExecutor(rootDir string) EditorCommandExecutor {
 				running: false,
 			},
 		},
-		mutex:   sync.Mutex{},
-		rootDir: rootDir,
+		mutex:    sync.Mutex{},
+		rootDir:  rootDir,
+		dirLevel: dirLevel,
 	}
 }
 

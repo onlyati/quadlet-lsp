@@ -34,8 +34,12 @@ func TestPropertyImage_Valid(t *testing.T) {
 
 	s := Completion{}
 	s.commander = imageMockCommander{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListImages(s)
 

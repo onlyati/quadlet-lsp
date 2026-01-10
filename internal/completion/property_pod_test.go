@@ -17,8 +17,12 @@ func TestPropertyPod_Valid(t *testing.T) {
 	createTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := Completion{}
-	s.config = &utils.QuadletConfig{}
-	s.config.WorkspaceRoot = tmpDir
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
 
 	comps := propertyListPods(s)
 

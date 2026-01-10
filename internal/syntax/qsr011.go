@@ -21,32 +21,34 @@ var (
 func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 	var diags []protocol.Diagnostic
 
-	qsr011Mutex.Lock()
-	defer qsr011Mutex.Unlock()
-	qsr011PortsRaw = nil
-	qsr011FailedCheck = nil
-	qsr011Ports = nil
-
 	allowedFiles := []string{"container", "pod"}
-	qsr011PortsRaw = utils.FindImageExposedPorts(
-		s.commander,
-		s.uri,
-		s.config.WorkspaceRoot,
-		s.uri,
-	)
-
-	for _, s := range qsr011PortsRaw {
-		if strings.HasPrefix(s, "failed-check-") {
-			s, _ := strings.CutPrefix(s, "failed-check-")
-			qsr011FailedCheck = append(qsr011FailedCheck, s)
-		} else {
-			if !slices.Contains(qsr011Ports, s) {
-				qsr011Ports = append(qsr011Ports, s)
-			}
-		}
-	}
 
 	if c := canFileBeApplied(s.uri, allowedFiles); c != "" {
+		qsr011Mutex.Lock()
+		defer qsr011Mutex.Unlock()
+		qsr011PortsRaw = nil
+		qsr011FailedCheck = nil
+		qsr011Ports = nil
+
+		props := utils.FindImageExposedPortsProperty{
+			C:        s.commander,
+			Name:     s.uri,
+			URI:      s.uri,
+			RootDir:  s.config.WorkspaceRoot,
+			DirLevel: *s.config.Project.DirLevel,
+		}
+		qsr011PortsRaw = utils.FindImageExposedPorts(props)
+
+		for _, s := range qsr011PortsRaw {
+			if strings.HasPrefix(s, "failed-check-") {
+				s, _ := strings.CutPrefix(s, "failed-check-")
+				qsr011FailedCheck = append(qsr011FailedCheck, s)
+			} else {
+				if !slices.Contains(qsr011Ports, s) {
+					qsr011Ports = append(qsr011Ports, s)
+				}
+			}
+		}
 		items := utils.FindItems(
 			utils.FindItemProperty{
 				URI:           s.uri,
@@ -54,6 +56,7 @@ func qsr011(s SyntaxChecker) []protocol.Diagnostic {
 				Text:          s.documentText,
 				Section:       c,
 				Property:      "PublishPort",
+				DirLevel:      *s.config.Project.DirLevel,
 			},
 		)
 

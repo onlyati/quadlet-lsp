@@ -38,6 +38,9 @@ func TestPropertyUserIDs_Valid(t *testing.T) {
 	s.commander = usernsMockCommander{}
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
 	}
 
 	comps := propertyListUserIDs(s)
@@ -75,6 +78,9 @@ func TestPropertyUserIDs_Invalid(t *testing.T) {
 	s.commander = usernsMockCommander{}
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
 	}
 
 	comps := propertyListUserIDs(s)

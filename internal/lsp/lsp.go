@@ -162,7 +162,7 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 		})
 	}
 
-	commander = commands.NewEditorCommandExecutor(cfg.WorkspaceRoot)
+	commander = commands.NewEditorCommandExecutor(cfg.WorkspaceRoot, *cfg.Project.DirLevel)
 
 	startFileWatcher(
 		context,
