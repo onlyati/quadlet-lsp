@@ -39,6 +39,10 @@ func LoadConfig(workspaceRoot string, c Commander) (*QuadletConfig, error) {
 	}
 
 	config.WorkspaceRoot = workspaceRoot
+	if config.Project.RootDir != "" {
+		config.WorkspaceRoot = path.Join(config.WorkspaceRoot, config.Project.RootDir)
+	}
+
 	if config.Podman, err = ParseVersion(config.PodmanVersion); err != nil {
 		// try to discover podman version from the machine
 		pVersion, err := NewPodmanVersion(c)

@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"errors"
+	"path"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -59,15 +60,15 @@ func TestConfig_FromFile(t *testing.T) {
 
 func TestConfig_WithProjectProps(t *testing.T) {
 	tmpDir := t.TempDir()
-	createTempFile(t, tmpDir, ".quadletrc.json", `{ "project" : { "rootDir": "./containers", "dirLevel": 4 } }`)
+	createTempFile(t, tmpDir, ".quadletrc.json", `{ "project" : { "rootDir": "containers", "dirLevel": 4 } }`)
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
 	assert.NoError(t, err)
-	assert.Equal(t, tmpDir, cfg.WorkspaceRoot, "workspace root should be the current directory")
+	assert.Equal(t, path.Join(tmpDir, "containers"), cfg.WorkspaceRoot, "workspace root should be the current directory")
 	assert.Equal(t, utils.BuildPodmanVersion(5, 5, 2), cfg.Podman, "wrong podman version gathered")
 	assert.Nil(t, cfg.Disable, "wrong disable array length")
-	assert.Equal(t, "./containers", cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
+	assert.Equal(t, "containers", cfg.Project.RootDir, "if no project rootDir specified, this should be workspace root")
 	assert.Equal(t, 4, *cfg.Project.DirLevel, "dirLevel default is 2")
 }
 
