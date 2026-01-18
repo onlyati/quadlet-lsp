@@ -1,6 +1,6 @@
 Name:           quadlet-lsp
-Version:        0.6.0
-Release:        0.6.0
+Version:        0.7.0
+Release:        0.7.0
 Summary:        Podman Quadlet Language Server
 
 License:        GPLv3
@@ -40,6 +40,8 @@ install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
 %{_bindir}/%{name}
 
 %changelog
+* San Jan 18 2026 Attila Molnar <onlyati@pm.me>
+- Release v0.7.0 language server
 * Tue Nov 11 2025 Attila Molnar <onlyati@pm.me>
 - Release v0.6.0 language server
 * Tue Sep 25 2025 Attila Molnar <onlyati@pm.me>
