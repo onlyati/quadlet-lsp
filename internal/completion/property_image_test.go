@@ -24,6 +24,14 @@ func createTempFile(t *testing.T, dir, name, content string) string {
 	return path
 }
 
+func createTempDir(t *testing.T, dir, name string) string {
+	t.Helper()
+	path := filepath.Join(dir, name)
+	err := os.Mkdir(path, 0o755)
+	assert.NoError(t, err)
+	return path
+}
+
 func TestPropertyImage_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
 	_ = os.Chdir(tmpDir)
