@@ -14,7 +14,7 @@ func propertyListPorts(s Completion) []protocol.CompletionItem {
 	colons := strings.Count(s.text[s.line], ":")
 	tmp := strings.Split(s.text[s.line], ":")
 
-	// We need complation in two cases:
+	// We need completion in two cases:
 	// ExposedPorts=127.0.0.1:420:69
 	// ExposedPorts=420:69
 	if colons == 0 {

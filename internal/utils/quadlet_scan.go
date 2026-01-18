@@ -255,6 +255,19 @@ func readItems(text, property, section string) []QuadletLine {
 func findImageInContainerUnit(f []byte, props FindImageExposedPortsProperty) []string {
 	var images []string
 
+	// If file ends with .conf, this is a dropins.
+	// Start the search from the corresponding container
+	if strings.HasSuffix(props.URI, ".conf") {
+		tmp := strings.Split(props.URI, string(os.PathSeparator))
+		parentDirName := tmp[len(tmp)-2]
+		ownerContainer, _ := strings.CutSuffix(parentDirName, ".d")
+		props.URI = ownerContainer
+		newF, err := os.ReadFile(path.Join(props.RootDir, props.URI))
+		if err != nil {
+			return []string{}
+		}
+		f = newF
+	}
 	lines := FindItems(
 		FindItemProperty{
 			RootDirectory: props.RootDir,
@@ -319,7 +332,8 @@ func FindImageExposedPorts(props FindImageExposedPortsProperty) []string {
 	name := strings.TrimPrefix(props.Name, "file://")
 	var images []string
 
-	if strings.HasSuffix(name, ".container") {
+	isItContainerDropins := strings.HasSuffix(name, ".conf") && strings.Contains(name, ".container.d")
+	if strings.HasSuffix(name, ".container") || isItContainerDropins {
 		f, err := os.ReadFile(name)
 		if err != nil {
 			log.Printf("failed to read file: %+v", err.Error())

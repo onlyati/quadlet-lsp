@@ -2,6 +2,7 @@ package completion
 
 import (
 	"os"
+	"path"
 	"slices"
 	"testing"
 
@@ -61,7 +62,7 @@ func TestPropertyPort_ValidRawImage(t *testing.T) {
 		},
 	}
 	s.text = []string{"[Container]", "Image=scr.io/org/mock1:latest", "PublishPort=69:"}
-	s.char = 0
+	s.char = 14
 	s.line = 2
 	s.uri = "file://" + tmpDir + "/foo.container"
 
@@ -188,5 +189,97 @@ func TestPropertyPort_ValidPod(t *testing.T) {
 			checkPort420,
 			checkPort69,
 		)
+	}
+}
+
+func TestPropertyPort_ValidRawImageInDropins1(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	createTempFile(
+		t,
+		tmpDir,
+		"foo.container",
+		"[Container]\nImage=scr.io/org/mock1:latest",
+	)
+	createTempDir(t, tmpDir, "foo.container.d")
+	createTempFile(
+		t,
+		path.Join(tmpDir, "foo.container.d"),
+		"image.conf",
+		"[Container]\nPublishPort=69:",
+	)
+
+	s := Completion{}
+	s.commander = portMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
+	s.text = []string{"[Container]", "PublishPort=69:"}
+	s.char = 14
+	s.line = 1
+	s.uri = "file://" + tmpDir + "/foo.container.d/image.conf"
+
+	comps := propertyListPorts(s)
+
+	labels := []string{}
+	for _, c := range comps {
+		labels = append(labels, c.Label)
+	}
+
+	if len(labels) != 1 {
+		t.Fatalf("expected 1, but got %d", len(labels))
+	}
+
+	if labels[0] != "420" {
+		t.Fatalf("exptected port 420, but got %s", labels[0])
+	}
+}
+
+func TestPropertyPort_ValidRawImageInDropins2(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	createTempFile(
+		t,
+		tmpDir,
+		"foo.container",
+		"",
+	)
+	createTempDir(t, tmpDir, "foo.container.d")
+	createTempFile(
+		t,
+		path.Join(tmpDir, "foo.container.d"),
+		"image.conf",
+		"[Container]\nImage=scr.io/org/mock1:latest",
+	)
+
+	s := Completion{}
+	s.commander = portMockCommander{}
+	s.config = &utils.QuadletConfig{
+		WorkspaceRoot: tmpDir,
+		Project: utils.ProjectProperty{
+			DirLevel: utils.ReturnAsPtr(2),
+		},
+	}
+	s.text = []string{"[Container]", "PublishPort=69:"}
+	s.char = 14
+	s.line = 1
+	s.uri = "file://" + tmpDir + "/foo.container.d/image.conf"
+
+	comps := propertyListPorts(s)
+
+	labels := []string{}
+	for _, c := range comps {
+		labels = append(labels, c.Label)
+	}
+
+	if len(labels) != 1 {
+		t.Fatalf("expected 1, but got %d", len(labels))
+	}
+
+	if labels[0] != "420" {
+		t.Fatalf("exptected port 420, but got %s", labels[0])
 	}
 }
