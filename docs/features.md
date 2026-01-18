@@ -9,7 +9,6 @@
     * [Project settings](#project-settings)
     * [Example for file](#example-for-file)
 - [Format file](#format-file)
-- [Generate document](#generate-document)
 - [Hover menu](#hover-menu)
     * [Hover on properties](#hover-on-properties)
     * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
@@ -200,18 +199,6 @@ RestartSec=2
 WantedBy=default.target
 
 ```
-
-## Generate document
-
-Language server has a feature to generate documentation. Command can be invoked
-from editor using editor commands or CLI using `quadlet-lsp doc` command. The
-comment section at the beginning of the file marked as header. This accept
-markdown format.
-
-![doc_sample_1](./assets/docs_sample_1.png)
-![doc_sample_2](./assets/docs_sample_2.png)
-![doc_sample_3](./assets/docs_sample_3.png)
-![doc_sample_4](./assets/docs_sample_4.png)
 
 ## Hover menu
 
