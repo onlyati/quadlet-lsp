@@ -8,7 +8,7 @@ import (
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 )
 
-const ProgramVersion = "0.7.0"
+const ProgramVersion = "0.7.1"
 
 type FormatGroup string
 
