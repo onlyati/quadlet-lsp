@@ -27,6 +27,15 @@ func Test_ListNewProperties(t *testing.T) {
 			},
 			section: "Container",
 		},
+		{
+			line: 1,
+			text: []string{"", "H"},
+			char: 1,
+			config: &utils.QuadletConfig{
+				Podman: utils.BuildPodmanVersion(5, 6, 0),
+			},
+			section: "Container",
+		},
 	}
 
 	for _, s := range cases {
