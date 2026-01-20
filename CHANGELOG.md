@@ -1,5 +1,12 @@
 # Changelog of Quadlet-LSP
 
+## v0.7.1
+
+### Bugfixes
+
+- Completion crashes when previous line is empty
+  (https://github.com/onlyati/quadlet-lsp/pull/172)
+
 ## v0.7.0
 
 ### Features
