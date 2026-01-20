@@ -13,7 +13,7 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 	// If this is a continuation line, then it is not a new property
 	if s.line > 0 {
 		t := strings.TrimSpace(s.text[s.line-1])
-		if t[len(t)-1] == '\\' {
+		if strings.HasSuffix(t, "\\") {
 			return completionItems
 		}
 	}
