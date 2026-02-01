@@ -64,10 +64,11 @@ func handlePropertyHover(info HoverInformation) *protocol.Hover {
 
 func handleValueHover(info HoverInformation) *protocol.Hover {
 	handlerMap := map[string]func(HoverInformation) *protocol.Hover{
-		"UserNS": handleValueUserNS,
-		"Volume": handleValueVolume,
-		"Secret": handleValueSecret,
-		"Pod":    handleValuePod,
+		"UserNS":  handleValueUserNS,
+		"Volume":  handleValueVolume,
+		"Secret":  handleValueSecret,
+		"Pod":     handleValuePod,
+		"Network": handleValueNetwork,
 	}
 
 	fn, found := handlerMap[info.property]
