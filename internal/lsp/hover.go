@@ -24,11 +24,18 @@ func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.H
 		return nil, nil
 	}
 
+	config.Mu.RLock()
+	rootDir := config.WorkspaceRoot
+	level := config.Project.DirLevel
+	config.Mu.RUnlock()
+
 	return hover.HoverFunction(hover.HoverInformation{
 		Line:              lines[editorLine],
 		CharacterPosition: cursorPos,
 		Section:           section,
 		URI:               uri,
 		LineNumber:        editorLine,
+		RootDir:           rootDir,
+		Level:             *level,
 	}), nil
 }

@@ -16,6 +16,8 @@ type HoverInformation struct {
 	Section           string
 	LineNumber        protocol.UInteger
 	CharacterPosition protocol.UInteger
+	RootDir           string
+	Level             int
 	property          string
 	value             string
 }
@@ -62,9 +64,11 @@ func handlePropertyHover(info HoverInformation) *protocol.Hover {
 
 func handleValueHover(info HoverInformation) *protocol.Hover {
 	handlerMap := map[string]func(HoverInformation) *protocol.Hover{
-		"UserNS": handleValueUserNS,
-		"Volume": handleValueVolume,
-		"Secret": handleValueSecret,
+		"UserNS":  handleValueUserNS,
+		"Volume":  handleValueVolume,
+		"Secret":  handleValueSecret,
+		"Pod":     handleValuePod,
+		"Network": handleValueNetwork,
 	}
 
 	fn, found := handlerMap[info.property]

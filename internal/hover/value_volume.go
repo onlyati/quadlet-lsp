@@ -1,8 +1,10 @@
 package hover
 
 import (
+	"os"
 	"strings"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -18,6 +20,33 @@ func handleValueVolume(info HoverInformation) *protocol.Hover {
 			"If a volume source is specified, it must be a path on the host or the name of a named volume. Host paths are allowed to be absolute or relative; relative paths are resolved relative to the directory Podman is run in. If the source does not exist, Podman returns an error. Users must pre-create the source files or directories.",
 			"",
 			"Any source that does not begin with a `.` or `/` is treated as the name of a named volume. If a volume with that name does not exist, it is created. Volumes created with names are not anonymous, and they are not removed by the `--rm` option and the podman rm `--volumes` command.",
+		}
+		hostVolume := paths[0]
+		if strings.HasSuffix(hostVolume, ".volume") {
+			if strings.Contains(hostVolume, "@") {
+				hostVolume = utils.ConvertTemplateNameToFile(hostVolume)
+			}
+
+			files, err := utils.ListQuadletFiles("volume", info.RootDir, info.Level)
+			if err == nil {
+				for _, f := range files {
+					if hostVolume == f.Label {
+						switch v := f.Documentation.(type) {
+						case string:
+							path, _ := strings.CutPrefix(v, "From work directory: ")
+							content, err := os.ReadFile(path)
+							if err == nil {
+								msg = append(msg, "")
+								msg = append(msg, "**Content of file**")
+								msg = append(msg, "```quadlet")
+								msg = append(msg, strings.Split(string(content), "\n")...)
+								msg = append(msg, "```")
+							}
+							break
+						}
+					}
+				}
+			}
 		}
 		return &protocol.Hover{
 			Contents: protocol.MarkupContent{
