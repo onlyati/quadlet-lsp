@@ -12,6 +12,7 @@
 - [Hover menu](#hover-menu)
     * [Hover on properties](#hover-on-properties)
     * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
+    * [Peek into Quadlets](#peek-into-quadlets)
 - [Completion](#completion)
     * [Starter template](#starter-template)
     * [Static completion](#static-completion)
@@ -222,6 +223,13 @@ The
 can be used in Quadlets. Language server provide hover functionality for them.
 
 <img src="assets/systemd_specifier_hover_demo.gif" style="width: 100%;"/>
+
+### Peek into Quadlets
+
+If the hover is done on a value that points to another Quadlet at `Network`,
+`Pod` or `Volume` value, it peek into the file and display on hover.
+
+<img src="assets/peek_demo.gif" style="width: 100%;"/>
 
 ## Completion
 
