@@ -16,6 +16,8 @@ type HoverInformation struct {
 	Section           string
 	LineNumber        protocol.UInteger
 	CharacterPosition protocol.UInteger
+	RootDir           string
+	Level             int
 	property          string
 	value             string
 }
