@@ -3,7 +3,7 @@ package util
 import (
 	"fmt"
 
-	"github.com/tliron/kutil/terminal"
+	"github.com/tliron/go-kutil/terminal"
 )
 
 func Fail(message string) {
