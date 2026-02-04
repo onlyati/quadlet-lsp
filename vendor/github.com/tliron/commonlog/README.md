@@ -107,7 +107,7 @@ Example of structured logging:
 import (
     "github.com/tliron/commonlog"
     _ "github.com/tliron/commonlog/simple"
-    "github.com/tliron/kutil/util"
+    "github.com/tliron/go-kutil/util"
 )
 
 func main() {
@@ -145,7 +145,7 @@ is used. However, CommonLog provides a more familiar logging API:
 import (
     "github.com/tliron/commonlog"
     _ "github.com/tliron/commonlog/simple"
-    "github.com/tliron/kutil/util"
+    "github.com/tliron/go-kutil/util"
 )
 
 var log = commonlog.GetLogger("engine.parser")
@@ -269,7 +269,7 @@ colorization support in its cmd terminal:
 import (
     "github.com/tliron/commonlog"
     _ "github.com/tliron/commonlog/simple"
-    "github.com/tliron/kutil/util"
+    "github.com/tliron/go-kutil/util"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/tliron/kutil/terminal"
+	"github.com/tliron/go-kutil/terminal"
 )
 
 var backend Backend

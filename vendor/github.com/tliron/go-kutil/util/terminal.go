@@ -1,7 +1,7 @@
 package util
 
 import (
-	"github.com/tliron/kutil/terminal"
+	"github.com/tliron/go-kutil/terminal"
 )
 
 // Attempts to enable colorization for [os.Stdout] and [os.Stderr] according to

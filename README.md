@@ -95,7 +95,7 @@ mise use -g ubi:onlyati/quadlet-lsp
 
 ### Install from Fedora copr
 
-This is supported on Fedora 42/43, RHEL 10, Alma Linux 10, Rocky Linux 10.
+This is supported on Fedora 43, RHEL 10, Alma Linux 10, Rocky Linux 10.
 
 ```bash
 sudo dnf copr enable onlyati/quadlet-lsp

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/tliron/commonlog"
-	"github.com/tliron/kutil/terminal"
+	"github.com/tliron/go-kutil/terminal"
 )
 
 const TimeFormat = "2006/01/02 15:04:05.000"

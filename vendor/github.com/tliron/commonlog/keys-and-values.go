@@ -3,7 +3,7 @@ package commonlog
 import (
 	"fmt"
 
-	"github.com/tliron/kutil/util"
+	"github.com/tliron/go-kutil/util"
 )
 
 // Calls [Message.Set] on a provided sequence of key-value pairs.
