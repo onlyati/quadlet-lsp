@@ -49,7 +49,10 @@ func propertyListUserIDs(s Completion) []protocol.CompletionItem {
 	inspectJSON := strings.Join(output, "")
 	log.Println(inspectJSON)
 	var data []map[string]any
-	json.Unmarshal([]byte(inspectJSON), &data)
+	err = json.Unmarshal([]byte(inspectJSON), &data)
+	if err != nil {
+		log.Printf("failed to unmarshal json: %s", err.Error())
+	}
 
 	if len(data) == 0 {
 		log.Printf("image is not pulled: %s", imageName)

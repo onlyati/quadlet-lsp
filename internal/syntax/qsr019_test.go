@@ -9,7 +9,7 @@ import (
 
 func TestQSR019_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
 			"[Container]\nPod=test.pod",
@@ -34,7 +34,7 @@ func TestQSR019_Valid(t *testing.T) {
 
 func TestQSR019_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
 			"[Container]\nPod=test.pod\nNetwork=my.network",

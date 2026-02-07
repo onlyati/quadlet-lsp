@@ -10,7 +10,7 @@ import (
 
 func TestQSR018_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -36,7 +36,7 @@ func TestQSR018_Valid(t *testing.T) {
 
 func TestQSR018_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -70,7 +70,7 @@ func TestQSR018_Invalid(t *testing.T) {
 
 func TestQSR018_InvalidWithDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.container", "[Container]\nImage=foo.image\nPublishPort=8080:8080")
 	createTempDir(t, tmpDir, "foo.container.d")
@@ -105,7 +105,7 @@ func TestQSR018_InvalidWithDropins(t *testing.T) {
 
 func TestQSR018_InvalidWithDropinsMoreLevel(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo-bar-baz.container", "[Container]\nImage=foo.image\nPublishPort=8080:8080")
 	createTempDir(t, tmpDir, "foo-bar-baz.container.d")

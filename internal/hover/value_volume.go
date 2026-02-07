@@ -42,7 +42,6 @@ func handleValueVolume(info HoverInformation) *protocol.Hover {
 								msg = append(msg, strings.Split(string(content), "\n")...)
 								msg = append(msg, "```")
 							}
-							break
 						}
 					}
 				}
