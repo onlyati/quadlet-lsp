@@ -26,7 +26,6 @@ func (m mockCommander) Run(name string, args ...string) ([]string, error) {
 
 func TestPullAll_ValidListJobs(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
 	commandExecutor := NewEditorCommandExecutor(tmpDir, 2)
 	commandExecutor.syncCall = true
 	messenger := mockMessenger{}
@@ -51,7 +50,7 @@ func TestPullAll_ValidListJobs(t *testing.T) {
 
 func TestPullAll_InvalidCommand(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	commandExecutor := NewEditorCommandExecutor(tmpDir, 2)
 	commandExecutor.syncCall = true
 	messenger := mockMessenger{}

@@ -410,7 +410,10 @@ func FindImageExposedPorts(props FindImageExposedPortsProperty) []string {
 
 		inspectJSON := strings.Join(output, "")
 		var data []map[string]any
-		json.Unmarshal([]byte(inspectJSON), &data)
+		err = json.Unmarshal([]byte(inspectJSON), &data)
+		if err != nil {
+			return []string{}
+		}
 
 		config, ok := data[0]["Config"].(map[string]any)
 		if !ok {

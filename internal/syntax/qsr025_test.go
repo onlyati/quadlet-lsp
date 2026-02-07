@@ -29,7 +29,7 @@ func TestQSR025_ValidBase(t *testing.T) {
 
 func TestQSR025_ValidDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t, tmpDir,
@@ -66,7 +66,7 @@ func TestQSR025_ValidDropins(t *testing.T) {
 
 func TestQSR025_ValidNestedDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempDir(
 		t,
@@ -111,7 +111,7 @@ func TestQSR025_ValidNestedDropins(t *testing.T) {
 
 func TestQSR025_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t, tmpDir,

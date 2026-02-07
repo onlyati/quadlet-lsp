@@ -44,7 +44,6 @@ func (m portMockCommander) Run(name string, args ...string) ([]string, error) {
 
 func TestPropertyPort_ValidRawImage(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -84,7 +83,7 @@ func TestPropertyPort_ValidRawImage(t *testing.T) {
 
 func TestPropertyPort_ValidImageFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -130,7 +129,7 @@ func TestPropertyPort_ValidImageFile(t *testing.T) {
 
 func TestPropertyPort_ValidPod(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,

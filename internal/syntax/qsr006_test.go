@@ -11,14 +11,14 @@ import (
 func createTestFile(t *testing.T, dir, name, content string) string {
 	t.Helper()
 	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	assert.NoError(t, err)
 	return path
 }
 
 func TestQSR006_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTestFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
 
@@ -32,7 +32,7 @@ func TestQSR006_Valid(t *testing.T) {
 
 func TestQSR006_ValidVolume(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTestFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
 
@@ -46,7 +46,7 @@ func TestQSR006_ValidVolume(t *testing.T) {
 
 func TestQSR006_Skipped(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	s := NewSyntaxChecker("[Container]\nImage=library/debian", "foo.container")
 	diags := qsr006(s)
@@ -58,7 +58,7 @@ func TestQSR006_Skipped(t *testing.T) {
 
 func TestQSR006_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTestFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
 

@@ -9,7 +9,7 @@ import (
 
 func TestQSR017_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -42,7 +42,7 @@ func TestQSR017_Valid(t *testing.T) {
 
 func TestQSR017_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(

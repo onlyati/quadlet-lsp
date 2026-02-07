@@ -61,7 +61,7 @@ func createTempDir(t *testing.T, dir, name string) string {
 
 func TestQSR011_ValidContainer(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -95,7 +95,7 @@ func TestQSR011_ValidContainer(t *testing.T) {
 
 func TestQSR011_InvalidContainer(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -137,7 +137,7 @@ func TestQSR011_InvalidContainer(t *testing.T) {
 
 func TestQSR011_ValidPod(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -185,7 +185,7 @@ func TestQSR011_ValidPod(t *testing.T) {
 
 func TestQSR011_InvalidPod(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,
@@ -241,7 +241,7 @@ func TestQSR011_InvalidPod(t *testing.T) {
 
 func TestQSR011_InvalidDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo.container", "[Container]\nPublishPort=420:69")
 	createTempDir(t, tmpDir, "foo.container.d")
@@ -269,7 +269,7 @@ func TestQSR011_InvalidDropins(t *testing.T) {
 
 func TestQSR011_InvalidMultiDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(t, tmpDir, "foo-bar-baz.container", "[Container]")
 	createTempDir(t, tmpDir, "foo-bar-baz.container.d")
@@ -327,7 +327,7 @@ func TestQSR011_ValidPodDropins(t *testing.T) {
 
 func TestQSR011_MoreOption(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 
 	createTempFile(
 		t,

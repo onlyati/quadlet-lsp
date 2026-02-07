@@ -18,7 +18,7 @@ func pullAll(command *protocol.ExecuteCommandParams, e *EditorCommandExecutor, m
 	dirLevel := e.dirLevel
 	e.mutex.Unlock()
 
-	utils.QuadletWalkDir(rootDir, dirLevel, func(p string, entry fs.DirEntry, err error) error {
+	_ = utils.QuadletWalkDir(rootDir, dirLevel, func(p string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

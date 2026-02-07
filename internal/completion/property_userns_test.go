@@ -28,7 +28,7 @@ func (m usernsMockCommander) Run(name string, args ...string) ([]string, error) 
 
 func TestPropertyUserIDs_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	s := NewCompletion(
 		[]string{"[Container]", "UserNS=keep-id:", "Image=scr.io/org/mock1:latest"},
 		"foo.container",
@@ -68,7 +68,7 @@ func TestPropertyUserIDs_Valid(t *testing.T) {
 
 func TestPropertyUserIDs_Invalid(t *testing.T) {
 	tmpDir := os.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	s := NewCompletion(
 		[]string{"[Container]", "UserNS=auto", "Image=scr.io/org/mock1:latest"},
 		"foo.container",

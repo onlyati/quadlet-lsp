@@ -120,10 +120,10 @@ func FormatDocument(text string) string {
 	}
 
 	// Generate the new text
-	newText := ""
-
-	for _, l := range document.header {
-		newText += l + "\n"
+	var newTextBuilder strings.Builder
+	newTextBuilder.WriteString(strings.Join(document.header, "\n"))
+	if len(document.header) > 0 {
+		newTextBuilder.WriteString("\n")
 	}
 
 	sectionSeq := []string{
@@ -152,31 +152,31 @@ func FormatDocument(text string) string {
 
 	for _, k := range sectionSeq {
 		if v, ok := document.sections[k]; ok {
-			newText += "[" + k + "]\n"
+			newTextBuilder.WriteString("[" + k + "]\n")
 
 			for _, p := range printSeq {
 				if vv, ok := v[p]; ok {
 					if k != "Install" && k != "Unit" && k != "Service" {
-						newText += "# " + string(p) + " options\n"
+						newTextBuilder.WriteString("# " + string(p) + " options\n")
 					}
 					for _, element := range vv {
 						newLine := element.property + "=" + strings.TrimSpace(element.value)
 						if len(newLine) <= 80 {
 							// Short line, one line is enough
-							newText += newLine + "\n"
+							newTextBuilder.WriteString(newLine + "\n")
 						} else {
 							// Long line, split to multiple ones
-							newText += wrapLine(newLine, 80)
+							newTextBuilder.WriteString(wrapLine(newLine, 80))
 						}
 					}
-					newText += "\n"
+					newTextBuilder.WriteString("\n")
 				}
 			}
 
 		}
 	}
 
-	return newText
+	return newTextBuilder.String()
 }
 
 func wrapLine(s string, width int) string {
@@ -198,7 +198,6 @@ func wrapLine(s string, width int) string {
 					offset = 4
 					width -= 2
 					o = s[lastPossibleCutPoint:i] + " \\\n"
-					lastCutPoint = i
 				} else {
 					o += " " + s[lastPossibleCutPoint:i] + " \\\n"
 				}
@@ -216,7 +215,6 @@ func wrapLine(s string, width int) string {
 					offset = 4
 					width -= 2
 					o = s[lastCutPoint:i] + " \\\n"
-					lastCutPoint = i
 				} else {
 					o += " " + s[lastCutPoint:i] + " \\\n"
 				}

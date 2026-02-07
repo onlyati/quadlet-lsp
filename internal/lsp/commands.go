@@ -10,7 +10,10 @@ func ExecuteCommands(context *glsp.Context, params *protocol.ExecuteCommandParam
 	messenger := utils.ContextMessenger{
 		Context: context,
 	}
-	commander.Run(params, &messenger, utils.CommandExecutor{})
+	err := commander.Run(params, &messenger, utils.CommandExecutor{})
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
 }

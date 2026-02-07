@@ -13,7 +13,7 @@ import (
 
 func TestFindItems(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	text := `[Unit]
 Description=description
 
@@ -59,7 +59,7 @@ StartLimitBurst=5
 
 func TestFindItemsWithExec(t *testing.T) {
 	tmpDir := t.TempDir()
-	os.Chdir(tmpDir)
+	_ = os.Chdir(tmpDir)
 	text := `[Unit]
 Description=description
 

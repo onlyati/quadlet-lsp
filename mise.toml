@@ -12,4 +12,5 @@ run = "go test -race ./..."
 
 [tools]
 go = "1.25.5"
+golangci-lint = "2.8.0"
 goreleaser = "2.12.1"
