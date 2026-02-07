@@ -61,10 +61,12 @@ $ mise task ls
 Name       Description
 build      Build languager server to your system
 build_all  Make an offline release
+lint       Check linting
 test       Run unit tests
 ```
 
 The `build_all` command uses `goreleaser` but this is included as tool onto
+`mise.toml` file. The lint option uses `golangci-lint` but it also included into
 `mise.toml` file.
 
 ## Project structure
