@@ -1,11 +1,32 @@
 # Changelog of Quadlet-LSP
 
+## V0.7.2
+
+### Features
+
+- Add file preview for `Network`, `Pod` and `Volume` on hover
+  (<https://github.com/onlyati/quadlet-lsp/pull/176>)
+- Remove templates and build into the property completion
+  (<https://github.com/onlyati/quadlet-lsp/pull/182>)
+
+### Bugfixes
+
+- `QSR006` looking for in nested directories
+  (<https://github.com/onlyati/quadlet-lsp/pull/181>)
+
+### Repo
+
+- Update to go 1.25.5 (<https://github.com/onlyati/quadlet-lsp/pull/177>)
+- Fix lint issues, add linter for verification
+  (<https://github.com/onlyati/quadlet-lsp/pull/178>)
+- Review unit tests (<https://github.com/onlyati/quadlet-lsp/pull/180>)
+
 ## v0.7.1
 
 ### Bugfixes
 
 - Completion crashes when previous line is empty
-  (https://github.com/onlyati/quadlet-lsp/pull/172)
+  (<https://github.com/onlyati/quadlet-lsp/pull/172>)
 
 ## v0.7.0
 
