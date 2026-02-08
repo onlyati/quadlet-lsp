@@ -1,13 +1,13 @@
 Name:           quadlet-lsp
-Version:        0.7.1
-Release:        0.7.1
+Version:        0.7.2
+Release:        0.7.2
 Summary:        Podman Quadlet Language Server
 
 License:        GPLv3
 URL:            https://github.com/onlyati/quadlet-lsp
 Source0:        https://github.com/onlyati/quadlet-lsp/archive/refs/tags/v%{version}.tar.gz
 
-BuildRequires:  golang >= 1.24.4
+BuildRequires:  golang >= 1.25.5
 BuildRequires:  git
 
 %description
@@ -40,6 +40,8 @@ install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
 %{_bindir}/%{name}
 
 %changelog
+* San Deb 08 2026 Attila Molnar <onlyati@pm.me>
+- Releaes v0.7.2 languager server
 * San Jan 18 2026 Attila Molnar <onlyati@pm.me>
 - Release v0.7.0 language server
 * Tue Nov 11 2025 Attila Molnar <onlyati@pm.me>
