@@ -3,7 +3,6 @@ package syntax
 import (
 	"os"
 	"path"
-	"path/filepath"
 	"sync"
 	"testing"
 
@@ -44,22 +43,6 @@ func (m mockCommanderQSR011) Run(name string, args ...string) ([]string, error) 
 	}
 
 	return []string{}, nil
-}
-
-func createTempFile(t *testing.T, dir, name, content string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0o644)
-	assert.NoError(t, err)
-	return path
-}
-
-func createTempDir(t *testing.T, dir, name string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.Mkdir(path, 0o755)
-	assert.NoError(t, err)
-	return path
 }
 
 func TestQSR011_ValidContainer(t *testing.T) {

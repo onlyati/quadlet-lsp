@@ -4,6 +4,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/pkg/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -12,7 +13,7 @@ import (
 func Test_ParseQuadletDir(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	createTempFile(
+	testutils.CreateTempFile(
 		t,
 		tmpDir,
 		"foo.container",
@@ -21,7 +22,7 @@ Image=foo.image
 Exec=tail \
   -f /dev/null
 `)
-	createTempFile(
+	testutils.CreateTempFile(
 		t,
 		tmpDir,
 		"foo.image",
@@ -30,13 +31,13 @@ Image=docker.io/library/debian
 `)
 
 	// Dropins for foo.container
-	createTempDir(t, tmpDir, "foo.container.d")
-	createTempFile(t, path.Join(tmpDir, "foo.container.d"), "labels.conf", `
+	testutils.CreateTempDir(t, tmpDir, "foo.container.d")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "foo.container.d"), "labels.conf", `
 [Container]
 Label="app=foo"
 `)
 
-	createTempFile(
+	testutils.CreateTempFile(
 		t,
 		tmpDir,
 		".quadletrc.json",
@@ -44,27 +45,27 @@ Label="app=foo"
 	)
 
 	// Test application in nested directory
-	createTempDir(t, tmpDir, "app")
-	createTempFile(t, path.Join(tmpDir, "app"), "bar.container", `
+	testutils.CreateTempDir(t, tmpDir, "app")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "app"), "bar.container", `
 [Container]
 Image=bar.image
 `)
-	createTempDir(t, path.Join(tmpDir, "app"), "bar.container.d")
-	createTempFile(t, path.Join(tmpDir, "app", "bar.container.d"), "labels.conf", `
+	testutils.CreateTempDir(t, path.Join(tmpDir, "app"), "bar.container.d")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "app", "bar.container.d"), "labels.conf", `
 [Container]
 Label="app=bar"
 `)
 
 	// Still should work even outside of the nested direcrory
-	createTempDir(t, tmpDir, "bar.container.d")
-	createTempFile(t, path.Join(tmpDir, "bar.container.d"), "labels.conf", `
+	testutils.CreateTempDir(t, tmpDir, "bar.container.d")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "bar.container.d"), "labels.conf", `
 [Container]
 Label="app=bar"
 `)
 
 	// An oprhan dropins, no 'baz.container' exists
-	createTempDir(t, tmpDir, "baz.container.d")
-	createTempFile(t, path.Join(tmpDir, "baz.container.d"), "labels.conf", `
+	testutils.CreateTempDir(t, tmpDir, "baz.container.d")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "baz.container.d"), "labels.conf", `
 [Container]
 Label="app=baz"
 `)

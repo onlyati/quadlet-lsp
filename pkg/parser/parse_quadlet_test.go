@@ -1,37 +1,20 @@
 package parser_test
 
 import (
-	"os"
 	"path"
-	"path/filepath"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/pkg/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func createTempFile(t *testing.T, dir, name, content string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0o644)
-	assert.NoError(t, err)
-	return path
-}
-
-func createTempDir(t *testing.T, dir, name string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.Mkdir(path, 0o755)
-	assert.NoError(t, err)
-	return path
-}
-
 func Test_ParseQuadlet(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create foo.container
-	createTempFile(
+	testutils.CreateTempFile(
 		t,
 		tmpDir,
 		"foo-bar.container",
@@ -59,8 +42,8 @@ WantedBy=default.target
 `)
 
 	// Create foo-.container.d/network.conf
-	createTempDir(t, tmpDir, "foo-.container.d")
-	createTempFile(
+	testutils.CreateTempDir(t, tmpDir, "foo-.container.d")
+	testutils.CreateTempFile(
 		t,
 		path.Join(tmpDir, "foo-.container.d"),
 		"network.conf",
@@ -71,8 +54,8 @@ Network=bar.network
 `)
 
 	// Create foo-bar.container.d/network.conf
-	createTempDir(t, tmpDir, "foo-bar.container.d")
-	createTempFile(
+	testutils.CreateTempDir(t, tmpDir, "foo-bar.container.d")
+	testutils.CreateTempFile(
 		t,
 		path.Join(tmpDir, "foo-bar.container.d"),
 		"network.conf",
@@ -82,8 +65,8 @@ Network=foo-bar.network
 `)
 
 	// Create container.d/labels.conf
-	createTempDir(t, tmpDir, "container.d")
-	createTempFile(
+	testutils.CreateTempDir(t, tmpDir, "container.d")
+	testutils.CreateTempFile(
 		t,
 		path.Join(tmpDir, "container.d"),
 		"labels.conf",
@@ -94,9 +77,9 @@ Label="env.server=app01"
 `)
 
 	// Create app/foo-bar.container.d/labels.conf
-	createTempDir(t, tmpDir, "app")
-	createTempDir(t, path.Join(tmpDir, "app"), "foo-bar.container.d")
-	createTempFile(t, path.Join(tmpDir, "app", "foo-bar.container.d"), "labels.conf", `
+	testutils.CreateTempDir(t, tmpDir, "app")
+	testutils.CreateTempDir(t, path.Join(tmpDir, "app"), "foo-bar.container.d")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "app", "foo-bar.container.d"), "labels.conf", `
 [Container]
 Label="env.name=app"
 `)
@@ -298,7 +281,7 @@ func Test_ParseQuadletImageOverride(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create foo.container
-	createTempFile(
+	testutils.CreateTempFile(
 		t,
 		tmpDir,
 		"foo.container",
@@ -307,8 +290,8 @@ Image=foo.image
 `)
 
 	// Create foo-.container.d/network.conf
-	createTempDir(t, tmpDir, "foo.container.d")
-	createTempFile(
+	testutils.CreateTempDir(t, tmpDir, "foo.container.d")
+	testutils.CreateTempFile(
 		t,
 		path.Join(tmpDir, "foo.container.d"),
 		"image.conf",
