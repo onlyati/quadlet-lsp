@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"os"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -50,7 +49,7 @@ func TestPullAll_ValidListJobs(t *testing.T) {
 
 func TestPullAll_InvalidCommand(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
+
 	commandExecutor := NewEditorCommandExecutor(tmpDir, 2)
 	commandExecutor.syncCall = true
 	messenger := mockMessenger{}

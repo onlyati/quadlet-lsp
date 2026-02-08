@@ -1,7 +1,6 @@
 package completion
 
 import (
-	"os"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/testutils"
@@ -80,7 +79,6 @@ func TestPropertyVolume_NoList(t *testing.T) {
 // ':' sign.
 func TestPropertyVolume_ListFlags(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
 	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]")
 	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]")

@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"os"
 	"path"
 	"sync"
 	"testing"
@@ -184,7 +183,6 @@ func TestQSR011_InvalidDropins(t *testing.T) {
 
 func TestQSR011_InvalidMultiDropins(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
 	testutils.CreateTempDir(t, tmpDir, "foo-bar-baz.container.d")
 	testutils.CreateTempDir(t, tmpDir, "foo-bar-.container.d")

@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"os"
 	"sync"
 	"testing"
 
@@ -13,7 +12,6 @@ import (
 
 func TestQSR018_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
