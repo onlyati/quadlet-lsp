@@ -1,28 +1,19 @@
 package syntax
 
 import (
-	"os"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR014_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(
-		t,
-		tmpDir,
-		"net1.network",
-		"[Network]",
-	)
-	createTempFile(
-		t,
-		tmpDir,
-		"net2.network",
-		"[Network]",
-	)
+	testutils.CreateTempFile(t, tmpDir, "net1.network", "[Network]")
+	testutils.CreateTempFile(t, tmpDir, "net2.network", "[Network]")
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -51,16 +42,12 @@ func TestQSR014_Valid(t *testing.T) {
 			},
 		}
 		diags := qsr014(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Expected 0 diagnostics, got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
 func TestQSR014_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -89,17 +76,13 @@ func TestQSR014_Invalid(t *testing.T) {
 			},
 		}
 		diags := qsr014(s)
+		require.Len(t, diags, 2)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr014", *diags[0].Source)
+		assert.Equal(t, "Network file does not exists: net1.network", diags[0].Message)
 
-		if len(diags) != 2 {
-			t.Fatalf("Expected 2 diagnostics, got %d at %s", len(diags), s.uri)
-		}
-
-		if *diags[0].Source != "quadlet-lsp.qsr014" {
-			t.Fatalf("Wrong source found: %s at %s", *diags[0].Source, s.uri)
-		}
-
-		if diags[0].Message != "Network file does not exists: net1.network" {
-			t.Fatalf("Unexpected message: '%s' at %s", diags[0].Message, s.uri)
-		}
+		require.NotNil(t, diags[1].Source)
+		assert.Equal(t, "quadlet-lsp.qsr014", *diags[1].Source)
+		assert.Equal(t, "Network file does not exists: net2.network", diags[1].Message)
 	}
 }

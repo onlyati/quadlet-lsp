@@ -2,6 +2,9 @@ package syntax
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR005_Valid(t *testing.T) {
@@ -11,10 +14,7 @@ func TestQSR005_Valid(t *testing.T) {
 	)
 
 	diags := qsr005(s)
-
-	if len(diags) != 0 {
-		t.Fatalf("Exptected 0, but got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR005_ValidKube(t *testing.T) {
@@ -24,10 +24,7 @@ func TestQSR005_ValidKube(t *testing.T) {
 	)
 
 	diags := qsr005(s)
-
-	if len(diags) != 0 {
-		t.Fatalf("Exptected 0, but got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR005_Invalid(t *testing.T) {
@@ -37,16 +34,8 @@ func TestQSR005_Invalid(t *testing.T) {
 	)
 
 	diags := qsr005(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Exptected 1, but got %d", len(diags))
-	}
-
-	if diags[0].Message != "Invalid value of AutoUpdate: foo" {
-		t.Fatalf("Returned with wrong message tahn expected: %s", diags[0].Message)
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr005" {
-		t.Fatalf("Exptected 'quadlet-lsp.qsr005' source, got %s", *diags[0].Source)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr005", *diags[0].Source)
+	assert.Equal(t, "Invalid value of AutoUpdate: foo", diags[0].Message)
 }

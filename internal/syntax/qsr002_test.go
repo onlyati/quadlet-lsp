@@ -2,42 +2,31 @@ package syntax
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR002_UnfinishedLine(t *testing.T) {
 	s := NewSyntaxChecker("Name=\nExec=run.sh", "test.container")
 	diags := qsr002(s)
 
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostic, got %d", len(diags))
-	}
+	require.Len(t, diags, 1)
+	assert.Equal(t, "Line is unfinished", diags[0].Message)
+	assert.NotEqual(t, 0, diags[0].Range.Start.Line)
 
-	diag := diags[0]
-	if diag.Message != "Line is unfinished" {
-		t.Errorf("Unexpected diagnostic message: %s", diag.Message)
-	}
-	if diag.Range.Start.Line != 0 {
-		t.Errorf("Expected diagnostic on line 0, got line %d", diag.Range.Start.Line)
-	}
-	if diag.Source == nil || *diag.Source != "quadlet-lsp.qsr002" {
-		t.Errorf("Unexpected diagnostic source: %v", diag.Source)
-	}
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr002", *diags[0].Source)
 }
 
 func TestQSR002_CompleteLinesOnly(t *testing.T) {
 	s := NewSyntaxChecker("Name=web\nExec=run.sh", "test.container")
 	diags := qsr002(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR002_EqualInValue(t *testing.T) {
 	s := NewSyntaxChecker("Env=FOO=bar", "test.container")
 	diags := qsr002(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }

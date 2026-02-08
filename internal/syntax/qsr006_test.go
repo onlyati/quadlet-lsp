@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func createTestFile(t *testing.T, dir, name, content string) string {
@@ -20,28 +22,22 @@ func TestQSR006_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
 	_ = os.Chdir(tmpDir)
 
-	createTestFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
+	testutils.CreateTempFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
 
 	s := NewSyntaxChecker("[Container]\nImage=foo.image", "foo.container")
 	diags := qsr006(s)
-
-	if len(diags) != 0 {
-		t.Fatalf("Expected no diagnostics, but got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR006_ValidVolume(t *testing.T) {
 	tmpDir := t.TempDir()
 	_ = os.Chdir(tmpDir)
 
-	createTestFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
+	testutils.CreateTempFile(t, tmpDir, "foo.image", "[Image]\nImage=docker.io/library/debian")
 
 	s := NewSyntaxChecker("[Volume]\nImage=foo.image", "foo.volume")
 	diags := qsr006(s)
-
-	if len(diags) != 0 {
-		t.Fatalf("Expected no diagnostics, but got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR006_Skipped(t *testing.T) {
@@ -50,10 +46,7 @@ func TestQSR006_Skipped(t *testing.T) {
 
 	s := NewSyntaxChecker("[Container]\nImage=library/debian", "foo.container")
 	diags := qsr006(s)
-
-	if len(diags) != 0 {
-		t.Fatalf("Expected no diagnostics, but got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR006_Invalid(t *testing.T) {
@@ -64,13 +57,8 @@ func TestQSR006_Invalid(t *testing.T) {
 
 	s := NewSyntaxChecker("[Container]\nImage=bar.image", "foo.container")
 	diags := qsr006(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Expected no diagnostics, but got %d", len(diags))
-	}
-
-	msg := "Image file does not exists: bar.image"
-	if diags[0].Message != msg {
-		t.Fatalf("Wrong error message expected: '%s', got: '%s'", msg, diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr006", *diags[0].Source)
+	assert.Equal(t, "Image file does not exists: bar.image", diags[0].Message)
 }

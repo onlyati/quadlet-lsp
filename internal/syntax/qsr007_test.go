@@ -1,10 +1,11 @@
 package syntax
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR007_Valid(t *testing.T) {
@@ -34,10 +35,7 @@ func TestQSR007_Valid(t *testing.T) {
 	for _, s := range variants {
 		s.config = &utils.QuadletConfig{}
 		diags := qsr007(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Exptected 0 diagnosis, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -52,19 +50,10 @@ func TestQSR007_InvalidUnfinished(t *testing.T) {
 	for _, s := range variants {
 		s.config = &utils.QuadletConfig{}
 		diags := qsr007(s)
-
-		if len(diags) != 1 {
-			t.Fatalf("Exptected 1 diagnosis, but got %d at %s", len(diags), s.uri)
-		}
-
-		if *diags[0].Source != "quadlet-lsp.qsr007" {
-			t.Fatalf("Exptected quadlet-lsp.qsr007 source but got %s", *diags[0].Source)
-		}
-
-		if diags[0].Message != "Invalid format: bad delimiter usage at FOO" {
-			t.Fatalf("Got unexpected error message: '%s' at %s", diags[0].Message, s.uri)
-		}
-
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr007", *diags[0].Source)
+		assert.Equal(t, "Invalid format: bad delimiter usage at FOO", diags[0].Message)
 	}
 }
 
@@ -83,16 +72,10 @@ func TestQSR007_InvalidSpaceFound(t *testing.T) {
 	for _, s := range variants {
 		s.config = &utils.QuadletConfig{}
 		diags := qsr007(s)
-
-		if len(diags) == 0 {
-			t.Fatalf("Exptected more diagnosis, but got %d at %s", len(diags), s.uri)
-		}
-
-		messageCheck := strings.HasPrefix(diags[0].Message, "Invalid format: bad delimiter usage at")
-		if !messageCheck {
-			t.Fatalf("Got unexpected error message: '%s' at %s", diags[0].Message, s.uri)
-		}
-
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr007", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Invalid format: bad delimiter usage at")
 	}
 }
 
@@ -108,9 +91,6 @@ func TestQSR007_ValidAfter560(t *testing.T) {
 		s.config = &utils.QuadletConfig{}
 		s.config.Podman = utils.BuildPodmanVersion(5, 6, 0)
 		diags := qsr007(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Exptected 0 diagnosis, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }

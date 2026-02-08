@@ -1,8 +1,10 @@
 package syntax
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR020_Valid(t *testing.T) {
@@ -27,10 +29,7 @@ func TestQSR020_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr020(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Exptected 0 diagnostics but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -56,18 +55,9 @@ func TestQSR020_Invalid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr020(s)
-
-		if len(diags) != 1 {
-			t.Fatalf("Exptected 1 diagnostics but got %d at %s", len(diags), s.uri)
-		}
-
-		if *diags[0].Source != "quadlet-lsp.qsr020" {
-			t.Fatalf("Unexpected source: %s", *diags[0].Source)
-		}
-
-		matchMessageStart := strings.HasPrefix(diags[0].Message, "Invalid name of unit: ")
-		if !matchMessageStart {
-			t.Fatalf("Unexpected error message: %s", diags[0].Message)
-		}
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr020", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Invalid name of unit: ")
 	}
 }

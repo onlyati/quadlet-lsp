@@ -2,6 +2,9 @@ package syntax
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR001_WithValidSection(t *testing.T) {
@@ -9,9 +12,7 @@ func TestQSR001_WithValidSection(t *testing.T) {
 
 	diags := qsr001(s)
 
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR001_WithoutValidSection(t *testing.T) {
@@ -19,13 +20,9 @@ func TestQSR001_WithoutValidSection(t *testing.T) {
 
 	diags := qsr001(s)
 
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostic, got %d", len(diags))
-	}
+	require.Len(t, diags, 1)
+	assert.Equal(t, "quadlet-lsp.qsr001", *diags[0].Source)
 
-	diag := diags[0]
-
-	if diag.Message == "" || diag.Source == nil || *diag.Source != "quadlet-lsp.qsr001" {
-		t.Errorf("Unexpected diagnostic content: %+v", diag)
-	}
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "Missing any of these sections: [[Image] [Container] [Volume] [Network] [Kube] [Pod] [Build] [Artifact]]", diags[0].Message)
 }

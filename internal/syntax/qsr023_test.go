@@ -1,8 +1,10 @@
 package syntax
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR023_Valid(t *testing.T) {
@@ -27,10 +29,7 @@ func TestQSR023_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr023(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("expected 0 finding, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -52,23 +51,11 @@ func TestQSR023_Invalid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr023(s)
-
-		if len(diags) != 1 {
-			t.Fatalf("expected 1 finding, but got %d at %s", len(diags), s.uri)
-		}
-
-		if *diags[0].Source != "quadlet-lsp.qsr023" {
-			t.Fatalf("unexpected source: %s at %s", *diags[0].Source, s.uri)
-		}
-
-		msgStart := strings.HasPrefix(diags[0].Message, "Specifier ")
-		msgEnd := strings.HasSuffix(diags[0].Message, "is invalid")
-		if !msgStart || !msgEnd {
-			t.Fatalf("unexpected message: '%s' at %s", diags[0].Message, s.uri)
-		}
-
-		if diags[0].Range.Start.Line != 1 {
-			t.Fatalf("found issue in unexpteced line: %d at %s", diags[0].Range.Start.Line, s.uri)
-		}
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr023", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Specifier ")
+		assert.Contains(t, diags[0].Message, "is invalid")
+		assert.Equal(t, uint32(1), diags[0].Range.Start.Line)
 	}
 }
