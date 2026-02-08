@@ -1,8 +1,6 @@
 package completion
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/testutils"
@@ -14,14 +12,6 @@ type imageMockCommander struct{}
 
 func (c imageMockCommander) Run(name string, args ...string) ([]string, error) {
 	return []string{"image1", "image2"}, nil
-}
-
-func createTempFile(t *testing.T, dir, name, content string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0o644)
-	assert.NoError(t, err)
-	return path
 }
 
 // TestPropertyImage_Valid tests if only *.image, *.build and pulled images are

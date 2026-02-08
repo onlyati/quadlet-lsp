@@ -3,14 +3,17 @@ package hover
 import (
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+// When hover is displayed on network and file exists, then the file's content
+// also displayed.
 func TestValueNetworkPeek(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	createTempFile(t, tmpDir, "foo.network", "[Network]\nDNS=1.1.1.1")
+	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]\nDNS=1.1.1.1")
 	info := HoverInformation{
 		Line:              "Network=foo.network",
 		URI:               "file://foo.container",
@@ -28,6 +31,6 @@ func TestValueNetworkPeek(t *testing.T) {
 		expected := "**Content of file**\n```quadlet\n[Network]\nDNS=1.1.1.1\n```"
 		assert.Equal(t, expected, v.Value, "unexpected content")
 	default:
-		t.Fatal("hoverValue content is not protocol.MarkupContent")
+		assert.Fail(t, "hoverValue content is not protocol.MarkupContent")
 	}
 }
