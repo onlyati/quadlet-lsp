@@ -26,14 +26,41 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 	for _, p := range data.PropertiesMap[s.section] {
 		checkVersion := podVer.GreaterOrEqual(p.MinVersion)
 		if checkVersion {
-			completionItems = append(completionItems, protocol.CompletionItem{
-				Label: p.Label,
-				Documentation: protocol.MarkupContent{
-					Kind:  protocol.MarkupKindMarkdown,
-					Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
-				},
-				Kind: &completionKind,
-			})
+			if p.Macro != "" {
+				textEdit := protocol.TextEdit{
+					Range: protocol.Range{
+						Start: protocol.Position{
+							Line:      s.line,
+							Character: 0,
+						},
+						End: protocol.Position{
+							Line:      s.line,
+							Character: uint32(len(s.text[s.line])),
+						},
+					},
+					NewText: p.Macro,
+				}
+
+				completionItems = append(completionItems, protocol.CompletionItem{
+					Label: p.Label,
+					Documentation: protocol.MarkupContent{
+						Kind:  protocol.MarkupKindMarkdown,
+						Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
+					},
+					Kind:             &itemKind,
+					TextEdit:         textEdit,
+					InsertTextFormat: &insertFormat,
+				})
+			} else {
+				completionItems = append(completionItems, protocol.CompletionItem{
+					Label: p.Label,
+					Documentation: protocol.MarkupContent{
+						Kind:  protocol.MarkupKindMarkdown,
+						Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
+					},
+					Kind: &completionKind,
+				})
+			}
 		}
 	}
 

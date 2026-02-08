@@ -252,15 +252,15 @@ Documentation, like `Exec`, `Environment`, and so on.
 Some property has a "new template". If you type them you can get predefined
 snippets. Currently supported new templates:
 
-- `new.Annotation`
-- `new.AddHost`
-- `new.Environment`
-- `new.Label`
-- `new.PublishPort`
-- `new.Secret`
-- `new.Volume`
+- `Annotation`
+- `AddHost`
+- `Environment`
+- `Label`
+- `PublishPort`
+- `Secret`
+- `Volume`
 
-<img src="assets/new_env_demo.gif" style="width: 100%;"/>
+<img src="assets/new_template_demo.gif" style="width: 100%;"/>
 
 ### Dynamic completion
 
