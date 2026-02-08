@@ -56,11 +56,6 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 		return listSections(s)
 	}
 
-	// If 'new.Something' is typed it provides suggestions for templates
-	if isItNewMacro(s.text[s.line]) {
-		return listNewMacros(s)
-	}
-
 	// If user type '%' suggest systemd specifiers
 	if isItSystemSpecifier(s.text[s.line], s.char) {
 		return listSystemdSpecifier(s)
