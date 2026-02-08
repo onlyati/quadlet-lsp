@@ -1,20 +1,21 @@
 package completion
 
 import (
-	"os"
-	"slices"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
 )
 
+// TestPropertyPod_Valid tests if only *.pod files are display in the complation
+// for Pod.
 func TestPropertyPod_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.pod", "[Pod]")
-	createTempFile(t, tmpDir, "bar.pod", "[Pod]")
-	createTempFile(t, tmpDir, "foo.network", "[Network]")
+	testutils.CreateTempFile(t, tmpDir, "foo.pod", "[Pod]")
+	testutils.CreateTempFile(t, tmpDir, "bar.pod", "[Pod]")
+	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := Completion{}
 	s.config = &utils.QuadletConfig{
@@ -31,19 +32,11 @@ func TestPropertyPod_Valid(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	checkFooNetwork := slices.Contains(labels, "foo.network")
-	if checkFooNetwork {
-		t.Fatalf("listed network but it should not: %v", labels)
-	}
-
-	checkFooPod := slices.Contains(labels, "foo.pod")
-	checkBarPod := slices.Contains(labels, "bar.pod")
-	if !checkFooPod || !checkBarPod {
-		t.Fatalf(
-			"did not list everything: %v %v %v",
-			labels,
-			checkFooPod,
-			checkBarPod,
-		)
-	}
+	assert.NotContains(t, labels, "foo.network", "listed network but should not")
+	assert.ElementsMatch(
+		t,
+		labels,
+		[]string{"foo.pod", "bar.pod"},
+		"did not list everything",
+	)
 }

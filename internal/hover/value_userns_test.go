@@ -2,8 +2,12 @@ package hover
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
+// TestValueUserNS tests hover output for the 'UserNS=' lines.
 func TestValueUserNS(t *testing.T) {
 	cases := []HoverInformation{
 		{
@@ -41,13 +45,9 @@ func TestValueUserNS(t *testing.T) {
 	for i, info := range cases {
 		hoverValue := HoverFunction(info)
 
-		if hoverValue == nil {
-			t.Fatalf("expected hover value but got nil at #%d", i)
-		}
+		require.NotNilf(t, hoverValue, "expected hover value at %d", i)
 
 		highlight := info.Line[hoverValue.Range.Start.Character:hoverValue.Range.End.Character]
-		if highlight != "keep-id" && highlight != "nomap" && highlight != "host" && highlight != "auto" {
-			t.Fatalf("unexpected highlight but got '%s'", highlight)
-		}
+		assert.Contains(t, []string{"keep-id", "nomap", "host", "auto"}, highlight, "unexpected highlight")
 	}
 }

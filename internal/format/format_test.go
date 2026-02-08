@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Test_FormatDocument tests document format method.
 func Test_FormatDocument(t *testing.T) {
 	source := `# disable-qsr: qsr014
 # disable-qsr: qsr015
@@ -122,15 +123,12 @@ WantedBy=default.target
 	newText := FormatDocument(source)
 
 	for i, c := range newText {
-		if i > len(expected) {
-			t.Fatalf("result longer than expected '%s'", newText[i:])
-		}
-		if c != rune(expected[i]) {
-			t.Fatalf("unpextected text after formatting, at position %d: got: '%v' expected: '%v'", i, newText[i-10:i+1], expected[i-10:i+1])
-		}
+		require.Less(t, i, len(expected), "result longer than expected")
+		require.Equalf(t, c, rune(expected[i]), "unexpected text at formatting at %d, %c %c", i, c, rune(expected[i]))
 	}
 }
 
+// Test_FormatDocumentMultiLine tests formatting when continuation sign is used.
 func Test_FormatDocumentMultiLine(t *testing.T) {
 	source := ` [Unit]
 Description=PostgreSQL database for Nextcloud
@@ -169,15 +167,12 @@ Memory=512M
 	newText := FormatDocument(source)
 
 	for i, c := range newText {
-		if i > len(expected) {
-			t.Fatalf("result longer than expected '%s'", newText[i:])
-		}
-		if c != rune(expected[i]) {
-			t.Fatalf("unpextected text after formatting, at position %d: got: '%v' expected: '%v'", i, newText[i-10:i+1], expected[i-10:i+1])
-		}
+		require.Less(t, i, len(expected), "result longer than expected")
+		require.Equalf(t, c, rune(expected[i]), "unexpected text at formatting at %d, %c %c", i, c, rune(expected[i]))
 	}
 }
 
+// Test_WrapLine tests that formatting make long lines shorter.
 func Test_WrapLine(t *testing.T) {
 	source := `[Container]
 # Healthcheck options
@@ -198,15 +193,12 @@ HealthTimeout=15s
 	newText := FormatDocument(source)
 
 	for i, c := range newText {
-		if i >= len(expected) {
-			t.Fatalf("result longer than expected '%s'", newText[i:])
-		}
-		if c != rune(expected[i]) {
-			t.Fatalf("unpextected text after formatting, at position %d: got:\n'%v'\nexpected:\n'%v'", i, newText[i-10:i+1], expected[i-10:i+1])
-		}
+		require.Less(t, i, len(expected), "result longer than expected")
+		require.Equalf(t, c, rune(expected[i]), "unexpected text at formatting at %d, %c %c", i, c, rune(expected[i]))
 	}
 }
 
+// Test_Unchanged tests if something format is correct, then do nothing.
 func Test_Unchanged(t *testing.T) {
 	source := `[Container]
 # Healthcheck options
@@ -220,15 +212,12 @@ HealthTimeout=15s
 	newText := FormatDocument(source)
 
 	for i, c := range newText {
-		if i > len(source) {
-			t.Fatalf("result longer than expected '%s'", newText[i:])
-		}
-		if c != rune(source[i]) {
-			t.Fatalf("unpextected text after formatting, at position %d: got:\n'%v'\nexpected:\n'%v'", i, newText[i-10:i+10], source[i-10:i+10])
-		}
+		require.Less(t, i, len(source), "result longer than source")
+		require.Equalf(t, c, rune(source[i]), "unexpected text at formatting at %d, %c %c", i, c, rune(source[i]))
 	}
 }
 
+// Test_Wrap tests the wrap function itself that is used by formatter.
 func Test_Wrap(t *testing.T) {
 	sources := []string{
 		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nunc mauris, pharetra quis nisi in, eleifend vulputate nisl. Fusce justo mauris, aliquam sed urna feugiat, accumsan egestas tellus. Maecenas ut felis a leo tincidunt volutpat eget a nibh.",

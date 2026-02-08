@@ -3,14 +3,17 @@ package hover
 import (
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
+// TestValuePodPeek tests when pod file exists that is currently hovered then
+// display the content of the file.
 func TestValuePodPeek(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	createTempFile(t, tmpDir, "foo.pod", "[Pod]\nPublishPort=8080:8080")
+	testutils.CreateTempFile(t, tmpDir, "foo.pod", "[Pod]\nPublishPort=8080:8080")
 	info := HoverInformation{
 		Line:              "Pod=foo.pod",
 		URI:               "file://foo.container",
@@ -28,6 +31,6 @@ func TestValuePodPeek(t *testing.T) {
 		expected := "**Content of file**\n```quadlet\n[Pod]\nPublishPort=8080:8080\n```"
 		assert.Equal(t, expected, v.Value, "unexpected content")
 	default:
-		t.Fatal("hoverValue content is not protocol.MarkupContent")
+		assert.Fail(t, "hoverValue content is not protocol.MarkupContent")
 	}
 }

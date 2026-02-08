@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR003_ValidProperties(t *testing.T) {
@@ -15,10 +17,7 @@ func TestQSR003_ValidProperties(t *testing.T) {
 		Podman: utils.BuildPodmanVersion(5, 5, 2),
 	}
 	diags := qsr003(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR003_InvalidProperty(t *testing.T) {
@@ -28,24 +27,12 @@ func TestQSR003_InvalidProperty(t *testing.T) {
 	}
 	diags := qsr003(s)
 
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostic, got %d", len(diags))
-	}
+	require.Len(t, diags, 1)
+	assert.Equal(t, "Invalid property is found: Container.Foobar", diags[0].Message)
+	assert.Equal(t, uint32(2), diags[0].Range.Start.Line)
 
-	diag := diags[0]
-
-	if diag.Message == "" || diag.Source == nil || *diag.Source != "quadlet-lsp.qsr003" {
-		t.Errorf("Unexpected diagnostic: %+v", diag)
-	}
-
-	expectedMessage := "Invalid property is found: Container.Foobar"
-	if diag.Message != expectedMessage {
-		t.Errorf("Unexpected message:\n  got: %s\n want: %s", diag.Message, expectedMessage)
-	}
-
-	if diag.Range.Start.Line != 2 {
-		t.Fatalf("expected error in line 2 but got %d", diag.Range.Start.Line)
-	}
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr003", *diags[0].Source)
 }
 
 func TestQSR003_UnknownSection(t *testing.T) {
@@ -54,10 +41,14 @@ func TestQSR003_UnknownSection(t *testing.T) {
 		Podman: utils.BuildPodmanVersion(5, 5, 2),
 	}
 	diags := qsr003(s)
+	require.Len(t, diags, 2)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr003", *diags[0].Source)
+	assert.Equal(t, "Invalid property is found: Test.", diags[0].Message)
 
-	if len(diags) != 2 {
-		t.Errorf("Expected 2 diagnostics for unknown section, got %d", len(diags))
-	}
+	require.NotNil(t, diags[1].Source)
+	assert.Equal(t, "Invalid property is found: Test.Description", diags[1].Message)
+	assert.Equal(t, "quadlet-lsp.qsr003", *diags[1].Source)
 }
 
 func TestQSR003_OldVersion(t *testing.T) {
@@ -68,18 +59,8 @@ func TestQSR003_OldVersion(t *testing.T) {
 	}
 	diags := qsr003(s)
 
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostic, got %d", len(diags))
-	}
-
-	diag := diags[0]
-
-	if diag.Message == "" || diag.Source == nil || *diag.Source != "quadlet-lsp.qsr003" {
-		t.Errorf("Unexpected diagnostic: %+v", diag)
-	}
-
-	expectedMessage := "Invalid property is found: Container.Memory"
-	if diag.Message != expectedMessage {
-		t.Errorf("Unexpected message:\n  got: %s\n want: %s", diag.Message, expectedMessage)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr003", *diags[0].Source)
+	assert.Equal(t, "Invalid property is found: Container.Memory", diags[0].Message)
 }

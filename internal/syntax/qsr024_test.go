@@ -1,8 +1,10 @@
 package syntax
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR024_Valid(t *testing.T) {
@@ -12,16 +14,16 @@ func TestQSR024_Valid(t *testing.T) {
 	}
 
 	diags := qsr024(s)
+	require.Len(t, diags, 3)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr024", *diags[0].Source)
+	assert.Equal(t, "Usage in rootless podman is not recommended: Service.User", diags[0].Message)
 
-	if len(diags) != 3 {
-		t.Fatalf("expected 3 diagnostics but got %d", len(diags))
-	}
+	require.NotNil(t, diags[1].Source)
+	assert.Equal(t, "quadlet-lsp.qsr024", *diags[1].Source)
+	assert.Equal(t, "Usage in rootless podman is not recommended: Service.Group", diags[1].Message)
 
-	if *diags[0].Source != "quadlet-lsp.qsr024" {
-		t.Fatalf("unexpected source: %s", *diags[0].Source)
-	}
-
-	if !strings.HasPrefix(diags[0].Message, "Usage in rootless podman is not recommended:") {
-		t.Fatalf("unexpected message: %s", diags[0].Message)
-	}
+	require.NotNil(t, diags[2].Source)
+	assert.Equal(t, "quadlet-lsp.qsr024", *diags[2].Source)
+	assert.Equal(t, "Usage in rootless podman is not recommended: Service.DynamicUser", diags[2].Message)
 }

@@ -1,6 +1,11 @@
 package syntax
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func TestQSR016_Valid(t *testing.T) {
 	cases := []SyntaxChecker{
@@ -28,10 +33,7 @@ func TestQSR016_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr015(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -42,18 +44,10 @@ func TestQSR016_NoParameters(t *testing.T) {
 	)
 
 	diags := qsr016(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Exptected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr016" {
-		t.Fatalf("Exptected quadlet-lsp.qsr016 source, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid value of UserNS: 'auto' has no parameters" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr016", *diags[0].Source)
+	assert.Equal(t, "Invalid value of UserNS: 'auto' has no parameters", diags[0].Message)
 }
 
 func TestQSR016_KeepIdWrongParameter(t *testing.T) {
@@ -63,18 +57,10 @@ func TestQSR016_KeepIdWrongParameter(t *testing.T) {
 	)
 
 	diags := qsr016(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Exptected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr016" {
-		t.Fatalf("Exptected quadlet-lsp.qsr016 source, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid value of UserNS: [uid gid] allowed but found foo=101" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr016", *diags[0].Source)
+	assert.Equal(t, "Invalid value of UserNS: [uid gid] allowed but found foo=101", diags[0].Message)
 }
 
 func TestQSR016_InvalidValue(t *testing.T) {
@@ -84,16 +70,8 @@ func TestQSR016_InvalidValue(t *testing.T) {
 	)
 
 	diags := qsr016(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Exptected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr016" {
-		t.Fatalf("Exptected quadlet-lsp.qsr016 source, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid value of UserNS: allowed values: '[auto host keep-id nomap]' and found foo" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr016", *diags[0].Source)
+	assert.Equal(t, "Invalid value of UserNS: allowed values: '[auto host keep-id nomap]' and found foo", diags[0].Message)
 }

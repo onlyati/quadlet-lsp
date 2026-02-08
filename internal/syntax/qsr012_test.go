@@ -1,8 +1,10 @@
 package syntax
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR012_Valid(t *testing.T) {
@@ -31,10 +33,7 @@ func TestQSR012_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr012(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -45,18 +44,10 @@ func TestQSR012_UnfinishedOption(t *testing.T) {
 	)
 
 	diags := qsr012(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr012" {
-		t.Fatalf("Exptected source quadlet-lsp.qsr012, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid format of secret specification: 'type' has no value" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr012", *diags[0].Source)
+	assert.Equal(t, "Invalid format of secret specification: 'type' has no value", diags[0].Message)
 }
 
 func TestQSR012_InvalidType(t *testing.T) {
@@ -66,18 +57,10 @@ func TestQSR012_InvalidType(t *testing.T) {
 	)
 
 	diags := qsr012(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr012" {
-		t.Fatalf("Exptected source quadlet-lsp.qsr012, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid format of secret specification: 'type' can be either 'mount' or 'env'" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr012", *diags[0].Source)
+	assert.Equal(t, "Invalid format of secret specification: 'type' can be either 'mount' or 'env'", diags[0].Message)
 }
 
 func TestQSR012_InvalidOption(t *testing.T) {
@@ -87,18 +70,10 @@ func TestQSR012_InvalidOption(t *testing.T) {
 	)
 
 	diags := qsr012(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr012" {
-		t.Fatalf("Exptected source quadlet-lsp.qsr012, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid format of secret specification: 'foo' is invalid option" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr012", *diags[0].Source)
+	assert.Equal(t, "Invalid format of secret specification: 'foo' is invalid option", diags[0].Message)
 }
 
 func TestQSR012_InvalidWithEnv(t *testing.T) {
@@ -111,19 +86,10 @@ func TestQSR012_InvalidWithEnv(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr012(s)
-
-		if len(diags) != 1 {
-			t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
-		}
-
-		if *diags[0].Source != "quadlet-lsp.qsr012" {
-			t.Fatalf("Exptected source quadlet-lsp.qsr012, but got %s", *diags[0].Source)
-		}
-
-		checkMessageStart := strings.HasPrefix(diags[0].Message, "Invalid format of secret specification: ")
-		checkMessageSuffix := strings.HasSuffix(diags[0].Message, "' only allowed if type=mount")
-		if !checkMessageStart || !checkMessageSuffix {
-			t.Fatalf("Unexpected message: %s", diags[0].Message)
-		}
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr012", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Invalid format of secret specification: ", diags[0].Message)
+		assert.Contains(t, diags[0].Message, "' only allowed if type=mount", diags[0].Message)
 	}
 }

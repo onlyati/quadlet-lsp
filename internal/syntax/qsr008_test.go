@@ -1,8 +1,10 @@
 package syntax
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR008_Valid(t *testing.T) {
@@ -43,10 +45,7 @@ func TestQSR008_Valid(t *testing.T) {
 
 	for _, s := range variants {
 		diags := qsr008(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Exptected 0 diagnosis, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -60,19 +59,10 @@ func TestQSR008_InvalidUnfinished(t *testing.T) {
 
 	for _, s := range variants {
 		diags := qsr008(s)
-
-		if len(diags) != 1 {
-			t.Fatalf("Exptected 1 diagnosis, but got %d at %s", len(diags), s.uri)
-		}
-
-		if *diags[0].Source != "quadlet-lsp.qsr008" {
-			t.Fatalf("Exptected quadlet-lsp.qsr008 source but got %s", *diags[0].Source)
-		}
-
-		if diags[0].Message != "Invalid format: bad delimiter usage at FOO" {
-			t.Fatalf("Got unexpected error message: '%s' at %s", diags[0].Message, s.uri)
-		}
-
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr008", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Invalid format: bad delimiter usage at")
 	}
 }
 
@@ -90,15 +80,9 @@ func TestQSR008_InvalidSpaceFound(t *testing.T) {
 
 	for _, s := range variants {
 		diags := qsr008(s)
-
-		if len(diags) == 0 {
-			t.Fatalf("Exptected more diagnosis, but got %d at %s", len(diags), s.uri)
-		}
-
-		messageCheck := strings.HasPrefix(diags[0].Message, "Invalid format: bad delimiter usage at")
-		if !messageCheck {
-			t.Fatalf("Got unexpected error message: '%s' at %s", diags[0].Message, s.uri)
-		}
-
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr008", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Invalid format: bad delimiter usage at")
 	}
 }

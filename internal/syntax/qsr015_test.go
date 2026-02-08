@@ -2,6 +2,9 @@ package syntax
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR015_Valid(t *testing.T) {
@@ -38,10 +41,7 @@ func TestQSR015_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr015(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
@@ -52,18 +52,10 @@ func TestQSR015_InvalidContainerDirectory(t *testing.T) {
 	)
 
 	diags := qsr015(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr015" {
-		t.Fatalf("Exptected quadlet-lsp.qsr015 source, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid format of Volume specification: container directory is not absolute" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr015", *diags[0].Source)
+	assert.Equal(t, "Invalid format of Volume specification: container directory is not absolute", diags[0].Message)
 }
 
 func TestQSR016_UnkownFlag(t *testing.T) {
@@ -73,16 +65,8 @@ func TestQSR016_UnkownFlag(t *testing.T) {
 	)
 
 	diags := qsr015(s)
-
-	if len(diags) != 1 {
-		t.Fatalf("Expected 1 diagnostics, but got %d", len(diags))
-	}
-
-	if *diags[0].Source != "quadlet-lsp.qsr015" {
-		t.Fatalf("Exptected quadlet-lsp.qsr015 source, but got %s", *diags[0].Source)
-	}
-
-	if diags[0].Message != "Invalid format of Volume specification: 'foo' flag is unknown" {
-		t.Fatalf("Unexpected message: %s", diags[0].Message)
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr015", *diags[0].Source)
+	assert.Equal(t, "Invalid format of Volume specification: 'foo' flag is unknown", diags[0].Message)
 }

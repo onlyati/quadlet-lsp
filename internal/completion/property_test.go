@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test_IsItPropertyCompletion tests condition of property completion call.
 func Test_IsItPropertyCompletion(t *testing.T) {
 	cases := []Completion{
 		{

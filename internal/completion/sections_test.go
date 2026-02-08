@@ -2,8 +2,11 @@ package completion
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
+// TestSection_Valid tests if sections list is valid.
 func TestSection_Valid(t *testing.T) {
 	expected := []string{
 		"Pod",
@@ -25,7 +28,5 @@ func TestSection_Valid(t *testing.T) {
 		result = append(result, diag.Label)
 	}
 
-	if len(expected) != len(result) {
-		t.Fatalf("Expected '%v', but got '%v'", expected, result)
-	}
+	require.Len(t, result, len(expected), "did not contain all sections")
 }

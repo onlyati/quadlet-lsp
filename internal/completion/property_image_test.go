@@ -1,11 +1,9 @@
 package completion
 
 import (
-	"os"
-	"path/filepath"
-	"slices"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,29 +14,14 @@ func (c imageMockCommander) Run(name string, args ...string) ([]string, error) {
 	return []string{"image1", "image2"}, nil
 }
 
-func createTempFile(t *testing.T, dir, name, content string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0o644)
-	assert.NoError(t, err)
-	return path
-}
-
-func createTempDir(t *testing.T, dir, name string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.Mkdir(path, 0o755)
-	assert.NoError(t, err)
-	return path
-}
-
+// TestPropertyImage_Valid tests if only *.image, *.build and pulled images are
+// showed in the completion.
 func TestPropertyImage_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.image", "[Image]")
-	createTempFile(t, tmpDir, "foo.build", "[Build]")
-	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "foo.image", "[Image]")
+	testutils.CreateTempFile(t, tmpDir, "foo.build", "[Build]")
+	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]")
 
 	s := Completion{}
 	s.commander = imageMockCommander{}
@@ -56,19 +39,8 @@ func TestPropertyImage_Valid(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	if slices.Contains(labels, "foo.volume") {
-		t.Fatal("cannot list images")
-	}
-
-	if !slices.Contains(labels, "image1") {
-		t.Fatal("did not read commander output")
-	}
-
-	if !slices.Contains(labels, "foo.image") {
-		t.Fatal("did not list image files")
-	}
-
-	if !slices.Contains(labels, "foo.build") {
-		t.Fatal("did not list build files")
-	}
+	assert.NotContains(t, labels, "foo.volume")
+	assert.Contains(t, labels, "image1", "did not read commander output")
+	assert.Contains(t, labels, "foo.image", "did not list image files")
+	assert.Contains(t, labels, "foo.build", "did not list build files")
 }

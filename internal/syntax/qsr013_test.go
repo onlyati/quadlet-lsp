@@ -1,34 +1,20 @@
 package syntax
 
 import (
-	"os"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQSR013_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(
-		t,
-		tmpDir,
-		"data1.volume",
-		"[Volume]",
-	)
-	createTempFile(
-		t,
-		tmpDir,
-		"data2.volume",
-		"[Volume]",
-	)
-	createTempFile(
-		t,
-		tmpDir,
-		"data@.volume",
-		"[Volume]",
-	)
+	testutils.CreateTempFile(t, tmpDir, "data1.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "data2.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "data@.volume", "[Volume]")
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -57,16 +43,12 @@ func TestQSR013_Valid(t *testing.T) {
 			},
 		}
 		diags := qsr013(s)
-
-		if len(diags) != 0 {
-			t.Fatalf("Expected 0 diagnostics, got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
 func TestQSR013_Invalid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
 	cases := []SyntaxChecker{
 		NewSyntaxChecker(
@@ -91,17 +73,14 @@ func TestQSR013_Invalid(t *testing.T) {
 			},
 		}
 		diags := qsr013(s)
+		require.Len(t, diags, 2)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr013", *diags[0].Source)
+		assert.Equal(t, "Volume file does not exists: data1.volume", diags[0].Message)
 
-		if len(diags) != 2 {
-			t.Fatalf("Expected 2 diagnostics, got %d at %s", len(diags), s.uri)
-		}
+		require.NotNil(t, diags[1].Source)
+		assert.Equal(t, "quadlet-lsp.qsr013", *diags[1].Source)
+		assert.Equal(t, "Volume file does not exists: data2.volume", diags[1].Message)
 
-		if *diags[0].Source != "quadlet-lsp.qsr013" {
-			t.Fatalf("Wrong source found: %s at %s", *diags[0].Source, s.uri)
-		}
-
-		if diags[0].Message != "Volume file does not exists: data1.volume" {
-			t.Fatalf("Unexpected message: '%s' at %s", diags[0].Message, s.uri)
-		}
 	}
 }

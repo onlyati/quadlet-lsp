@@ -31,10 +31,7 @@ func TestNewPodmanVersion(t *testing.T) {
 
 	result, err := utils.NewPodmanVersion(mockCommander{})
 	assert.NoError(t, err)
-
-	if expected != result {
-		t.Fatalf("Exptected: '%v', but got '%v'", expected, result)
-	}
+	assert.Equal(t, expected, result)
 }
 
 func TestPodmanVersionGreateThan(t *testing.T) {
@@ -43,12 +40,11 @@ func TestPodmanVersionGreateThan(t *testing.T) {
 		Release: 4,
 		Minor:   2,
 	}
-
-	if p.GreaterOrEqual(utils.PodmanVersion{Version: 5, Release: 4, Minor: 0}) == false {
-		t.Fatal("failed test case 1")
+	cases := []utils.PodmanVersion{
+		{Version: 5, Release: 4, Minor: 0},
+		{Version: 5, Release: 5, Minor: 0},
 	}
 
-	if p.GreaterOrEqual(utils.PodmanVersion{Version: 5, Release: 5, Minor: 0}) == true {
-		t.Fatal("failed test case 2")
-	}
+	assert.True(t, p.GreaterOrEqual(cases[0]))
+	assert.False(t, p.GreaterOrEqual(cases[1]))
 }

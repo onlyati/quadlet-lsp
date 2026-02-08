@@ -1,6 +1,11 @@
 package syntax
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func TestQSR004_Valid(t *testing.T) {
 	cases := []SyntaxChecker{
@@ -32,38 +37,26 @@ func TestQSR004_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr004(s)
-
-		if len(diags) != 0 {
-			t.Errorf("Expected no diagnostics, got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 0)
 	}
 }
 
 func TestQSR004_ValidImageFile(t *testing.T) {
 	s := NewSyntaxChecker("[Image]\nImage=docker.io/library/debian:bookworm-slim", "test.image")
 	diags := qsr004(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR004_ValidWithImage(t *testing.T) {
 	s := NewSyntaxChecker("[Container]\nImage=db.image", "test.container")
 	diags := qsr004(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR004_ValidWithBuild(t *testing.T) {
 	s := NewSyntaxChecker("[Container]\nImage=db.build", "test.container")
 	diags := qsr004(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }
 
 func TestQSR004_Invalid(t *testing.T) {
@@ -88,27 +81,24 @@ func TestQSR004_Invalid(t *testing.T) {
 
 	for _, s := range cases {
 		diags := qsr004(s)
-
-		if len(diags) != 1 {
-			t.Errorf("Expected 1 diagnostic, got %d at %s", len(diags), s.uri)
-		}
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr004", *diags[0].Source)
+		assert.Equal(t, "Image name is not fully qualified", diags[0].Message)
 	}
 }
 
 func TestQSR004_InvalidImageFile(t *testing.T) {
 	s := NewSyntaxChecker("[Image]\nImage=library/debian:bookworm-slim", "test.image")
 	diags := qsr004(s)
-
-	if len(diags) != 1 {
-		t.Errorf("Expected 1 diagnostic, got %d", len(diags))
-	}
+	require.Len(t, diags, 1)
+	require.NotNil(t, diags[0].Source)
+	assert.Equal(t, "quadlet-lsp.qsr004", *diags[0].Source)
+	assert.Equal(t, "Image name is not fully qualified", diags[0].Message)
 }
 
 func TestQSR004_NonContainer(t *testing.T) {
 	s := NewSyntaxChecker("[Pod]\nImage=library/debian:bookworm-slim", "test.pod")
 	diags := qsr004(s)
-
-	if len(diags) != 0 {
-		t.Errorf("Expected no diagnostics, got %d", len(diags))
-	}
+	require.Len(t, diags, 0)
 }

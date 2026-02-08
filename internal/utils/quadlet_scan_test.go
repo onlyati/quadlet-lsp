@@ -1,19 +1,20 @@
 package utils_test
 
 import (
-	"os"
 	"path"
 	"strings"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 func TestFindItems(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
+
 	text := `[Unit]
 Description=description
 
@@ -39,27 +40,19 @@ StartLimitBurst=5
 			URI:           "file://" + tmpDir + "foo.container",
 		},
 	)
+	require.Len(t, findings, 2)
+	assert.Equal(t, "Environment", findings[0].Property)
+	assert.Equal(t, "ENV1=VALUE1", findings[0].Value)
+	assert.Equal(t, uint32(6), findings[0].LineNumber)
 
-	if len(findings) != 2 {
-		t.Fatalf("Expected 2 founds, got %d", len(findings))
-	}
-
-	if findings[0].Property != "Environment" {
-		t.Fatalf("Expected to get 'Environment' property, but got %s", findings[0].Property)
-	}
-
-	if findings[0].Value != "ENV1=VALUE1" {
-		t.Fatalf("Expected to get 'ENV1=VALUE1' value, but got %s", findings[0].Value)
-	}
-
-	if findings[0].LineNumber != 6 {
-		t.Fatalf("Expected to find in 6th line, but got %d", findings[0].LineNumber)
-	}
+	assert.Equal(t, "Environment", findings[1].Property)
+	assert.Equal(t, "ENV2=VALUE2", findings[1].Value)
+	assert.Equal(t, uint32(8), findings[1].LineNumber)
 }
 
 func TestFindItemsWithExec(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
+
 	text := `[Unit]
 Description=description
 
@@ -88,22 +81,10 @@ StartLimitBurst=5
 			URI:           "file://" + tmpDir + "foo.container",
 		},
 	)
-
-	if len(findings) != 1 {
-		t.Fatalf("Expected 1 founds, got %d", len(findings))
-	}
-
-	if findings[0].Property != "Exec" {
-		t.Fatalf("Expected to get 'Environment' property, but got %s", findings[0].Property)
-	}
-
-	if findings[0].Value != "tail -f /dev/null" {
-		t.Fatalf("Expected to get 'tail -f /dev/null' value, but got '%s'", findings[0].Value)
-	}
-
-	if findings[0].LineNumber != 8 {
-		t.Fatalf("Expected to find in 8th line, but got %d", findings[0].LineNumber)
-	}
+	require.Len(t, findings, 1)
+	assert.Equal(t, "Exec", findings[0].Property)
+	assert.Equal(t, "tail -f /dev/null", findings[0].Value)
+	assert.Equal(t, uint32(8), findings[0].LineNumber)
 }
 
 func TestScanQuadlet(t *testing.T) {
@@ -152,25 +133,18 @@ StartLimitBurst=5
 		nil,
 	)
 
-	if len(findings) != 3 {
-		t.Fatalf("execpted 3 finding but got %d", len(findings))
-	}
+	require.Len(t, findings, 3)
+	assert.Equal(t, "[Container]", findings[0].c)
+	assert.Equal(t, "Environment", findings[0].p)
+	assert.Equal(t, "ENV1=VALUE1", findings[0].v)
 
-	if findings[0].c != "[Container]" {
-		t.Fatalf("expected '[Container]' section but got '%s'", findings[0].c)
-	}
+	assert.Equal(t, "[Container]", findings[1].c)
+	assert.Equal(t, "Exec", findings[1].p)
+	assert.Equal(t, "tail -f /dev/null", findings[1].v)
 
-	if findings[0].p != "Environment" && findings[0].v != "ENV1=VALUE1" {
-		t.Fatalf("unexpected finding for 0: '%s=%s'", findings[0].p, findings[0].v)
-	}
-
-	if findings[1].p != "Exec" && findings[1].v != "tail -f /dev/null" {
-		t.Fatalf("unexpected finding for 1: '%s=%s'", findings[1].p, findings[1].v)
-	}
-
-	if findings[2].p != "Environment" && findings[2].v != "ENV2=VALUE2" {
-		t.Fatalf("unexpected finding for 2: '%s=%s'", findings[2].p, findings[2].v)
-	}
+	assert.Equal(t, "[Container]", findings[2].c)
+	assert.Equal(t, "Environment", findings[2].p)
+	assert.Equal(t, "ENV2=VALUE2", findings[2].v)
 }
 
 func TestScanQuadletAll(t *testing.T) {
@@ -237,17 +211,14 @@ NoExist=true
 	}
 
 	for i, e := range expectedFindings {
-		if findings[i] != e {
-			t.Fatalf("unexpected finding: %+v", findings[0])
-		}
+		assert.Equal(t, e, findings[i])
 	}
 }
 
 func TestFindReferences(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "example.container", "[Container]\nNetwork=example.network\nAnotherLine")
+	testutils.CreateTempFile(t, tmpDir, "example.container", "[Container]\nNetwork=example.network\nAnotherLine")
 
 	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
@@ -263,10 +234,9 @@ func TestFindReferences(t *testing.T) {
 
 func TestFindReferencesTemplate(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "web@.container", "[Container]\nVolume=web@%i.volume:/app")
-	createTempFile(t, tmpDir, "builder@.container", "[Container]\nVolume=web@%i.volume:/app")
+	testutils.CreateTempFile(t, tmpDir, "web@.container", "[Container]\nVolume=web@%i.volume:/app")
+	testutils.CreateTempFile(t, tmpDir, "builder@.container", "[Container]\nVolume=web@%i.volume:/app")
 
 	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
@@ -279,19 +249,18 @@ func TestFindReferencesTemplate(t *testing.T) {
 
 	for _, loc := range locations {
 		if !strings.Contains(loc.URI, "web@.container") && !strings.Contains(loc.URI, "builder@.container") {
-			t.Fatalf("Unexpected finding: %+v", loc)
+			assert.Fail(t, "Unexpected finding: %+v", loc)
 		}
 	}
 }
 
 func TestFindReferencesDropIns(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.container", "[Container]\nImage=foo.image\n")
-	createTempFile(t, tmpDir, "foo.pod", "[Pod]\n")
-	createTempDir(t, tmpDir, "foo.container.d")
-	createTempFile(t, path.Join(tmpDir, "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
+	testutils.CreateTempDir(t, tmpDir, "foo.container.d")
+	testutils.CreateTempFile(t, tmpDir, "foo.container", "[Container]\nImage=foo.image\n")
+	testutils.CreateTempFile(t, tmpDir, "foo.pod", "[Pod]\n")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
 
 	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{
@@ -307,13 +276,12 @@ func TestFindReferencesDropIns(t *testing.T) {
 
 func TestFindReferencesNested(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempDir(t, tmpDir, "foo")
-	createTempFile(t, path.Join(tmpDir, "foo"), "foo.container", "[Container]\nImage=foo.image\n")
-	createTempFile(t, path.Join(tmpDir, "foo"), "foo.pod", "[Pod]\n")
-	createTempDir(t, path.Join(tmpDir, "foo"), "foo.container.d")
-	createTempFile(t, path.Join(tmpDir, "foo", "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
+	testutils.CreateTempDir(t, tmpDir, "foo")
+	testutils.CreateTempDir(t, path.Join(tmpDir, "foo"), "foo.container.d")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "foo"), "foo.container", "[Container]\nImage=foo.image\n")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "foo"), "foo.pod", "[Pod]\n")
+	testutils.CreateTempFile(t, path.Join(tmpDir, "foo", "foo.container.d"), "pod.conf", "[Container]\nPod=foo.pod\n")
 
 	locations, err := utils.FindReferences(
 		utils.GoReferenceProperty{

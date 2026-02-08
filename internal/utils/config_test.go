@@ -5,6 +5,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -45,7 +46,7 @@ func TestConfig_Default(t *testing.T) {
 
 func TestConfig_FromFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	createTempFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] }")
+	testutils.CreateTempFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] }")
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
@@ -60,7 +61,7 @@ func TestConfig_FromFile(t *testing.T) {
 
 func TestConfig_WithProjectProps(t *testing.T) {
 	tmpDir := t.TempDir()
-	createTempFile(t, tmpDir, ".quadletrc.json", `{ "project" : { "rootDir": "containers", "dirLevel": 4 } }`)
+	testutils.CreateTempFile(t, tmpDir, ".quadletrc.json", `{ "project" : { "rootDir": "containers", "dirLevel": 4 } }`)
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)
@@ -74,7 +75,7 @@ func TestConfig_WithProjectProps(t *testing.T) {
 
 func TestConfig_InvalidJson(t *testing.T) {
 	tmpDir := t.TempDir()
-	createTempFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] ")
+	testutils.CreateTempFile(t, tmpDir, ".quadletrc.json", "{ \"podmanVersion\": \"5.4.0\", \"disable\": [\"qsr003\"] ")
 
 	c := configMockCommander{}
 	cfg, err := utils.LoadConfig(tmpDir, c)

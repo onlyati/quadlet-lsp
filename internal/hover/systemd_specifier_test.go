@@ -1,7 +1,12 @@
 package hover
 
-import "testing"
+import (
+	"testing"
 
+	"github.com/stretchr/testify/assert"
+)
+
+// TestSystemdSpecifier tests hover on systemd identifiers.
 func TestSystemdSpecifier(t *testing.T) {
 	cases := []HoverInformation{
 		{
@@ -20,13 +25,12 @@ func TestSystemdSpecifier(t *testing.T) {
 
 	for _, info := range cases {
 		hoverValue := handleSystemSpecifier(info)
-
-		if hoverValue == nil {
-			t.Fatalf("expected hover value but got nil at %s", info.URI)
-		}
+		assert.NotNil(t, hoverValue, "expected hover value")
 	}
 }
 
+// TestSystemdSpecifierEscaping tests that no hover when it is an escaped
+// systemd identifier.
 func TestSystemdSpecifierEscaping(t *testing.T) {
 	cases := []HoverInformation{
 		{
@@ -51,10 +55,6 @@ func TestSystemdSpecifierEscaping(t *testing.T) {
 
 	for _, info := range cases {
 		hoverValue := handleSystemSpecifier(info)
-
-		if hoverValue != nil {
-			t.Fatalf("not expected hover value but got %+v at %s", hoverValue, info.URI)
-		}
-
+		assert.Nil(t, hoverValue, "expected hover value")
 	}
 }

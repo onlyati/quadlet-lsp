@@ -1,27 +1,21 @@
 package hover
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func createTempFile(t *testing.T, dir, name, content string) string {
-	t.Helper()
-	path := filepath.Join(dir, name)
-	err := os.WriteFile(path, []byte(content), 0o644)
-	assert.NoError(t, err)
-	return path
-}
-
+// TestValueVolumePeek tests if hover contains the content of the volume that is
+// hovered.
 func TestValueVolumePeek(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	createTempFile(t, tmpDir, "foo.volume", "[Volume]\n")
+	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]\n")
 
 	info := HoverInformation{
 		Line:              "Volume=foo.volume:/app:rw",
@@ -53,10 +47,11 @@ func TestValueVolumePeek(t *testing.T) {
 		expected := strings.Join(expectedMessage, "\n")
 		assert.Equal(t, expected, v.Value, "unexpected content")
 	default:
-		t.Fatal("hoverValue content is not protocol.MarkupContent")
+		assert.Fail(t, "hoverValue content is not protocol.MarkupContent")
 	}
 }
 
+// TestValueVolumeSource tests hover on the source volume.
 func TestValueVolumeSource(t *testing.T) {
 	cases := []HoverInformation{
 		{
@@ -82,17 +77,15 @@ func TestValueVolumeSource(t *testing.T) {
 	for i, info := range cases {
 		hoverValue := HoverFunction(info)
 
-		if hoverValue == nil {
-			t.Fatalf("expected hover value but got nil at #%d", i)
-		}
+		require.NotNilf(t, hoverValue, "expected hover at %d", i)
 
 		highlight := info.Line[hoverValue.Range.Start.Character:hoverValue.Range.End.Character]
-		if highlight != "/home/ati/tmp" {
-			t.Fatalf("unexpected highlight but got '%s'", highlight)
-		}
+		assert.Equal(t, "/home/ati/tmp", highlight, "unexpected highlight")
 	}
 }
 
+// TestValueVolumeContainer tests the hover on the container side of volume
+// definition.
 func TestValueVolumeContainer(t *testing.T) {
 	cases := []HoverInformation{
 		{
@@ -118,17 +111,14 @@ func TestValueVolumeContainer(t *testing.T) {
 	for i, info := range cases {
 		hoverValue := HoverFunction(info)
 
-		if hoverValue == nil {
-			t.Fatalf("expected hover value but got nil at #%d", i)
-		}
+		require.NotNilf(t, hoverValue, "expected hover at %d", i)
 
 		highlight := info.Line[hoverValue.Range.Start.Character:hoverValue.Range.End.Character]
-		if highlight != "/app/tmp" {
-			t.Fatalf("unexpected highlight but got '%s'", highlight)
-		}
+		assert.Equal(t, "/app/tmp", highlight, "unexpected highlight")
 	}
 }
 
+// TestValueVolumeFlag tests hover on volume flags.
 func TestValueVolumeFlag(t *testing.T) {
 	info := HoverInformation{
 		Line:    "Volume=/home/ati/tmp:/app/tmp:rw,z,U,nocopy,shared",
@@ -151,13 +141,9 @@ func TestValueVolumeFlag(t *testing.T) {
 		info.CharacterPosition = c.position
 		hoverValue := HoverFunction(info)
 
-		if hoverValue == nil {
-			t.Fatalf("expected hover value but got nil at #%d", i)
-		}
+		require.NotNilf(t, hoverValue, "expected hovere at %d", i)
 
 		highlight := info.Line[hoverValue.Range.Start.Character:hoverValue.Range.End.Character]
-		if highlight != c.flag {
-			t.Fatalf("unexpected highlight but got '%s'", highlight)
-		}
+		assert.Equal(t, c.flag, highlight, "unexpected highlight")
 	}
 }

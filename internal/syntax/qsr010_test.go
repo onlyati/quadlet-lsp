@@ -1,6 +1,11 @@
 package syntax
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 func TestQSR010_Valid(t *testing.T) {
 	cases := []SyntaxChecker{
@@ -63,10 +68,7 @@ func TestQSR010_Valid(t *testing.T) {
 
 	for _, s := range cases {
 		d := qsr010(s)
-
-		if len(d) != 0 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(d), s.uri)
-		}
+		require.Len(t, d, 0)
 	}
 }
 
@@ -83,19 +85,11 @@ func TestQSR010_InvalidFormat(t *testing.T) {
 	}
 
 	for _, s := range cases {
-		d := qsr010(s)
-
-		if len(d) != 1 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(d), s.uri)
-		}
-
-		if *d[0].Source != "quadlet-lsp.qsr010" {
-			t.Fatalf("Wrong source, expected 'quadlet-lsp.qsr010', got '%s' at %s", *d[0].Source, s.uri)
-		}
-
-		if d[0].Message != "Incorrect format of PublishPort" {
-			t.Fatalf("Unexpected message: '%s' at %s", d[0].Message, s.uri)
-		}
+		diags := qsr010(s)
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr010", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Incorrect format of PublishPort")
 	}
 }
 
@@ -124,19 +118,11 @@ func TestQSR010_InvalidPortIsText(t *testing.T) {
 	}
 
 	for _, s := range cases {
-		d := qsr010(s)
-
-		if len(d) != 1 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(d), s.uri)
-		}
-
-		if *d[0].Source != "quadlet-lsp.qsr010" {
-			t.Fatalf("Wrong source, expected 'quadlet-lsp.qsr010', got '%s' at %s", *d[0].Source, s.uri)
-		}
-
-		if d[0].Message != "Incorrect format of PublishPort" {
-			t.Fatalf("Unexpected message: '%s' at %s", d[0].Message, s.uri)
-		}
+		diags := qsr010(s)
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr010", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Incorrect format of PublishPort")
 	}
 }
 
@@ -161,18 +147,10 @@ func TestQSR010_InvalidInvalidPortNumber(t *testing.T) {
 	}
 
 	for _, s := range cases {
-		d := qsr010(s)
-
-		if len(d) != 1 {
-			t.Fatalf("Expected 0 diagnostics, but got %d at %s", len(d), s.uri)
-		}
-
-		if *d[0].Source != "quadlet-lsp.qsr010" {
-			t.Fatalf("Wrong source, expected 'quadlet-lsp.qsr010', got '%s' at %s", *d[0].Source, s.uri)
-		}
-
-		if d[0].Message != "Incorrect format of PublishPort" {
-			t.Fatalf("Unexpected message: '%s' at %s", d[0].Message, s.uri)
-		}
+		diags := qsr010(s)
+		require.Len(t, diags, 1)
+		require.NotNil(t, diags[0].Source)
+		assert.Equal(t, "quadlet-lsp.qsr010", *diags[0].Source)
+		assert.Contains(t, diags[0].Message, "Incorrect format of PublishPort")
 	}
 }

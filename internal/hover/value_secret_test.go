@@ -2,8 +2,12 @@ package hover
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
+// TestValueSecret tests the hover values on lines like 'Secret='.
 func TestValueSecret(t *testing.T) {
 	cases := []struct {
 		info              HoverInformation
@@ -96,24 +100,9 @@ func TestValueSecret(t *testing.T) {
 		c.info.CharacterPosition = c.expectedHighlight.position
 		hoverValue := HoverFunction(c.info)
 
-		if hoverValue == nil {
-			t.Fatalf("expected hover value but got nil at #%d", i)
-		}
-
-		isItStart := hoverValue.Range.Start.Character == c.expectedHighlight.position
-		isItEnd := hoverValue.Range.End.Character-1 == c.expectedHighlight.position
-		if !isItEnd && !isItStart {
-			t.Fatalf(
-				"charatcer position should be at boundary but it %d id not %d-%d",
-				c.expectedHighlight.position,
-				hoverValue.Range.Start.Character,
-				hoverValue.Range.End.Character,
-			)
-		}
+		require.NotNilf(t, hoverValue, "expected hover value at %d", i)
 
 		highlight := c.info.Line[hoverValue.Range.Start.Character:hoverValue.Range.End.Character]
-		if highlight != c.expectedHighlight.text {
-			t.Fatalf("unexpected highlight but got '%s'", highlight)
-		}
+		assert.Equal(t, c.expectedHighlight.text, highlight, "unexpected highlight")
 	}
 }
