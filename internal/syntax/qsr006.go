@@ -24,7 +24,7 @@ func qsr006(s SyntaxChecker) []protocol.Diagnostic {
 
 	allowedFiles := []string{"container", "volume"}
 	s.config.Mu.RLock()
-	parm := qsr017ActionParms{
+	parm := qsr006ActionParms{
 		rootDir:  s.config.WorkspaceRoot,
 		dirLevel: *s.config.Project.DirLevel,
 	}
@@ -46,9 +46,9 @@ func qsr006(s SyntaxChecker) []protocol.Diagnostic {
 }
 
 func qsr006Action(q utils.QuadletLine, _ utils.PodmanVersion, extraInfo any) []protocol.Diagnostic {
-	actionParm := qsr017ActionParms{}
+	actionParm := qsr006ActionParms{}
 	switch v := extraInfo.(type) {
-	case qsr017ActionParms:
+	case qsr006ActionParms:
 		actionParm = v
 	default:
 		return nil
