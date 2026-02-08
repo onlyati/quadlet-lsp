@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test_ListNewProperties tests if properties are popup during completion.
 func Test_ListNewProperties(t *testing.T) {
 	cases := []Completion{
 		{
@@ -44,6 +45,8 @@ func Test_ListNewProperties(t *testing.T) {
 	}
 }
 
+// Test_ListNewPropertiesWithCont tests that no property completion popup if
+// specific line is a continuation line.
 func Test_ListNewPropertiesWithCont(t *testing.T) {
 	cases := []Completion{
 		{

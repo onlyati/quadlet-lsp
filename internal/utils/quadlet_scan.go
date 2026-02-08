@@ -232,6 +232,7 @@ func readItems(text, property, section string) []QuadletLine {
 						Property:   tmp[0],
 						Value:      strings.TrimSpace(value),
 						RawLine:    rawLine,
+						Section:    section,
 					})
 				}
 			}
@@ -281,7 +282,8 @@ func findImageInContainerUnit(f []byte, props FindImageExposedPortsProperty) []s
 
 	for _, line := range lines {
 		if strings.HasSuffix(line.Value, ".image") {
-			f, err := os.ReadFile(line.Value)
+			p := path.Join(props.RootDir, line.Value)
+			f, err := os.ReadFile(p)
 			if err != nil {
 				return images
 			}

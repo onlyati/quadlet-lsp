@@ -2,10 +2,12 @@ package completion
 
 import (
 	"os"
-	"slices"
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/testutils"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type volumeMockCommnander struct{}
@@ -14,12 +16,13 @@ func (c volumeMockCommnander) Run(name string, args ...string) ([]string, error)
 	return []string{"volume1", "volume2"}, nil
 }
 
+// TestPropertyVolume_ListVolume tests if only *.volume files are displayed on
+// completion of Volume.
 func TestPropertyVolume_ListVolume(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
-	createTempFile(t, tmpDir, "foo.network", "[Network]")
+	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := NewCompletion(
 		[]string{"Volume="},
@@ -42,31 +45,17 @@ func TestPropertyVolume_ListVolume(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	checkFooNetwork := slices.Contains(labels, "foo.network")
-	if checkFooNetwork {
-		t.Fatalf("listed network but it should not: %v", labels)
-	}
-
-	checkFooVolume := slices.Contains(labels, "foo.volume")
-	checkVolume1 := slices.Contains(labels, "volume1")
-	checkVolume2 := slices.Contains(labels, "volume2")
-	if !checkFooVolume || !checkVolume1 || !checkVolume2 {
-		t.Fatalf(
-			"did not list everything: %v %v %v %v",
-			labels,
-			checkFooVolume,
-			checkVolume1,
-			checkVolume2,
-		)
-	}
+	assert.NotContains(t, labels, "foo.network", "should only list volmes")
+	assert.ElementsMatch(t, labels, []string{"foo.volume", "volume1", "volume2"}, "did not list everything")
 }
 
+// TestPropertyVolume_NoList tests if no completion after the first ':' sign in
+// the Volume line.
 func TestPropertyVolume_NoList(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
-	createTempFile(t, tmpDir, "foo.network", "[Network]")
+	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := NewCompletion(
 		[]string{"Volume=foo.volume:"},
@@ -84,17 +73,17 @@ func TestPropertyVolume_NoList(t *testing.T) {
 
 	comps := propertyListVolumes(s)
 
-	if len(comps) > 0 {
-		t.Fatalf("expected 0 completions, but got %d", len(comps))
-	}
+	require.Len(t, comps, 0, "expected 0 completion")
 }
 
+// TestPropertyVolume_ListFlags tests if flags are displayed after the second
+// ':' sign.
 func TestPropertyVolume_ListFlags(t *testing.T) {
 	tmpDir := t.TempDir()
 	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
-	createTempFile(t, tmpDir, "foo.network", "[Network]")
+	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := NewCompletion(
 		[]string{"Volume=foo.volume:/app/:"},
@@ -117,28 +106,43 @@ func TestPropertyVolume_ListFlags(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	checkLabelRw := slices.Contains(labels, "rw")
-	checkLabelRo := slices.Contains(labels, "ro")
-	checkLabelZz := slices.Contains(labels, "z")
-	checkLabelZZ := slices.Contains(labels, "Z")
-	if !checkLabelRw || !checkLabelRo || !checkLabelZZ || !checkLabelZz {
-		t.Fatalf(
-			"Unexpected suggestions returned: %v %v %v %v %v",
-			labels,
-			checkLabelRw,
-			checkLabelRo,
-			checkLabelZz,
-			checkLabelZZ,
-		)
+	require.Greater(t, len(labels), 0, "expected flags on completion")
+
+	expectedFlags := []string{
+		"rw",
+		"ro",
+		"z",
+		"Z",
+		"O",
+		"copy",
+		"nocopy",
+		"dev",
+		"nodev",
+		"exec",
+		"noexec",
+		"suid",
+		"nosuid",
+		"bind",
+		"rbind",
+		"slave",
+		"rslave",
+		"shared",
+		"rshared",
+		"private",
+		"rprivate",
+		"unbindable",
+		"runbindable",
 	}
+	assert.ElementsMatch(t, labels, expectedFlags, "unexpected suggestions")
 }
 
+// TestPropertyVolume_ListVolumeWithCursor tests if volume completions are displayed
+// if cursor before the first ':' sign.
 func TestPropertyVolume_ListVolumeWithCursor(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
 
-	createTempFile(t, tmpDir, "foo.volume", "[Volume]")
-	createTempFile(t, tmpDir, "foo.network", "[Network]")
+	testutils.CreateTempFile(t, tmpDir, "foo.volume", "[Volume]")
+	testutils.CreateTempFile(t, tmpDir, "foo.network", "[Network]")
 
 	s := NewCompletion(
 		[]string{"Volume=:/app/:"},
@@ -161,21 +165,6 @@ func TestPropertyVolume_ListVolumeWithCursor(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	checkFooNetwork := slices.Contains(labels, "foo.network")
-	if checkFooNetwork {
-		t.Fatalf("listed network but it should not: %v", labels)
-	}
-
-	checkFooVolume := slices.Contains(labels, "foo.volume")
-	checkVolume1 := slices.Contains(labels, "volume1")
-	checkVolume2 := slices.Contains(labels, "volume2")
-	if !checkFooVolume || !checkVolume1 || !checkVolume2 {
-		t.Fatalf(
-			"did not list everything: %v %v %v %v",
-			labels,
-			checkFooVolume,
-			checkVolume1,
-			checkVolume2,
-		)
-	}
+	assert.NotContains(t, labels, "foo.network", "network should not be listed but volume")
+	assert.ElementsMatch(t, labels, []string{"foo.volume", "volume1", "volume2"}, "did not list everything")
 }

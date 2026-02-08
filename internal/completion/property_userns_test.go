@@ -2,10 +2,11 @@ package completion
 
 import (
 	"os"
-	"slices"
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type usernsMockCommander struct{}
@@ -13,13 +14,13 @@ type usernsMockCommander struct{}
 func (m usernsMockCommander) Run(name string, args ...string) ([]string, error) {
 	if args[2] == "scr.io/org/mock1:latest" {
 		return []string{
-			"[",
-			"	{",
-			"		 \"Config\": {",
-			"			\"User\": \"999\" ",
-			"		 }",
-			"	}",
-			"]",
+			`[`,
+			`	{`,
+			`		 "Config": {`,
+			`			"User": "999" `,
+			`		 }`,
+			`	}`,
+			`]`,
 		}, nil
 	}
 
@@ -28,7 +29,7 @@ func (m usernsMockCommander) Run(name string, args ...string) ([]string, error) 
 
 func TestPropertyUserIDs_Valid(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.Chdir(tmpDir)
+
 	s := NewCompletion(
 		[]string{"[Container]", "UserNS=keep-id:", "Image=scr.io/org/mock1:latest"},
 		"foo.container",
@@ -50,25 +51,14 @@ func TestPropertyUserIDs_Valid(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	if len(labels) != 2 {
-		t.Fatalf("exptected 2 completions, but got %d", len(labels))
-	}
-
-	checkGID := slices.Contains(labels, "gid=999")
-	checkUID := slices.Contains(labels, "uid=999")
-	if !checkGID || !checkUID {
-		t.Fatalf(
-			"did not read correct values: %v %v %v",
-			labels,
-			checkGID,
-			checkUID,
-		)
-	}
+	require.Len(t, labels, 2, "expected length 2")
+	assert.ElementsMatch(t, labels, []string{"uid=999", "gid=999"}, "unexpected userns parameters")
 }
 
+// TestPropertyUserIDs_Invalid tests if no completion on case of invalid userns.
 func TestPropertyUserIDs_Invalid(t *testing.T) {
 	tmpDir := os.TempDir()
-	_ = os.Chdir(tmpDir)
+
 	s := NewCompletion(
 		[]string{"[Container]", "UserNS=auto", "Image=scr.io/org/mock1:latest"},
 		"foo.container",
@@ -90,7 +80,5 @@ func TestPropertyUserIDs_Invalid(t *testing.T) {
 		labels = append(labels, c.Label)
 	}
 
-	if len(labels) != 0 {
-		t.Fatalf("exptected 0 completions, but got %d", len(labels))
-	}
+	require.Len(t, labels, 0, "should not be any completion")
 }
