@@ -1,6 +1,7 @@
 package completion
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
@@ -25,9 +26,10 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 
 	for _, p := range data.PropertiesMap[s.section] {
 		checkVersion := podVer.GreaterOrEqual(p.MinVersion)
+		var textEdit protocol.TextEdit
 		if checkVersion {
 			if p.Macro != "" {
-				textEdit := protocol.TextEdit{
+				textEdit = protocol.TextEdit{
 					Range: protocol.Range{
 						Start: protocol.Position{
 							Line:      s.line,
@@ -40,27 +42,31 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 					},
 					NewText: p.Macro,
 				}
-
-				completionItems = append(completionItems, protocol.CompletionItem{
-					Label: p.Label,
-					Documentation: protocol.MarkupContent{
-						Kind:  protocol.MarkupKindMarkdown,
-						Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
-					},
-					Kind:             &itemKind,
-					TextEdit:         textEdit,
-					InsertTextFormat: &insertFormat,
-				})
 			} else {
-				completionItems = append(completionItems, protocol.CompletionItem{
-					Label: p.Label,
-					Documentation: protocol.MarkupContent{
-						Kind:  protocol.MarkupKindMarkdown,
-						Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
+				textEdit = protocol.TextEdit{
+					Range: protocol.Range{
+						Start: protocol.Position{
+							Line:      s.line,
+							Character: 0,
+						},
+						End: protocol.Position{
+							Line:      s.line,
+							Character: uint32(len(s.text[s.line])),
+						},
 					},
-					Kind: &completionKind,
-				})
+					NewText: fmt.Sprintf("%s=${1:value}\n$0", p.Label),
+				}
 			}
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label: p.Label,
+				Documentation: protocol.MarkupContent{
+					Kind:  protocol.MarkupKindMarkdown,
+					Value: "**" + p.Label + "**\n\n" + strings.Join(p.Hover, "\n"),
+				},
+				Kind:             &itemKind,
+				TextEdit:         textEdit,
+				InsertTextFormat: &insertFormat,
+			})
 		}
 	}
 
