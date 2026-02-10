@@ -4,3 +4,7 @@ dist/
 
 # `nix build`
 result/
+
+# ignore generated docs
+book/
+site/

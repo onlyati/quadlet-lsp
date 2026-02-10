@@ -19,6 +19,7 @@ on:
       - ".goreleaser.yaml"
       - "mise.toml"
       - "*.spec"
+      - "*.yaml"
 
 permissions:
   contents: read

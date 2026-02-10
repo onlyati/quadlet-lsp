@@ -1,16 +1,5 @@
 # Development documentation
 
-<!-- toc -->
-
-- [Getting started](#getting-started)
-- [Project structure](#project-structure)
-    * [Syntax rules](#syntax-rules)
-    * [Hover](#hover)
-    * [Commands](#commands)
-- [Contribution](#contribution)
-
-<!-- tocstop -->
-
 This is a
 [language server](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/)
 for Podman Quadlets. Purpose of this language server is to provide a simple and
