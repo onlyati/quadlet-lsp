@@ -11,6 +11,7 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.tabs.link
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -19,8 +20,12 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - admonition
+  - pymdownx.details
   - pymdownx.superfences
-  - toc:
+  - toc
+  - pymdownx.tabbed:
+      alternate_style: true
 
 nav:
   - Home: index.md

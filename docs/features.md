@@ -16,10 +16,10 @@ Language server also support the drop-ins directories. For example having
 `foo.container.d/10-ports.conf`. On this way settings can be override without
 changing the actual Quadlet files.
 
-> [!IMPORTANT]
->
-> Only Quadlet part has features in the files below. The generic systemd related
-> parts are not covered.
+!!! warning "About the language server"
+
+    Only Quadlet part has features in the files below. The generic systemd related
+    parts are not covered.
 
 ## Built-in commands
 
@@ -43,7 +43,7 @@ Language server provides some command that can be called from IDEs.
 ## Syntax checking
 
 The language server performs syntax checking over the files. For more details,
-check the [description of Quadlet Syntax Rules](./qsr.md).
+check Quadlet Syntax Rules.
 
 ### Disable syntax rule per file
 
