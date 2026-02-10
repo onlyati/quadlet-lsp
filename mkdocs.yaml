@@ -1,0 +1,59 @@
+site_name: "Quadlet Language Server"
+site_url: https://quadlet-lsp.thinkaboutit.tech
+site_description: >-
+  "Documentation of Quadlet language server"
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - toc:
+
+nav:
+  - Home: index.md
+  - Installation and Plugins: install_and_plugins.md
+  - Features: features.md
+  - Development and Contribution: development.md
+  - Quadlet Syntax Rules (QSR):
+      - "Missing section header (QSR001)": QSR001.md
+      - "Unfinished line (QSR002)": QSR002.md
+      - "Invalid property (QSR003)": QSR003.md
+      - "Image name is not fully qualified (QSR004)": QSR004.md
+      - "Invalid value of AutoUpdate (QSR005)": QSR005.md
+      - "Image file does not exists (QSR006)": QSR006.md
+      - "Invalid format of Environment variable (QSR007)": QSR007.md
+      - "Invalid format of Annotation (QSR008)": QSR008.md
+      - "Invalid format of Label (QSR009)": QSR009.md
+      - "Incorrect format of PublishPort (QSR010)": QSR010.md
+      - "Port is not exposed in image (QSR011)": QSR011.md
+      - "Invalid format of secret specification (QSR012)": QSR012.md
+      - "Volume file does not exists (QSR013)": QSR013.md
+      - "Network file does not exists (QSR014)": QSR014.md
+      - "Invalid format of Volume specification (QSR015)": QSR015.md
+      - "Invalid value of UserNS specification (QSR016)": QSR016.md
+      - "Pod file does not exists (QSR017)": QSR017.md
+      - "Container cannot publish port with pod (QSR018)": QSR018.md
+      - "Container cannot have network with pod (QSR019)": QSR019.md
+      - "Naming of unit is invalid (QSR020)": QSR020.md
+      - "Unit points to not a systemd unit (QSR021)": QSR021.md
+      - "'/' is before systemd directory specifier (QSR022)": QSR022.md
+      - "Invalid systemd specifier is used (QSR023)": QSR023.md
+      - "Not recommended property usage in Service section (QSR024)": QSR024.md
+      - "Image is missing in container (QSR025)": QSR025.md
+      - "Artifact is missing in artifact (QSR026)": QSR026.md
+
+plugins:
+  - search

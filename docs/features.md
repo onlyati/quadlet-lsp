@@ -1,27 +1,5 @@
 # Features
 
-<!-- toc -->
-
-- [Built-in commands](#built-in-commands)
-- [Syntax checking](#syntax-checking)
-    * [Disable syntax rule per file](#disable-syntax-rule-per-file)
-- [Configuration file](#configuration-file)
-    * [Project settings](#project-settings)
-    * [Example for file](#example-for-file)
-- [Format file](#format-file)
-- [Hover menu](#hover-menu)
-    * [Hover on properties](#hover-on-properties)
-    * [Hover on systemd specifiers](#hover-on-systemd-specifiers)
-    * [Peek into Quadlets](#peek-into-quadlets)
-- [Completion](#completion)
-    * [Starter template](#starter-template)
-    * [Static completion](#static-completion)
-    * [Templates](#templates)
-    * [Dynamic completion](#dynamic-completion)
-    * [Go definition/references](#go-definitionreferences)
-
-<!-- tocstop -->
-
 Features below are implemented to support following file extensions:
 
 - `*.image`
@@ -131,7 +109,7 @@ settings has been made.
 ```json
 {
   "disable": ["qsr013", "qsr004"],
-  "podmanVersion": "5.4.0"
+  "podmanVersion": "5.4.0",
   "project": {
     "rootDir": "container/quadlets",
 }
@@ -208,7 +186,7 @@ WantedBy=default.target
 Provide some information about specific property. See a demo about a container
 file in the following video.
 
-<img src="assets/hover_demo.gif" style="width: 100%;"/>
+<img src="/assets/hover_demo.gif" style="width: 100%;"/>
 
 Besides, following property values has hover explanation:
 
@@ -222,14 +200,14 @@ The
 [systemd specifiers](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers)
 can be used in Quadlets. Language server provide hover functionality for them.
 
-<img src="assets/systemd_specifier_hover_demo.gif" style="width: 100%;"/>
+<img src="/assets/systemd_specifier_hover_demo.gif" style="width: 100%;"/>
 
 ### Peek into Quadlets
 
 If the hover is done on a value that points to another Quadlet at `Network`,
 `Pod` or `Volume` value, it peek into the file and display on hover.
 
-<img src="assets/peek_demo.gif" style="width: 100%;"/>
+<img src="/assets/peek_demo.gif" style="width: 100%;"/>
 
 ## Completion
 
@@ -238,14 +216,14 @@ If the hover is done on a value that points to another Quadlet at `Network`,
 The `newContainer`, `newVolume`, and so on, provide a started template for
 specific files.
 
-<img src="assets/overall_demo.gif" style="width: 100%;"/>
+<img src="/assets/overall_demo.gif" style="width: 100%;"/>
 
 ### Static completion
 
 Language server provide some static completion based on Podman Quadlet
 Documentation, like `Exec`, `Environment`, and so on.
 
-<img src="assets/static_comp_demo.gif" style="width: 100%;"/>
+<img src="/assets/static_comp_demo.gif" style="width: 100%;"/>
 
 ### Templates
 
@@ -260,7 +238,7 @@ snippets. Currently supported new templates:
 - `Secret`
 - `Volume`
 
-<img src="assets/new_template_demo.gif" style="width: 100%;"/>
+<img src="/assets/new_template_demo.gif" style="width: 100%;"/>
 
 ### Dynamic completion
 
@@ -277,7 +255,7 @@ Language server provide some dynamic completion:
   specified. In case of pod, it gather all images exposed ports.
 - List systemd specifier (e.g.: `%h`, `%t`, `%n`) whenever write '%' sign
 
-<img src="assets/din_comp_demo.gif" style="width: 100%;"/>
+<img src="/assets/din_comp_demo.gif" style="width: 100%;"/>
 
 ### Go definition/references
 
@@ -287,4 +265,23 @@ the `go definition` function, the file is open.
 If you are on a line like `[Pod]`, `[Volume]`, `[Network]`, `[Image]`, then
 current work directory is searched for any references to that specific file.
 
-<img src="assets/go_def_ref_demo.gif" style="width: 100%; max-width: 800px;"/>
+<img src="/assets/go_def_ref_demo.gif" style="width: 100%; max-width: 800px;"/>
+
+### Alternate usage
+
+This binary can be used as a CLI syntax checker for Quadlet files. This can be
+useful, for example in CI/CD pipeline to verify Quadlets before packaging and
+later deploying.
+
+Same rule applied for CLI that is also applied for editor syntax checking. The
+`.quadletrc.json` file is also used on same way.
+
+Example for usage, that monitor the current working directory:
+
+```bash
+$ quadlet-lsp check .
+nc-db.container     , quadlet-lsp.qsr003, 09.000-09.010, Invalid property is found: Container.Memory
+nc-app.container    , quadlet-lsp.qsr003, 08.000-08.010, Invalid property is found: Container.Memory
+$ echo $?
+4
+```
