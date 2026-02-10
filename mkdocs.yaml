@@ -3,6 +3,9 @@ site_url: https://quadlet-lsp.thinkaboutit.tech
 site_description: >-
   "Documentation of Quadlet language server"
 
+extra_files:
+  - CNAME
+
 theme:
   name: material
   features:
