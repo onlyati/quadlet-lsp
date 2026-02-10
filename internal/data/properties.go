@@ -385,6 +385,14 @@ $0
 				MultipleAdd: true,
 			},
 			{
+				Label: "AppArmor",
+				Hover: []string{
+					"Sets the apparmor confinement profile for the container. A value of `unconfined` turns off apparmor confinement.",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(5, 8, 0),
+			},
+			{
 				Label: "AutoUpdate",
 				Hover: []string{
 					"Indicates whether the container will be auto-updated ([podman-auto-update(1)](https://docs.podman.io/en/latest/markdown/podman-auto-update.1.html)). The following values are supported:",
