@@ -2,6 +2,16 @@ site_name: "Quadlet Language Server"
 site_url: https://quadlet-lsp.thinkaboutit.tech
 site_description: >-
   "Documentation of Quadlet language server"
+repo_url: https://github.com/onlyati/quadlet-lsp
+extra:
+  analytics:
+    provider: google
+    property: G-0FTK45CJBJ
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation.
 
 theme:
   name: material
