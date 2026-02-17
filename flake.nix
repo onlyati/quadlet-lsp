@@ -22,7 +22,7 @@
       pkgs = nixpkgsFor.${system};
     in {
       default =
-        pkgs.buildGo124Module rec
+        pkgs.buildGo125Module rec
         {
           pname = "quadlet-lsp";
           version = "0.7.2";
