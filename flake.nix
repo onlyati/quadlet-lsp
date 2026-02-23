@@ -25,13 +25,13 @@
         pkgs.buildGo125Module rec
         {
           pname = "quadlet-lsp";
-          version = "0.7.2";
+          version = "0.7.3";
 
           src = pkgs.fetchFromGitHub {
             owner = "onlyati";
             repo = "quadlet-lsp";
             rev = "v${version}";
-            hash = "sha256-uyuNl5GeR4s764PQMlrJls5Sd3jJ29UMd5Dc849gFVk=";
+            hash = "sha256-VMd3mSiegM5RFF6msEumezcwYfZm9intPsU7yg7i5x4=";
           };
 
           vendorHash = null;

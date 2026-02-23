@@ -1,5 +1,20 @@
 # Changelog of Quadlet-LSP
 
+## V0.7.3
+
+### Features
+
+- [feature] Add default template for inserting property
+  (<https://github.com/onlyati/quadlet-lsp/pull/185>)
+- [feature] Add new `AppArmor` keyword from Podman 5.8.0
+  (<https://github.com/onlyati/quadlet-lsp/pull/186>)
+- [doc] Create a document site (<https://github.com/onlyati/quadlet-lsp/pull/187>)
+
+### Bugfixes
+
+- update flake.nix for go 1.25.5
+  (<https://github.com/onlyati/quadlet-lsp/pull/189>)
+
 ## V0.7.2
 
 ### Features
