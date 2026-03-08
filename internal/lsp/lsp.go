@@ -11,6 +11,7 @@ import (
 
 	"github.com/onlyati/quadlet-lsp/internal/commands"
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/internal/semantic"
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	_ "github.com/tliron/commonlog/simple"
@@ -114,6 +115,9 @@ func Start() {
 
 		// Handle format requests
 		TextDocumentFormatting: Format,
+
+		// Handle semantic token requests
+		TextDocumentSemanticTokensFull: SemanticTokens,
 	}
 
 	server := server.NewServer(&handler, lsName, false)
@@ -175,6 +179,17 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 	capabilities := handler.CreateServerCapabilities()
 	capabilities.ExecuteCommandProvider = &protocol.ExecuteCommandOptions{
 		Commands: []string{"pullAll", "listJobs"},
+	}
+
+	capabilities.DocumentFormattingProvider = &protocol.DocumentFormattingOptions{}
+
+	capabilities.SemanticTokensProvider = &protocol.SemanticTokensOptions{
+		Legend: protocol.SemanticTokensLegend{
+			TokenTypes:     semantic.TokenLegends,
+			TokenModifiers: []string{},
+		},
+		Full:  true,
+		Range: false,
 	}
 
 	capabilities.CompletionProvider = &protocol.CompletionOptions{
