@@ -4,7 +4,7 @@ package semantic
 
 import (
 	"slices"
-	"strings"
+	"unicode/utf8"
 
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -27,113 +27,143 @@ func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) 
 	lastChar := uint32(0)
 
 	for _, token := range tokens {
-		deltaLine := token.Line - lastLine
-		deltaStart := token.CharPos
+		deltaLine := token.line - lastLine
+		deltaStart := token.charPos
 
 		if deltaLine == 0 {
-			deltaStart = token.CharPos - lastChar
+			deltaStart = token.charPos - lastChar
 		}
 
 		data = append(data,
 			deltaLine,
 			deltaStart,
-			token.Length,
-			uint32(slices.Index(TokenLegends, token.TokenType)),
+			token.length,
+			uint32(slices.Index(TokenLegends, token.tokenType)),
 			0, // No modifiers
 		)
 
-		lastLine = token.Line
-		lastChar = token.CharPos
+		lastLine = token.line
+		lastChar = token.charPos
 	}
 
 	return &protocol.SemanticTokens{Data: data}, nil
 }
 
-type Token struct {
-	Line      protocol.UInteger
-	CharPos   protocol.UInteger
-	Length    protocol.UInteger
-	TokenType string
+type token struct {
+	line      protocol.UInteger
+	charPos   protocol.UInteger
+	length    protocol.UInteger
+	tokenType string
 }
 
-func parseQuadlet(fileText string) []Token {
-	tokens := []Token{}
+type lexer struct {
+	input        string
+	position     protocol.UInteger
+	readPosition protocol.UInteger // Next character after position
+	lineNumber   protocol.UInteger
+	lineStart    protocol.UInteger
+	ch           rune
+}
 
-	specialKeywords := map[string]func(string) []Token{
-		"Image": ImageValueTokens,
+func newLexer(input string) *lexer {
+	l := &lexer{input: input}
+	l.readRune()
+	return l
+}
+
+func (l *lexer) readRune() {
+	if l.readPosition >= uint32(len(l.input)) {
+		l.ch = 0 // EOF
+		l.position = l.readPosition
+		return
 	}
 
-	for i, line := range strings.Split(fileText, "\n") {
-		// Do nothing if line is empty
-		if line == "" {
+	r, width := utf8.DecodeRuneInString(l.input[l.readPosition:])
+
+	l.ch = r
+	l.position = l.readPosition
+	l.readPosition += uint32(width)
+}
+
+func (l *lexer) peekRune() rune {
+	if l.readPosition >= uint32(len(l.input)) {
+		return 0
+	}
+	r, _ := utf8.DecodeRuneInString(l.input[l.readPosition:])
+	return r
+}
+
+func (l *lexer) skipWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		if l.ch == '\n' {
+			l.lineNumber++
+			l.readRune()
+			l.lineStart = l.position
 			continue
 		}
+		l.readRune()
+	}
+}
 
-		// This is a comment line
-		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
-			tokens = append(tokens, Token{
-				Line:      uint32(i),
-				CharPos:   uint32(0),
-				Length:    uint32(len(line)),
-				TokenType: string(protocol.SemanticTokenTypeComment),
-			})
-			continue
-		}
+func (l *lexer) nextToken() token {
+	var tok token
 
-		// Section header
-		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			tokens = append(tokens, Token{
-				Line:      uint32(i),
-				CharPos:   uint32(0),
-				Length:    uint32(len(line)),
-				TokenType: string(protocol.SemanticTokenTypeNamespace),
-			})
-			continue
-		}
+	l.skipWhitespace()
 
-		// Key value pair
-		tmp := strings.SplitN(line, "=", 2)
-		// No '=' sign, assume it is a continuation of previous line
-		if len(tmp) == 1 {
-			tokens = append(tokens, Token{
-				Line:      uint32(i),
-				CharPos:   0,
-				Length:    uint32(len(line)),
-				TokenType: string(protocol.SemanticTokenTypeString),
-			})
-			continue
-		}
+	switch l.ch {
+	case '#':
+		return l.readComment()
+	}
 
-		// This is a normal key-value pair
-		tokens = append(tokens, Token{
-			Line:      uint32(i),
-			CharPos:   uint32(0),
-			Length:    uint32(len(tmp[0])),
-			TokenType: string(protocol.SemanticTokenTypeProperty),
-		})
-		opPos := uint32(strings.Index(line, "="))
-		tokens = append(tokens, Token{
-			Line:      uint32(i),
-			CharPos:   opPos,
-			Length:    uint32(1),
-			TokenType: string(protocol.SemanticTokenTypeOperator),
-		})
-		if fn, ok := specialKeywords[tmp[0]]; ok {
-			valueTokens := fn(tmp[1])
-			for _, token := range valueTokens {
-				token.CharPos += opPos + 1
-				token.Line = uint32(i)
-				tokens = append(tokens, token)
-			}
-		} else {
-			tokens = append(tokens, Token{
-				Line:      uint32(i),
-				CharPos:   uint32(strings.Index(line, "=") + 1),
-				Length:    uint32(len(tmp[1])),
-				TokenType: string(protocol.SemanticTokenTypeString),
-			})
-		}
-		continue
+	tok.tokenType = "eof"
+	return tok
+}
+
+func (l *lexer) readComment() token {
+	charPos := l.position - l.lineStart
+
+	startPos := l.position
+	for l.ch != '\n' && l.ch != 0 {
+		l.readRune()
+	}
+
+	return token{
+		line:      l.lineNumber,
+		charPos:   charPos,
+		length:    l.position - startPos,
+		tokenType: string(protocol.SemanticTokenTypeComment),
+	}
+}
+
+type parser struct {
+	l         *lexer
+	curToken  token
+	peekToken token
+}
+
+func newParser(input string) parser {
+	p := parser{
+		l: newLexer(input),
+	}
+
+	// Read two tokens, so curToken and peekToken are both set
+	p.nextToken()
+	p.nextToken()
+	return p
+}
+
+func (p *parser) nextToken() {
+	p.curToken = p.peekToken
+	p.peekToken = p.l.nextToken()
+}
+
+func parseQuadlet(fileText string) []token {
+	tokens := []token{}
+
+	p := newParser(fileText)
+
+	for p.curToken.tokenType != "eof" {
+		p.nextToken()
 	}
 
 	return tokens

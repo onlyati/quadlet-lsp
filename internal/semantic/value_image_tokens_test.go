@@ -3,42 +3,44 @@ package semantic
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 func Test_ImagevalueTokens(t *testing.T) {
 	input := "docker.io/gitea/gitea:latest-rootless"
 
-	inputSlice := []string{"docker.io", "gitea", "gitea:latest-rootless"}
-	expected := []Token{
+	expected := []token{
 		{
-			CharPos:   0,
-			Length:    uint32(len(inputSlice[0])),
-			TokenType: string(protocol.SemanticTokenTypeString),
+			charPos:   0,
+			length:    uint32(len("docker.io")),
+			tokenType: string(protocol.SemanticTokenTypeString),
 		},
 		{
-			CharPos:   uint32(len("docker.io")),
-			Length:    1,
-			TokenType: string(protocol.SemanticTokenTypeOperator),
+			charPos:   uint32(len("docker.io")),
+			length:    1,
+			tokenType: string(protocol.SemanticTokenTypeOperator),
 		},
 		{
-			CharPos:   uint32(len("docker.io/")),
-			Length:    uint32(len(inputSlice[1])),
-			TokenType: string(protocol.SemanticTokenTypeClass),
+			charPos:   uint32(len("docker.io/")),
+			length:    uint32(len("gitea")),
+			tokenType: string(protocol.SemanticTokenTypeClass),
 		},
 		{
-			CharPos:   uint32(len("docker.io/gitea")),
-			Length:    1,
-			TokenType: string(protocol.SemanticTokenTypeOperator),
+			charPos:   uint32(len("docker.io/gitea")),
+			length:    1,
+			tokenType: string(protocol.SemanticTokenTypeOperator),
 		},
 		{
-			CharPos:   uint32(len("docker.io/gitea/")),
-			Length:    uint32(len(inputSlice[2])),
-			TokenType: string(protocol.SemanticTokenTypeClass),
+			charPos:   uint32(len("docker.io/gitea/")),
+			length:    uint32(len("gitea:latest-rootless")),
+			tokenType: string(protocol.SemanticTokenTypeClass),
 		},
 	}
 
 	result := ImageValueTokens(input)
-	assert.Equal(t, expected, result, "wrong image value tokens")
+
+	for i, r := range result {
+		require.Equal(t, expected[i], r, "invalid token at %d", i)
+	}
 }
