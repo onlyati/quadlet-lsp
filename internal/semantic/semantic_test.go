@@ -80,3 +80,39 @@ func Test_parseQuadletCommentUTF16(t *testing.T) {
 		require.Equal(t, expected[i], token, "invalid token parsed")
 	}
 }
+
+func Test_parseQuadletSection(t *testing.T) {
+	input := `
+[Container]
+[Unit]
+`
+
+	expected := []token{
+		{
+			line:      1,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("[Container]")),
+			tokenType: string(protocol.SemanticTokenTypeNamespace),
+		},
+		{
+			line:      2,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("[Unit]")),
+			tokenType: string(protocol.SemanticTokenTypeNamespace),
+		},
+	}
+
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
+
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed")
+	}
+}

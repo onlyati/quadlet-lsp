@@ -86,13 +86,13 @@ func (l *lexer) readRune() {
 	l.readPosition += uint32(width)
 }
 
-func (l *lexer) peekRune() rune {
-	if l.readPosition >= uint32(len(l.input)) {
-		return 0
-	}
-	r, _ := utf8.DecodeRuneInString(l.input[l.readPosition:])
-	return r
-}
+// func (l *lexer) peekRune() rune {
+// 	if l.readPosition >= uint32(len(l.input)) {
+// 		return 0
+// 	}
+// 	r, _ := utf8.DecodeRuneInString(l.input[l.readPosition:])
+// 	return r
+// }
 
 func (l *lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
@@ -114,10 +114,34 @@ func (l *lexer) nextToken() token {
 	switch l.ch {
 	case '#':
 		return l.readComment()
+	case '[':
+		return l.readSection()
 	}
 
 	tok.tokenType = "eof"
 	return tok
+}
+
+func (l *lexer) readSection() token {
+	startByte := l.position
+	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
+
+	for l.ch != ']' && l.ch != 0 {
+		l.readRune()
+	}
+	if l.ch == ']' {
+		l.readRune()
+	}
+
+	// Measure the content we just read in UTF-16 units
+	sectionText := l.input[startByte:l.position]
+
+	return token{
+		line:      l.lineNumber,
+		charPos:   charPos,
+		length:    utils.Utf16Len(sectionText),
+		tokenType: string(protocol.SemanticTokenTypeNamespace),
+	}
 }
 
 func (l *lexer) readComment() token {

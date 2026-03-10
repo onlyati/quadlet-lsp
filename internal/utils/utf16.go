@@ -9,7 +9,7 @@ func Utf16Len(s string) uint32 {
 		if r <= 0xFFFF {
 			count++
 		} else {
-			count += 2 // Surrogate pair for characters like 🫠
+			count += 2 // Surrogate pair for characters like emoji
 		}
 	}
 	return count
