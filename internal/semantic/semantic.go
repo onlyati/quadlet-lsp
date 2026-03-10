@@ -6,6 +6,7 @@ import (
 	"slices"
 	"unicode/utf8"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -120,17 +121,20 @@ func (l *lexer) nextToken() token {
 }
 
 func (l *lexer) readComment() token {
-	charPos := l.position - l.lineStart
+	startByte := l.position
+	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
-	startPos := l.position
 	for l.ch != '\n' && l.ch != 0 {
 		l.readRune()
 	}
 
+	// Measure the content we just read in UTF-16 units
+	commentText := l.input[startByte:l.position]
+
 	return token{
 		line:      l.lineNumber,
 		charPos:   charPos,
-		length:    l.position - startPos,
+		length:    utils.Utf16Len(commentText),
 		tokenType: string(protocol.SemanticTokenTypeComment),
 	}
 }
@@ -163,6 +167,7 @@ func parseQuadlet(fileText string) []token {
 	p := newParser(fileText)
 
 	for p.curToken.tokenType != "eof" {
+		tokens = append(tokens, p.curToken)
 		p.nextToken()
 	}
 

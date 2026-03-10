@@ -3,6 +3,7 @@ package semantic
 import (
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -18,13 +19,13 @@ func Test_parseQuadletCommentASCII(t *testing.T) {
 		{
 			line:      1,
 			charPos:   0,
-			length:    protocol.UInteger(len("# Fist comment line")),
+			length:    protocol.UInteger(utils.Utf16Len("# Fist comment line")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
 		},
 		{
 			line:      2,
 			charPos:   1,
-			length:    protocol.UInteger(len("# Second comment line")),
+			length:    protocol.UInteger(utils.Utf16Len("# Second comment line")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
 		},
 	}
@@ -54,13 +55,13 @@ func Test_parseQuadletCommentUTF16(t *testing.T) {
 		{
 			line:      1,
 			charPos:   0,
-			length:    protocol.UInteger(len("# Second comment line 🫠 emoji")),
+			length:    protocol.UInteger(utils.Utf16Len("# Second comment line 🫠 emoji")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
 		},
 		{
 			line:      2,
 			charPos:   0,
-			length:    protocol.UInteger(len("# 日本語 comment")),
+			length:    protocol.UInteger(utils.Utf16Len("# 日本語 comment")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
 		},
 	}
