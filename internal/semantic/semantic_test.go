@@ -116,3 +116,76 @@ func Test_parseQuadletSection(t *testing.T) {
 		require.Equal(t, expected[i], token, "invalid token parsed")
 	}
 }
+
+func Test_parseQuadletProperty(t *testing.T) {
+	input := `
+Foo=bar
+Bar=foobar \
+  foo
+`
+
+	expected := []token{
+		{
+			line:      1,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Foo")),
+			tokenType: string(protocol.SemanticTokenTypeProperty),
+		},
+		{
+			line:      1,
+			charPos:   3,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      1,
+			charPos:   4,
+			length:    protocol.UInteger(utils.Utf16Len("bar")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+		{
+			line:      2,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Bar")),
+			tokenType: string(protocol.SemanticTokenTypeProperty),
+		},
+		{
+			line:      2,
+			charPos:   3,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      2,
+			charPos:   4,
+			length:    protocol.UInteger(utils.Utf16Len("foobar ")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+		{
+			line:      2,
+			charPos:   11,
+			length:    protocol.UInteger(utils.Utf16Len("\\")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      3,
+			charPos:   2,
+			length:    protocol.UInteger(utils.Utf16Len("foo")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+	}
+
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
+
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
+	}
+}

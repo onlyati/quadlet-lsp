@@ -14,3 +14,7 @@ func Utf16Len(s string) uint32 {
 	}
 	return count
 }
+
+func IsLetter(ch rune) bool {
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}

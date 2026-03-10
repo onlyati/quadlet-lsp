@@ -64,6 +64,7 @@ type lexer struct {
 	lineNumber   protocol.UInteger
 	lineStart    protocol.UInteger
 	ch           rune
+	lastProperty string
 }
 
 func newLexer(input string) *lexer {
@@ -100,6 +101,7 @@ func (l *lexer) skipWhitespace() {
 			l.lineNumber++
 			l.readRune()
 			l.lineStart = l.position
+			l.lastProperty = ""
 			continue
 		}
 		l.readRune()
@@ -116,17 +118,95 @@ func (l *lexer) nextToken() token {
 		return l.readComment()
 	case '[':
 		return l.readSection()
+	case '=':
+		return l.readOperator()
+	case '\\':
+		return l.readOperator()
+	case 0:
+		tok.tokenType = "eof"
+		return tok
+	default:
+		if l.lastProperty != "" {
+			return l.readValue()
+		}
+
+		if utils.IsLetter(l.ch) {
+			return l.readProperty()
+		}
+
+		l.readRune()
+		return l.nextToken()
+	}
+}
+
+func (l *lexer) readOperator() token {
+	startByte := l.position
+	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
+
+	l.readRune()
+
+	// Measure the content we just read in UTF-16 units
+	sectionText := l.input[startByte:l.position]
+
+	return token{
+		line:      l.lineNumber,
+		charPos:   charPos,
+		length:    utils.Utf16Len(sectionText),
+		tokenType: string(protocol.SemanticTokenTypeOperator),
+	}
+}
+
+func (l *lexer) readValue() token {
+	startByte := l.position
+	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
+
+	for l.ch != '\n' && l.ch != '\\' && l.ch != 0 {
+		l.readRune()
 	}
 
-	tok.tokenType = "eof"
-	return tok
+	// Measure the content we just read in UTF-16 units
+	sectionText := l.input[startByte:l.position]
+
+	return token{
+		line:      l.lineNumber,
+		charPos:   charPos,
+		length:    utils.Utf16Len(sectionText),
+		tokenType: string(protocol.SemanticTokenTypeString),
+	}
+}
+
+func (l *lexer) readProperty() token {
+	startByte := l.position
+	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
+
+	for l.ch != '=' && l.ch != '\n' && l.ch != '\\' && l.ch != 0 {
+		l.readRune()
+	}
+
+	// Measure the content we just read in UTF-16 units
+	propText := l.input[startByte:l.position]
+
+	// If we hit a \n, it means it was a value line, if we hit '=' it is property
+	tokenType := string(protocol.SemanticTokenTypeProperty)
+	l.lastProperty = propText
+	if l.ch == '\n' || l.ch == '\\' {
+		tokenType = string(protocol.SemanticTokenTypeString)
+		l.lastProperty = ""
+	}
+
+	return token{
+		line:      l.lineNumber,
+		charPos:   charPos,
+		length:    utils.Utf16Len(propText),
+		tokenType: tokenType,
+	}
 }
 
 func (l *lexer) readSection() token {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
-	for l.ch != ']' && l.ch != 0 {
+	for l.ch != ']' && l.ch != '\n' && l.ch != 0 {
 		l.readRune()
 	}
 	if l.ch == ']' {
