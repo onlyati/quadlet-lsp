@@ -3,7 +3,6 @@
 package semantic
 
 import (
-	"slices"
 	"unicode/utf8"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -20,26 +19,40 @@ var TokenLegends = []string{
 	string(protocol.SemanticTokenTypeParameter), // Used within values to highlight things
 }
 
+var LegendMap = func() map[string]uint32 {
+	m := make(map[string]uint32)
+	for i, t := range TokenLegends {
+		m[t] = uint32(i)
+	}
+	return m
+}()
+
+var specialFunctionMap = map[string]func(){}
+
 func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) {
 	tokens := parseQuadlet(fileText)
 
-	var data []uint32
-	lastLine := uint32(0)
-	lastChar := uint32(0)
+	data := make([]uint32, 0, len(tokens)*5)
+
+	var lastLine, lastChar uint32
 
 	for _, token := range tokens {
 		deltaLine := token.line - lastLine
 		deltaStart := token.charPos
-
 		if deltaLine == 0 {
 			deltaStart = token.charPos - lastChar
+		}
+
+		typeIndex, ok := LegendMap[token.tokenType]
+		if !ok {
+			typeIndex = 0
 		}
 
 		data = append(data,
 			deltaLine,
 			deltaStart,
 			token.length,
-			uint32(slices.Index(TokenLegends, token.tokenType)),
+			typeIndex,
 			0, // No modifiers
 		)
 
@@ -64,7 +77,7 @@ type lexer struct {
 	lineNumber   protocol.UInteger
 	lineStart    protocol.UInteger
 	ch           rune
-	lastProperty string
+	queue        []token
 }
 
 func newLexer(input string) *lexer {
@@ -101,7 +114,6 @@ func (l *lexer) skipWhitespace() {
 			l.lineNumber++
 			l.readRune()
 			l.lineStart = l.position
-			l.lastProperty = ""
 			continue
 		}
 		l.readRune()
@@ -109,33 +121,36 @@ func (l *lexer) skipWhitespace() {
 }
 
 func (l *lexer) nextToken() token {
-	var tok token
-
-	l.skipWhitespace()
-
-	switch l.ch {
-	case '#':
-		return l.readComment()
-	case '[':
-		return l.readSection()
-	case '=':
-		return l.readOperator()
-	case '\\':
-		return l.readOperator()
-	case 0:
-		tok.tokenType = "eof"
+	// if something has been put into the queue, then empty it
+	if len(l.queue) > 0 {
+		tok := l.queue[0]
+		l.queue = l.queue[1:]
 		return tok
-	default:
-		if l.lastProperty != "" {
-			return l.readValue()
-		}
+	}
 
-		if utils.IsLetter(l.ch) {
-			return l.readProperty()
-		}
+	for {
+		l.skipWhitespace()
 
-		l.readRune()
-		return l.nextToken()
+		switch l.ch {
+		case '#':
+			return l.readComment()
+		case '[':
+			return l.readSection()
+		case '\\':
+			return l.readOperator()
+		case 0:
+			return token{tokenType: "eof"}
+		default:
+			if utils.IsLetter(l.ch) {
+				l.readAssignment()
+				return l.nextToken()
+			}
+
+			// This is something unknow, just iterate over it until we find
+			// something interesting
+			l.readRune()
+			continue
+		}
 	}
 }
 
@@ -175,7 +190,7 @@ func (l *lexer) readValue() token {
 	}
 }
 
-func (l *lexer) readProperty() token {
+func (l *lexer) readAssignment() {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
@@ -187,18 +202,33 @@ func (l *lexer) readProperty() token {
 	propText := l.input[startByte:l.position]
 
 	// If we hit a \n, it means it was a value line, if we hit '=' it is property
-	tokenType := string(protocol.SemanticTokenTypeProperty)
-	l.lastProperty = propText
-	if l.ch == '\n' || l.ch == '\\' {
-		tokenType = string(protocol.SemanticTokenTypeString)
-		l.lastProperty = ""
+	if l.ch == '\n' || l.ch == '\\' || l.ch == 0 {
+		l.queue = append(l.queue, token{
+			line:      l.lineNumber,
+			charPos:   charPos,
+			length:    utils.Utf16Len(propText),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		})
+		return
 	}
 
-	return token{
+	// We hit '=' a sign, put property to queue, then analyze line further
+	l.queue = append(l.queue, token{
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(propText),
-		tokenType: tokenType,
+		tokenType: string(protocol.SemanticTokenTypeProperty),
+	})
+
+	if l.ch == '=' {
+		l.queue = append(l.queue, l.readOperator())
+
+		// Check if we had any special parse for property, if not just read value
+		if fn, ok := specialFunctionMap[propText]; ok {
+			fn()
+		} else {
+			l.queue = append(l.queue, l.readValue())
+		}
 	}
 }
 
@@ -243,36 +273,15 @@ func (l *lexer) readComment() token {
 	}
 }
 
-type parser struct {
-	l         *lexer
-	curToken  token
-	peekToken token
-}
-
-func newParser(input string) parser {
-	p := parser{
-		l: newLexer(input),
-	}
-
-	// Read two tokens, so curToken and peekToken are both set
-	p.nextToken()
-	p.nextToken()
-	return p
-}
-
-func (p *parser) nextToken() {
-	p.curToken = p.peekToken
-	p.peekToken = p.l.nextToken()
-}
-
 func parseQuadlet(fileText string) []token {
 	tokens := []token{}
 
-	p := newParser(fileText)
+	l := newLexer(fileText)
+	tok := l.nextToken()
 
-	for p.curToken.tokenType != "eof" {
-		tokens = append(tokens, p.curToken)
-		p.nextToken()
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
 	}
 
 	return tokens
