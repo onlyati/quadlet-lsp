@@ -11,7 +11,7 @@ import (
 
 var TokenLegends = []string{
 	string(protocol.SemanticTokenTypeComment),   // Comment lines
-	string(protocol.SemanticTokenTypeProperty),  // Like 'Image=', 'Exec=', 'Pod='
+	string(protocol.SemanticTokenTypeKeyword),   // Like 'Image=', 'Exec=', 'Pod='
 	string(protocol.SemanticTokenTypeNamespace), // Section like '[Container]', '[Unit]'
 	string(protocol.SemanticTokenTypeString),    // Value belongs to keywords
 	string(protocol.SemanticTokenTypeOperator),  // Operators like '=', ':', ','
@@ -27,7 +27,11 @@ var LegendMap = func() map[string]uint32 {
 	return m
 }()
 
-var specialFunctionMap = map[string]func(){}
+var specialFunctionMap = map[string]func(*lexer){
+	"Image":  (*lexer).readImageValue,
+	"Volume": (*lexer).readVolumeValue,
+	"Pod":    (*lexer).readPodValue,
+}
 
 func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) {
 	tokens := parseQuadlet(fileText)
@@ -108,12 +112,22 @@ func (l *lexer) readRune() {
 // 	return r
 // }
 
+func (l *lexer) handleNewLine() {
+	l.lineNumber++
+	l.readRune()
+	l.lineStart = l.position
+}
+
+func (l *lexer) skipInlineWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' {
+		l.readRune()
+	}
+}
+
 func (l *lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		if l.ch == '\n' {
-			l.lineNumber++
-			l.readRune()
-			l.lineStart = l.position
+			l.handleNewLine()
 			continue
 		}
 		l.readRune()
@@ -217,7 +231,7 @@ func (l *lexer) readAssignment() {
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(propText),
-		tokenType: string(protocol.SemanticTokenTypeProperty),
+		tokenType: string(protocol.SemanticTokenTypeKeyword),
 	})
 
 	if l.ch == '=' {
@@ -225,7 +239,7 @@ func (l *lexer) readAssignment() {
 
 		// Check if we had any special parse for property, if not just read value
 		if fn, ok := specialFunctionMap[propText]; ok {
-			fn()
+			fn(l)
 		} else {
 			l.queue = append(l.queue, l.readValue())
 		}

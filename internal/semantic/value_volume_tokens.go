@@ -1,18 +1,15 @@
 package semantic
 
 import (
-	"regexp"
 	"slices"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-// readImageValue parses image value like: 'docker.io/gitea/gitea:rootless@sha256...'
-func (l *lexer) readImageValue() {
-	hostCheck := regexp.MustCompile(`(?:[a-z0-9]+(?:[a-z0-9._-]+)*\.(?:[a-z0-9]+)|localhost)`)
-	hostFound := false
-
+// readVolumeValue parses volume value like: 'foo.volume:/etc/asd:ro,z'
+func (l *lexer) readVolumeValue() {
+	hostFound := true
 	continueDetected := false
 	for {
 		l.skipInlineWhitespace()
@@ -29,17 +26,14 @@ func (l *lexer) readImageValue() {
 			continueDetected = false
 		case 0:
 			return
-		case '/', ':':
+		case ':', ',':
 			l.queue = append(l.queue, l.readOperator())
-		case '@':
-			l.queue = append(l.queue, l.readOperator())
-			l.queue = append(l.queue, l.readValue())
 		default:
-			if utils.IsLetter(l.ch) {
+			if utils.IsLetter(l.ch) || l.ch == '/' {
 				startByte := l.position
 				charPos := utils.Utf16Len(l.input[l.lineStart:l.position])
 
-				stoppers := []rune{'\n', '\\', 0, '/', ':', '@'}
+				stoppers := []rune{'\n', '\\', 0, ':', ','}
 				for !slices.Contains(stoppers, l.ch) {
 					l.readRune()
 				}
@@ -47,10 +41,10 @@ func (l *lexer) readImageValue() {
 				text := l.input[startByte:l.position]
 
 				tokenType := string(protocol.SemanticTokenTypeParameter)
-				if !hostFound && hostCheck.MatchString(text) {
+				if !hostFound {
 					tokenType = string(protocol.SemanticTokenTypeString)
-					hostFound = true
 				}
+				hostFound = false
 
 				l.queue = append(l.queue, token{
 					line:      l.lineNumber,
@@ -59,8 +53,9 @@ func (l *lexer) readImageValue() {
 					tokenType: tokenType,
 				})
 			} else {
-				l.readRune() // Avoid inifinite loop on unkonw character
+				l.readRune() // Avoid infinite loop on unkown field
 			}
+
 		}
 	}
 }

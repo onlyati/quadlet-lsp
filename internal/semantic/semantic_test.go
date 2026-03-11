@@ -129,7 +129,7 @@ Bar=foobar \
 			line:      1,
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("Foo")),
-			tokenType: string(protocol.SemanticTokenTypeProperty),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
 		},
 		{
 			line:      1,
@@ -147,7 +147,7 @@ Bar=foobar \
 			line:      2,
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("Bar")),
-			tokenType: string(protocol.SemanticTokenTypeProperty),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
 		},
 		{
 			line:      2,

@@ -3,44 +3,278 @@ package semantic
 import (
 	"testing"
 
+	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func Test_ImagevalueTokens(t *testing.T) {
-	input := "docker.io/gitea/gitea:latest-rootless"
+func Test_parseQuadletImageValue(t *testing.T) {
+	input := `Image=docker.io/gitea/gitea:rootless@sha256asdasdasdasd
+Foo=bar`
 
 	expected := []token{
 		{
+			line:      0,
 			charPos:   0,
-			length:    uint32(len("docker.io")),
+			length:    protocol.UInteger(utils.Utf16Len("Image")),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
+		},
+		{
+			line:      0,
+			charPos:   5,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   6,
+			length:    protocol.UInteger(utils.Utf16Len("docker.io")),
 			tokenType: string(protocol.SemanticTokenTypeString),
 		},
 		{
-			charPos:   uint32(len("docker.io")),
-			length:    1,
+			line:      0,
+			charPos:   15,
+			length:    protocol.UInteger(utils.Utf16Len("/")),
 			tokenType: string(protocol.SemanticTokenTypeOperator),
 		},
 		{
-			charPos:   uint32(len("docker.io/")),
-			length:    uint32(len("gitea")),
-			tokenType: string(protocol.SemanticTokenTypeClass),
+			line:      0,
+			charPos:   16,
+			length:    protocol.UInteger(utils.Utf16Len("gitea")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
 		},
 		{
-			charPos:   uint32(len("docker.io/gitea")),
-			length:    1,
+			line:      0,
+			charPos:   21,
+			length:    protocol.UInteger(utils.Utf16Len("/")),
 			tokenType: string(protocol.SemanticTokenTypeOperator),
 		},
 		{
-			charPos:   uint32(len("docker.io/gitea/")),
-			length:    uint32(len("gitea:latest-rootless")),
-			tokenType: string(protocol.SemanticTokenTypeClass),
+			line:      0,
+			charPos:   22,
+			length:    protocol.UInteger(utils.Utf16Len("gitea")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      0,
+			charPos:   27,
+			length:    protocol.UInteger(utils.Utf16Len(":")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   28,
+			length:    protocol.UInteger(utils.Utf16Len("rootless")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      0,
+			charPos:   36,
+			length:    protocol.UInteger(utils.Utf16Len("@")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   37,
+			length:    protocol.UInteger(utils.Utf16Len("sha256asdasdasdasd")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+		{
+			line:      1,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Foo")),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
+		},
+		{
+			line:      1,
+			charPos:   3,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      1,
+			charPos:   4,
+			length:    protocol.UInteger(utils.Utf16Len("bar")),
+			tokenType: string(protocol.SemanticTokenTypeString),
 		},
 	}
 
-	result := ImageValueTokens(input)
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
 
-	for i, r := range result {
-		require.Equal(t, expected[i], r, "invalid token at %d", i)
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
+	}
+}
+
+func Test_parseQuadletImageValueWithoutHash(t *testing.T) {
+	input := "Image=docker.io/gitea/gitea.container:rootless"
+
+	expected := []token{
+		{
+			line:      0,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Image")),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
+		},
+		{
+			line:      0,
+			charPos:   5,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   6,
+			length:    protocol.UInteger(utils.Utf16Len("docker.io")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+		{
+			line:      0,
+			charPos:   15,
+			length:    protocol.UInteger(utils.Utf16Len("/")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   16,
+			length:    protocol.UInteger(utils.Utf16Len("gitea")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      0,
+			charPos:   21,
+			length:    protocol.UInteger(utils.Utf16Len("/")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   22,
+			length:    protocol.UInteger(utils.Utf16Len("gitea.container")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      0,
+			charPos:   37,
+			length:    protocol.UInteger(utils.Utf16Len(":")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      0,
+			charPos:   38,
+			length:    protocol.UInteger(utils.Utf16Len("rootless")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+	}
+
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
+
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
+	}
+}
+
+func Test_parseQuadletImageValueMultiline(t *testing.T) {
+	input := `
+Image= \
+	docker.io/gitea/gitea:rootless@sha256asdasdasdasd`
+
+	expected := []token{
+		{
+			line:      1,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Image")),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
+		},
+		{
+			line:      1,
+			charPos:   5,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      2,
+			charPos:   1,
+			length:    protocol.UInteger(utils.Utf16Len("docker.io")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+		{
+			line:      2,
+			charPos:   10,
+			length:    protocol.UInteger(utils.Utf16Len("/")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      2,
+			charPos:   11,
+			length:    protocol.UInteger(utils.Utf16Len("gitea")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      2,
+			charPos:   16,
+			length:    protocol.UInteger(utils.Utf16Len("/")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      2,
+			charPos:   17,
+			length:    protocol.UInteger(utils.Utf16Len("gitea")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      2,
+			charPos:   22,
+			length:    protocol.UInteger(utils.Utf16Len(":")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      2,
+			charPos:   23,
+			length:    protocol.UInteger(utils.Utf16Len("rootless")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+		},
+		{
+			line:      2,
+			charPos:   31,
+			length:    protocol.UInteger(utils.Utf16Len("@")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+		},
+		{
+			line:      2,
+			charPos:   32,
+			length:    protocol.UInteger(utils.Utf16Len("sha256asdasdasdasd")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+		},
+	}
+
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
+
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
