@@ -28,9 +28,10 @@ var LegendMap = func() map[string]uint32 {
 }()
 
 var specialFunctionMap = map[string]func(*lexer){
-	"Image":  (*lexer).readImageValue,
-	"Volume": (*lexer).readVolumeValue,
-	"Pod":    (*lexer).readPodValue,
+	"Image":   (*lexer).readImageValue,
+	"Volume":  (*lexer).readVolumeValue,
+	"Pod":     (*lexer).readPodValue,
+	"Network": (*lexer).readNetworkValue,
 }
 
 func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) {
@@ -72,6 +73,7 @@ type token struct {
 	charPos   protocol.UInteger
 	length    protocol.UInteger
 	tokenType string
+	text      string
 }
 
 type lexer struct {
@@ -166,6 +168,7 @@ func (l *lexer) nextToken() token {
 				line:      l.lineNumber,
 				charPos:   l.position,
 				length:    0,
+				text:      "",
 			}
 		default:
 			if utils.IsLetter(l.ch) {
@@ -195,25 +198,37 @@ func (l *lexer) readOperator() token {
 		charPos:   charPos,
 		length:    utils.Utf16Len(sectionText),
 		tokenType: string(protocol.SemanticTokenTypeOperator),
+		text:      sectionText,
 	}
 }
 
-func (l *lexer) readValue() token {
+func (l *lexer) readUntil(delimiters map[rune]struct{}, tokenType string) token {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
-	for l.ch != '\n' && l.ch != '\\' && l.ch != 0 {
+	// Append default delimiters
+	delimiters['\n'] = struct{}{}
+	delimiters['\\'] = struct{}{}
+	delimiters[0] = struct{}{}
+
+	inList := func(ch rune) bool {
+		_, ok := delimiters[ch]
+		return ok
+	}
+
+	for !inList(l.ch) {
 		l.readRune()
 	}
 
 	// Measure the content we just read in UTF-16 units
-	sectionText := l.input[startByte:l.position]
+	text := l.input[startByte:l.position]
 
 	return token{
 		line:      l.lineNumber,
 		charPos:   charPos,
-		length:    utils.Utf16Len(sectionText),
-		tokenType: string(protocol.SemanticTokenTypeString),
+		length:    utils.Utf16Len(text),
+		tokenType: tokenType,
+		text:      text,
 	}
 }
 
@@ -235,6 +250,7 @@ func (l *lexer) readAssignment() {
 			charPos:   charPos,
 			length:    utils.Utf16Len(propText),
 			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      propText,
 		})
 		return
 	}
@@ -245,6 +261,7 @@ func (l *lexer) readAssignment() {
 		charPos:   charPos,
 		length:    utils.Utf16Len(propText),
 		tokenType: string(protocol.SemanticTokenTypeKeyword),
+		text:      propText,
 	})
 
 	if l.ch == '=' {
@@ -254,7 +271,7 @@ func (l *lexer) readAssignment() {
 		if fn, ok := specialFunctionMap[propText]; ok {
 			fn(l)
 		} else {
-			l.queue = append(l.queue, l.readValue())
+			l.queue = append(l.queue, l.readUntil(map[rune]struct{}{}, string(protocol.SemanticTokenTypeString)))
 		}
 	}
 }
@@ -278,6 +295,7 @@ func (l *lexer) readSection() token {
 		charPos:   charPos,
 		length:    utils.Utf16Len(sectionText),
 		tokenType: string(protocol.SemanticTokenTypeNamespace),
+		text:      sectionText,
 	}
 }
 
@@ -297,6 +315,7 @@ func (l *lexer) readComment() token {
 		charPos:   charPos,
 		length:    utils.Utf16Len(commentText),
 		tokenType: string(protocol.SemanticTokenTypeComment),
+		text:      commentText,
 	}
 }
 

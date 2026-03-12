@@ -2,7 +2,6 @@ package semantic
 
 import (
 	"regexp"
-	"slices"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -33,31 +32,22 @@ func (l *lexer) readImageValue() {
 			l.queue = append(l.queue, l.readOperator())
 		case '@':
 			l.queue = append(l.queue, l.readOperator())
-			l.queue = append(l.queue, l.readValue())
+			l.queue = append(l.queue, l.readUntil(map[rune]struct{}{}, string(protocol.SemanticTokenTypeString)))
 		default:
 			if utils.IsLetter(l.ch) {
-				startByte := l.position
-				charPos := utils.Utf16Len(l.input[l.lineStart:l.position])
-
-				stoppers := []rune{'\n', '\\', 0, '/', ':', '@'}
-				for !slices.Contains(stoppers, l.ch) {
-					l.readRune()
+				delimiters := map[rune]struct{}{
+					':': {},
+					'@': {},
+					'/': {},
 				}
+				token := l.readUntil(delimiters, string(protocol.SemanticTokenTypeParameter))
 
-				text := l.input[startByte:l.position]
-
-				tokenType := string(protocol.SemanticTokenTypeParameter)
-				if !hostFound && hostCheck.MatchString(text) {
-					tokenType = string(protocol.SemanticTokenTypeString)
+				if !hostFound && hostCheck.MatchString(token.text) {
+					token.tokenType = string(protocol.SemanticTokenTypeString)
 					hostFound = true
 				}
 
-				l.queue = append(l.queue, token{
-					line:      l.lineNumber,
-					charPos:   charPos,
-					length:    utils.Utf16Len(text),
-					tokenType: tokenType,
-				})
+				l.queue = append(l.queue, token)
 			} else {
 				l.readRune() // Avoid inifinite loop on unkonw character
 			}

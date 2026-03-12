@@ -11,7 +11,7 @@ import (
 
 func Test_parseQuadletCommentASCII(t *testing.T) {
 	input := `
-# Fist comment line
+# First comment line
 	# Second comment line
 `
 
@@ -19,14 +19,16 @@ func Test_parseQuadletCommentASCII(t *testing.T) {
 		{
 			line:      1,
 			charPos:   0,
-			length:    protocol.UInteger(utils.Utf16Len("# Fist comment line")),
+			length:    protocol.UInteger(utils.Utf16Len("# First comment line")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
+			text:      "# First comment line",
 		},
 		{
 			line:      2,
 			charPos:   1,
 			length:    protocol.UInteger(utils.Utf16Len("# Second comment line")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
+			text:      "# Second comment line",
 		},
 	}
 
@@ -57,12 +59,14 @@ func Test_parseQuadletCommentUTF16(t *testing.T) {
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("# Second comment line 🫠 emoji")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
+			text:      "# Second comment line 🫠 emoji",
 		},
 		{
 			line:      2,
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("# 日本語 comment")),
 			tokenType: string(protocol.SemanticTokenTypeComment),
+			text:      "# 日本語 comment",
 		},
 	}
 
@@ -93,12 +97,14 @@ func Test_parseQuadletSection(t *testing.T) {
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("[Container]")),
 			tokenType: string(protocol.SemanticTokenTypeNamespace),
+			text:      "[Container]",
 		},
 		{
 			line:      2,
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("[Unit]")),
 			tokenType: string(protocol.SemanticTokenTypeNamespace),
+			text:      "[Unit]",
 		},
 	}
 
@@ -130,48 +136,56 @@ Bar=foobar \
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("Foo")),
 			tokenType: string(protocol.SemanticTokenTypeKeyword),
+			text:      "Foo",
 		},
 		{
 			line:      1,
 			charPos:   3,
 			length:    protocol.UInteger(utils.Utf16Len("=")),
 			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
 		},
 		{
 			line:      1,
 			charPos:   4,
 			length:    protocol.UInteger(utils.Utf16Len("bar")),
 			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      "bar",
 		},
 		{
 			line:      2,
 			charPos:   0,
 			length:    protocol.UInteger(utils.Utf16Len("Bar")),
 			tokenType: string(protocol.SemanticTokenTypeKeyword),
+			text:      "Bar",
 		},
 		{
 			line:      2,
 			charPos:   3,
 			length:    protocol.UInteger(utils.Utf16Len("=")),
 			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
 		},
 		{
 			line:      2,
 			charPos:   4,
 			length:    protocol.UInteger(utils.Utf16Len("foobar ")),
 			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      "foobar ",
 		},
 		{
 			line:      2,
 			charPos:   11,
 			length:    protocol.UInteger(utils.Utf16Len("\\")),
 			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "\\",
 		},
 		{
 			line:      3,
 			charPos:   2,
 			length:    protocol.UInteger(utils.Utf16Len("foo")),
 			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      "foo",
 		},
 	}
 

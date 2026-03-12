@@ -1,8 +1,6 @@
 package semantic
 
 import (
-	"slices"
-
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -30,28 +28,18 @@ func (l *lexer) readVolumeValue() {
 			l.queue = append(l.queue, l.readOperator())
 		default:
 			if utils.IsLetter(l.ch) || l.ch == '/' {
-				startByte := l.position
-				charPos := utils.Utf16Len(l.input[l.lineStart:l.position])
-
-				stoppers := []rune{'\n', '\\', 0, ':', ','}
-				for !slices.Contains(stoppers, l.ch) {
-					l.readRune()
+				delimiters := map[rune]struct{}{
+					':': {},
+					',': {},
 				}
+				token := l.readUntil(delimiters, string(protocol.SemanticTokenTypeParameter))
 
-				text := l.input[startByte:l.position]
-
-				tokenType := string(protocol.SemanticTokenTypeParameter)
 				if !hostFound {
-					tokenType = string(protocol.SemanticTokenTypeString)
+					token.tokenType = string(protocol.SemanticTokenTypeString)
 				}
 				hostFound = false
 
-				l.queue = append(l.queue, token{
-					line:      l.lineNumber,
-					charPos:   charPos,
-					length:    utils.Utf16Len(text),
-					tokenType: tokenType,
-				})
+				l.queue = append(l.queue, token)
 			} else {
 				l.readRune() // Avoid infinite loop on unkown field
 			}
