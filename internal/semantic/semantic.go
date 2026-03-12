@@ -29,6 +29,7 @@ var specialFunctionMap = map[string]func(*lexer){
 	"Volume":  (*lexer).readVolumeValue,
 	"Pod":     (*lexer).readPodValue,
 	"Network": (*lexer).readNetworkValue,
+	"Secret":  (*lexer).readSecretValue,
 }
 
 func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) {
