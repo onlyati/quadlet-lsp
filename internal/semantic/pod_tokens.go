@@ -7,8 +7,8 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-// readNetworkValue parses network value like: 'foo.network'
-func (l *lexer) readNetworkValue() {
+// readPodValue parses pod value like: 'foo.pod'
+func (l *lexer) readPodValue() {
 	continueDetected := false
 	for {
 		l.skipInlineWhitespace()
@@ -28,10 +28,9 @@ func (l *lexer) readNetworkValue() {
 		default:
 			if utils.IsLetter(l.ch) || l.ch == '/' {
 				token := l.readUntil(map[rune]struct{}{}, string(protocol.SemanticTokenTypeString))
-				if strings.HasSuffix(token.text, ".network") {
+				if strings.HasSuffix(strings.TrimSpace(token.text), ".pod") {
 					token.tokenType = string(protocol.SemanticTokenTypeParameter)
 				}
-
 				l.queue = append(l.queue, token)
 			} else {
 				l.readRune() // Avoid infinite loop on unkown field
