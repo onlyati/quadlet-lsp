@@ -85,7 +85,15 @@ type lexer struct {
 }
 
 func newLexer(input string) *lexer {
-	l := &lexer{input: input}
+	l := &lexer{
+		input:        input,
+		position:     0,
+		readPosition: 0,
+		lineNumber:   0,
+		lineStart:    0,
+		ch:           0,
+		queue:        []token{},
+	}
 	l.readRune()
 	return l
 }
@@ -153,7 +161,12 @@ func (l *lexer) nextToken() token {
 		case '\\':
 			return l.readOperator()
 		case 0:
-			return token{tokenType: "eof"}
+			return token{
+				tokenType: "eof",
+				line:      l.lineNumber,
+				charPos:   l.position,
+				length:    0,
+			}
 		default:
 			if utils.IsLetter(l.ch) {
 				l.readAssignment()
