@@ -25,11 +25,12 @@ var LegendMap = func() map[string]uint32 {
 }()
 
 var specialFunctionMap = map[string]func(*lexer){
-	"Image":   (*lexer).readImageValue,
-	"Volume":  (*lexer).readVolumeValue,
-	"Pod":     (*lexer).readPodValue,
-	"Network": (*lexer).readNetworkValue,
-	"Secret":  (*lexer).readSecretValue,
+	"Image":       (*lexer).readImageValue,
+	"Volume":      (*lexer).readVolumeValue,
+	"Pod":         (*lexer).readPodValue,
+	"Network":     (*lexer).readNetworkValue,
+	"Secret":      (*lexer).readSecretValue,
+	"Environment": (*lexer).readEnvValue,
 }
 
 func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) {
