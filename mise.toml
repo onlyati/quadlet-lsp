@@ -16,6 +16,5 @@ run = "golangci-lint run --max-same-issues 0 --max-issues-per-linter  0 ./..."
 
 [tools]
 go = "1.25.5"
-golangci-lint = "2.8.0"
-goreleaser = "2.12.1"
-mdbook = "0.5.2"
+golangci-lint = "2.11.3"
+goreleaser = "2.13.3"

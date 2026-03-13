@@ -179,6 +179,17 @@ WantedBy=default.target
 
 ```
 
+## Syntax highlight
+
+The language server has feature called semantic tokens. In the Quadlet files
+there are no programming language syntax like classes, variables. Besides the
+generic highlighting, by semantic tokens, language server tries to highlight
+differently the more important fields, so if somebody take a look for a file,
+the important files (e.g.: image owner and name, environment variables name,
+etc.) are differently highlighted.
+
+<img src="/assets/syntax_hi.png" style="width: 100%;"/>
+
 ## Hover menu
 
 ### Hover on properties
