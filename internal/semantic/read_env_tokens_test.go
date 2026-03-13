@@ -445,3 +445,59 @@ Environment= \
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
+
+func Test_parseQuadletEnvWithNum(t *testing.T) {
+	input := `Environment=FOO=127.0.0.1`
+
+	expected := []token{
+		{
+			line:      0,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Environment")),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
+			text:      "Environment",
+		},
+		{
+			line:      0,
+			charPos:   11,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
+		},
+		{
+			line:      0,
+			charPos:   12,
+			length:    protocol.UInteger(utils.Utf16Len("FOO")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+			text:      "FOO",
+		},
+		{
+			line:      0,
+			charPos:   15,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
+		},
+		{
+			line:      0,
+			charPos:   16,
+			length:    protocol.UInteger(utils.Utf16Len("127.0.0.1")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      "127.0.0.1",
+		},
+	}
+
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
+
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
+	}
+}

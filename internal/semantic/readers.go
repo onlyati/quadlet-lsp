@@ -23,6 +23,29 @@ func (l *lexer) readOperator() token {
 	}
 }
 
+func (l *lexer) customReader(reader func(*lexer)) {
+	continueDetected := false
+	for {
+		l.skipInlineWhitespace()
+
+		switch l.ch {
+		case '\\':
+			continueDetected = true
+			l.readRune()
+		case '\n':
+			l.handleNewLine()
+			if !continueDetected {
+				return
+			}
+			continueDetected = false
+		case 0:
+			return
+		default:
+			reader(l)
+		}
+	}
+}
+
 func (l *lexer) readUntil(delimiters map[rune]struct{}, tokenType string) token {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16

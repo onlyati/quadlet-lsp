@@ -8,22 +8,8 @@ import (
 // readVolumeValue parses volume value like: 'foo.volume:/etc/asd:ro,z'
 func (l *lexer) readVolumeValue() {
 	hostFound := true
-	continueDetected := false
-	for {
-		l.skipInlineWhitespace()
-
+	l.customReader(func(l *lexer) {
 		switch l.ch {
-		case '\\':
-			continueDetected = true
-			l.readRune()
-		case '\n':
-			l.handleNewLine()
-			if !continueDetected {
-				return
-			}
-			continueDetected = false
-		case 0:
-			return
 		case ':', ',':
 			l.queue = append(l.queue, l.readOperator())
 		default:
@@ -43,7 +29,6 @@ func (l *lexer) readVolumeValue() {
 			} else {
 				l.readRune() // Avoid infinite loop on unkown field
 			}
-
 		}
-	}
+	})
 }

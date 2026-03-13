@@ -12,22 +12,8 @@ func (l *lexer) readImageValue() {
 	hostCheck := regexp.MustCompile(`(?:[a-z0-9]+(?:[a-z0-9._-]+)*\.(?:[a-z0-9]+)|localhost)`)
 	hostFound := false
 
-	continueDetected := false
-	for {
-		l.skipInlineWhitespace()
-
+	l.customReader(func(l *lexer) {
 		switch l.ch {
-		case '\\':
-			continueDetected = true
-			l.readRune()
-		case '\n':
-			l.handleNewLine()
-			if !continueDetected {
-				return
-			}
-			continueDetected = false
-		case 0:
-			return
 		case '/', ':':
 			l.queue = append(l.queue, l.readOperator())
 		case '@':
@@ -52,5 +38,5 @@ func (l *lexer) readImageValue() {
 				l.readRune() // Avoid inifinite loop on unkonw character
 			}
 		}
-	}
+	})
 }

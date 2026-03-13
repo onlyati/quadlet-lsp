@@ -9,22 +9,8 @@ import (
 
 // readPodValue parses pod value like: 'foo.pod'
 func (l *lexer) readPodValue() {
-	continueDetected := false
-	for {
-		l.skipInlineWhitespace()
-
+	l.customReader(func(l *lexer) {
 		switch l.ch {
-		case '\\':
-			continueDetected = true
-			l.readRune()
-		case '\n':
-			l.handleNewLine()
-			if !continueDetected {
-				return
-			}
-			continueDetected = false
-		case 0:
-			return
 		default:
 			if utils.IsLetter(l.ch) || l.ch == '/' {
 				token := l.readUntil(map[rune]struct{}{}, string(protocol.SemanticTokenTypeString))
@@ -35,7 +21,6 @@ func (l *lexer) readPodValue() {
 			} else {
 				l.readRune() // Avoid infinite loop on unkown field
 			}
-
 		}
-	}
+	})
 }

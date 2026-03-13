@@ -9,22 +9,9 @@ import (
 func (l *lexer) readLabelValue() {
 	extraDelimiter := ' '
 	foundEqual := false
-	continueDetected := false
-	for {
-		l.skipInlineWhitespace()
 
+	l.customReader(func(l *lexer) {
 		switch l.ch {
-		case '\\':
-			continueDetected = true
-			l.readRune()
-		case '\n':
-			l.handleNewLine()
-			if !continueDetected {
-				return
-			}
-			continueDetected = false
-		case 0:
-			return
 		case '\'', '"':
 			extraDelimiter = l.ch
 			l.queue = append(l.queue, l.readOperator())
@@ -62,5 +49,5 @@ func (l *lexer) readLabelValue() {
 			}
 
 		}
-	}
+	})
 }
