@@ -351,3 +351,97 @@ func Test_parseQuadletEnvComplex(t *testing.T) {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
+
+func Test_parseQuadletEnvMultiline(t *testing.T) {
+	input := `
+Environment= \
+	"FOO=foo bar" \
+	foo=bar`
+
+	expected := []token{
+		{
+			line:      1,
+			charPos:   0,
+			length:    protocol.UInteger(utils.Utf16Len("Environment")),
+			tokenType: string(protocol.SemanticTokenTypeKeyword),
+			text:      "Environment",
+		},
+		{
+			line:      1,
+			charPos:   11,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
+		},
+		{
+			line:      2,
+			charPos:   1,
+			length:    protocol.UInteger(utils.Utf16Len("\"")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "\"",
+		},
+		{
+			line:      2,
+			charPos:   2,
+			length:    protocol.UInteger(utils.Utf16Len("FOO")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+			text:      "FOO",
+		},
+		{
+			line:      2,
+			charPos:   5,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
+		},
+		{
+			line:      2,
+			charPos:   6,
+			length:    protocol.UInteger(utils.Utf16Len("foo bar")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      "foo bar",
+		},
+		{
+			line:      2,
+			charPos:   13,
+			length:    protocol.UInteger(utils.Utf16Len("\"")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "\"",
+		},
+		{
+			line:      3,
+			charPos:   1,
+			length:    protocol.UInteger(utils.Utf16Len("foo")),
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+			text:      "foo",
+		},
+		{
+			line:      3,
+			charPos:   4,
+			length:    protocol.UInteger(utils.Utf16Len("=")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "=",
+		},
+		{
+			line:      3,
+			charPos:   5,
+			length:    protocol.UInteger(utils.Utf16Len("bar")),
+			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      "bar",
+		},
+	}
+
+	tokens := []token{}
+	l := newLexer(input)
+	tok := l.nextToken()
+
+	for tok.tokenType != "eof" {
+		tokens = append(tokens, tok)
+		tok = l.nextToken()
+	}
+
+	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tokens {
+		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
+	}
+}
