@@ -109,14 +109,6 @@ func (l *Lexer) readRune() {
 	l.readPosition += uint32(width)
 }
 
-func (l *Lexer) peekRune() rune {
-	if l.readPosition >= uint32(len(l.Input)) {
-		return 0
-	}
-	r, _ := utf8.DecodeRuneInString(l.Input[l.readPosition:])
-	return r
-}
-
 func (l *Lexer) handleNewLine() {
 	l.lineNumber++
 	l.readRune() // Consume '\n'

@@ -18,8 +18,8 @@ func ReturnAsStringPtr(s string) *string {
 	return &s
 }
 
-// ReturnAsPtr return with pointer of any type
-func ReturnAsPtr[T any](s T) *T {
+// AsPtr return with pointer of any type
+func AsPtr[T any](s T) *T {
 	return &s
 }
 
