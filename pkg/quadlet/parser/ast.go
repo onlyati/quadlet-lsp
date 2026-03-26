@@ -14,8 +14,6 @@ type Node interface {
 
 // QuadletNode represents the whole Quadlet file.
 type QuadletNode struct {
-	StartPos  NodePosition
-	EndPos    NodePosition
 	Documents []*CommentNode
 	Sections  []*SectionNode
 }

@@ -34,7 +34,7 @@ type Token struct {
 	Text     string        // Content of the token
 }
 
-func newToken(
+func NewToken(
 	startLineNumber, startInlinePosition uint32,
 	endLineNumber, endInlinePosition uint32,
 	position uint32,
@@ -166,7 +166,7 @@ func (l *Lexer) readUntil(parms readUntilParm) Token {
 
 	text := l.Input[startByte:l.position]
 
-	return newToken(
+	return NewToken(
 		startLine, startInlinePos,
 		endLine, endInlinePos,
 		startByte,
@@ -188,7 +188,7 @@ func (l *Lexer) readOneRune(tokenType TokenType) Token {
 
 	text := l.Input[startByte:l.position]
 
-	return newToken(
+	return NewToken(
 		startLine, startInlinePos,
 		endLine, endInlinePos,
 		startByte,
@@ -267,7 +267,7 @@ func (l *Lexer) nextToken() {
 				readLast:   true,
 			}))
 		case 0:
-			l.Tokens = append(l.Tokens, newToken(
+			l.Tokens = append(l.Tokens, NewToken(
 				l.lineNumber,
 				l.position-l.lineStartPosition,
 				l.lineNumber,
