@@ -9,7 +9,91 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParser(t *testing.T) {
+func TestParserMissingValue(t *testing.T) {
+	inputContent := `[foo]
+Foo=
+`
+	tmpDir := t.TempDir()
+	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
+
+	parser := NewParser(path.Join(tmpDir, "foo.container"))
+	parser.Run()
+
+	require.Len(t, parser.Errors, 1)
+	assert.Equal(t, "unfinished line", parser.Errors[0].Text)
+}
+
+func TestParserError1(t *testing.T) {
+	inputContent := `[foo]
+Foo=bar
+ forget cont sign
+`
+	tmpDir := t.TempDir()
+	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
+
+	parser := NewParser(path.Join(tmpDir, "foo.container"))
+	parser.Run()
+
+	require.Len(t, parser.Errors, 1)
+	assert.Equal(t, "expects an '=' sign after keyword, it got end of file", parser.Errors[0].Text)
+}
+
+func TestParserError2(t *testing.T) {
+	inputContent := `[foo]
+Foo=bar
+ forget cont sign
+
+[bar]
+`
+	tmpDir := t.TempDir()
+	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
+
+	parser := NewParser(path.Join(tmpDir, "foo.container"))
+	parser.Run()
+
+	require.Len(t, parser.Errors, 1)
+	assert.Equal(t, "expects an '=' sign after keyword, it got [bar]", parser.Errors[0].Text)
+}
+
+func TestParserError3(t *testing.T) {
+	inputContent := `
+Image=foo.image
+Label= \
+  env=test
+`
+	tmpDir := t.TempDir()
+	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
+
+	parser := NewParser(path.Join(tmpDir, "foo.container"))
+	parser.Run()
+
+	// This should be error because it has no section before.
+	// Keywords will be invalid, and other tokens will be unexpected.
+	require.Len(t, parser.Errors, 7)
+
+	assert.Equal(t, "keyword without section is invalid", parser.Errors[0].Text)
+	assert.Equal(t, "Image", parser.Errors[0].Token.Text)
+
+	assert.Equal(t, "unexpected token", parser.Errors[1].Text)
+	assert.Equal(t, "=", parser.Errors[1].Token.Text)
+
+	assert.Equal(t, "unexpected token", parser.Errors[2].Text)
+	assert.Equal(t, "foo.image", parser.Errors[2].Token.Text)
+
+	assert.Equal(t, "keyword without section is invalid", parser.Errors[3].Text)
+	assert.Equal(t, "Label", parser.Errors[3].Token.Text)
+
+	assert.Equal(t, "unexpected token", parser.Errors[4].Text)
+	assert.Equal(t, "=", parser.Errors[4].Token.Text)
+
+	assert.Equal(t, "unexpected token", parser.Errors[5].Text)
+	assert.Equal(t, "\\", parser.Errors[5].Token.Text)
+
+	assert.Equal(t, "unexpected token", parser.Errors[6].Text)
+	assert.Equal(t, "env=test", parser.Errors[6].Token.Text)
+}
+
+func TestParserOK(t *testing.T) {
 	inputContent := `# Test container
 
 [Container]

@@ -47,9 +47,14 @@ func NewParser(path string) Parser {
 func (p *Parser) Run() {
 	token := p.consumeToken()
 	for token != nil {
-		if token.Type != lexer.TokenTypeComment && p.prevToken().Type == lexer.TokenTypeComment && len(p.Quadlet.Documents) == 0 {
-			p.Quadlet.Documents = p.commentBuffer
-			p.commentBuffer = []*CommentNode{}
+		if token.Type != lexer.TokenTypeComment && len(p.Quadlet.Documents) == 0 {
+			prevToken := p.prevToken()
+			if prevToken != nil {
+				if prevToken.Type == lexer.TokenTypeComment {
+					p.Quadlet.Documents = p.commentBuffer
+					p.commentBuffer = []*CommentNode{}
+				}
+			}
 		}
 
 		switch token.Type {
@@ -64,7 +69,7 @@ func (p *Parser) Run() {
 			// If this is hit, it is an unexpected token
 			syntaxError := ParserError{
 				Token: token,
-				Text:  "unexpected value",
+				Text:  "unexpected token",
 			}
 			p.Errors = append(p.Errors, syntaxError)
 		}
@@ -113,6 +118,7 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 	}
 	p.commentBuffer = []*CommentNode{}
 
+	// If not in section it is an error
 	if p.lastSection() == nil {
 		p.Errors = append(p.Errors, ParserError{
 			Text:  "keyword without section is invalid",
@@ -123,9 +129,17 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 
 	// Next token should be an assign
 	if p.peekToken() == nil {
+		p.Errors = append(p.Errors, ParserError{
+			Text:  "expects an '=' sign after keyword, it got end of file",
+			Token: token,
+		})
 		return
 	}
 	if p.peekToken().Type != lexer.TokenTypeAssign {
+		p.Errors = append(p.Errors, ParserError{
+			Text:  "expects an '=' sign after keyword, it got " + p.peekToken().Text,
+			Token: token,
+		})
 		return
 	}
 	token = p.consumeToken()
@@ -134,6 +148,13 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 	value := ValueNode{}
 	valueString := strings.Builder{}
 	startNotSet := true
+	if p.peekToken() == nil {
+		p.Errors = append(p.Errors, ParserError{
+			Text:  "unfinished line",
+			Token: token,
+		})
+		return
+	}
 	for p.peekToken().Type == lexer.TokenTypeValue || p.peekToken().Type == lexer.TokenTypeContSign {
 		token = p.consumeToken()
 
