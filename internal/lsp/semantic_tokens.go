@@ -8,7 +8,7 @@ import (
 
 func SemanticTokens(context *glsp.Context, params *protocol.SemanticTokensParams) (*protocol.SemanticTokens, error) {
 	uri := string(params.TextDocument.URI)
-	text := documents.Read(uri)
+	text := docs.Read(uri)
 
 	return semantic.CalculateSemanticTokens(text)
 }

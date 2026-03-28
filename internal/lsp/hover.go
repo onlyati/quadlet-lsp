@@ -14,7 +14,7 @@ import (
 // markdown response back.
 func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := string(params.TextDocument.URI)
-	text := documents.Read(uri)
+	text := docs.Read(uri)
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	editorLine := params.Position.Line
 	cursorPos := params.Position.Character
