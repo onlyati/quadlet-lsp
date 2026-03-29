@@ -12,6 +12,11 @@ type Node interface {
 	String() string
 }
 
+type FindTokenOutput struct {
+	Node   Node
+	RelPos NodePosition // Relative cursor position within found token
+}
+
 // QuadletNode represents the whole Quadlet file.
 type QuadletNode struct {
 	Documents []*CommentNode
@@ -31,6 +36,104 @@ func (q *QuadletNode) String() string {
 	}
 
 	return strBuilder.String()
+}
+
+// FindToken method receives two parameter a line and a position number, then
+// searches in the Quadlet and return with the token where the position is.
+func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
+	inLineFunc := func(position, startPos, endPos NodePosition) bool {
+		betweenLine := position.LineNumber >= startPos.LineNumber && position.LineNumber <= endPos.LineNumber
+		if !betweenLine {
+			return false
+		}
+
+		if position.LineNumber == startPos.LineNumber && position.Position < startPos.Position {
+			return false
+		}
+
+		if position.LineNumber == endPos.LineNumber && position.Position > endPos.Position {
+			return false
+		}
+		return true
+	}
+
+	// Search in document's comment
+	for _, node := range q.Documents {
+		if inLineFunc(position, node.StartPos, node.EndPos) {
+			return FindTokenOutput{
+				Node: node,
+				RelPos: NodePosition{
+					LineNumber: position.LineNumber - node.StartPos.LineNumber,
+					Position:   position.Position - node.StartPos.Position,
+				},
+			}
+		}
+	}
+
+	for _, section := range q.Sections {
+		// Search in section's comment
+		for _, sectionDoc := range section.Documents {
+			if inLineFunc(position, sectionDoc.StartPos, sectionDoc.EndPos) {
+				return FindTokenOutput{
+					Node: sectionDoc,
+					RelPos: NodePosition{
+						LineNumber: position.LineNumber - sectionDoc.StartPos.LineNumber,
+						Position:   position.Position - sectionDoc.StartPos.Position,
+					},
+				}
+			}
+		}
+		if inLineFunc(position, section.StartPos, section.EndPos) {
+			return FindTokenOutput{
+				Node: section,
+				RelPos: NodePosition{
+					LineNumber: position.LineNumber - section.StartPos.LineNumber,
+					Position:   position.Position - section.StartPos.Position,
+				},
+			}
+		}
+
+		// Search in assigment
+		for _, assigments := range section.Assignments {
+			// Search in assingment's comment
+			for _, assigmentDoc := range assigments.Documents {
+				if inLineFunc(position, assigmentDoc.StartPos, assigmentDoc.EndPos) {
+					return FindTokenOutput{
+						Node: assigmentDoc,
+						RelPos: NodePosition{
+							LineNumber: position.LineNumber - assigmentDoc.StartPos.LineNumber,
+							Position:   position.Position - assigmentDoc.StartPos.Position,
+						},
+					}
+				}
+			}
+			// Search in assigment's value
+			if inLineFunc(position, assigments.Value.StartPos, assigments.Value.EndPos) {
+				return FindTokenOutput{
+					Node: assigments.Value,
+					RelPos: NodePosition{
+						LineNumber: position.LineNumber - assigments.Value.StartPos.LineNumber,
+						Position:   position.Position - assigments.Value.StartPos.Position,
+					},
+				}
+			}
+
+			// Search in assigment
+			if inLineFunc(position, assigments.StartPos, assigments.EndPos) {
+				return FindTokenOutput{
+					Node: assigments,
+					RelPos: NodePosition{
+						LineNumber: position.LineNumber - assigments.StartPos.LineNumber,
+						Position:   position.Position - assigments.StartPos.Position,
+					},
+				}
+			}
+		}
+	}
+
+	return FindTokenOutput{
+		Node: nil,
+	}
 }
 
 // CommentNode represent the comment nodes in the file.

@@ -30,7 +30,7 @@ func NewParser(path string) Parser {
 	}
 	l := lexer.NewLexer(string(content))
 	l.Run()
-	return Parser{
+	parser := Parser{
 		Path: path,
 		Quadlet: &QuadletNode{
 			Documents: []*CommentNode{},
@@ -41,6 +41,9 @@ func NewParser(path string) Parser {
 		commentBuffer: []*CommentNode{},
 		Errors:        []ParserError{},
 	}
+	parser.Run()
+
+	return parser
 }
 
 // Run method iterate over the tokens and create an AST.

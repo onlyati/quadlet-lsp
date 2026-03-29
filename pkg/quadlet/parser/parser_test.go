@@ -9,6 +9,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestEmptyFile(t *testing.T) {
+	tmpDir := t.TempDir()
+	testutils.CreateTempFile(t, tmpDir, "foo.container", "")
+
+	parser := NewParser(path.Join(tmpDir, "foo.container"))
+	require.Len(t, parser.Errors, 0)
+	assert.Len(t, parser.Quadlet.Sections, 0)
+	assert.Len(t, parser.Quadlet.Documents, 0)
+}
+
+func TestNotFoundFile(t *testing.T) {
+	parser := NewParser("foo.container")
+	require.Len(t, parser.Errors, 0)
+	assert.Len(t, parser.Quadlet.Sections, 0)
+	assert.Len(t, parser.Quadlet.Documents, 0)
+}
+
 func TestParserMissingValue(t *testing.T) {
 	inputContent := `[foo]
 Foo=
@@ -17,7 +34,6 @@ Foo=
 	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
 
 	parser := NewParser(path.Join(tmpDir, "foo.container"))
-	parser.Run()
 
 	require.Len(t, parser.Errors, 1)
 	assert.Equal(t, "unfinished line", parser.Errors[0].Text)
@@ -32,7 +48,6 @@ Foo=bar
 	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
 
 	parser := NewParser(path.Join(tmpDir, "foo.container"))
-	parser.Run()
 
 	require.Len(t, parser.Errors, 1)
 	assert.Equal(t, "expects an '=' sign after keyword, it got end of file", parser.Errors[0].Text)
@@ -49,7 +64,6 @@ Foo=bar
 	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
 
 	parser := NewParser(path.Join(tmpDir, "foo.container"))
-	parser.Run()
 
 	require.Len(t, parser.Errors, 1)
 	assert.Equal(t, "expects an '=' sign after keyword, it got [bar]", parser.Errors[0].Text)
@@ -65,7 +79,6 @@ Label= \
 	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
 
 	parser := NewParser(path.Join(tmpDir, "foo.container"))
-	parser.Run()
 
 	// This should be error because it has no section before.
 	// Keywords will be invalid, and other tokens will be unexpected.
@@ -109,7 +122,6 @@ Description=Foo \
 	testutils.CreateTempFile(t, tmpDir, "foo.container", inputContent)
 
 	parser := NewParser(path.Join(tmpDir, "foo.container"))
-	parser.Run()
 
 	require.Len(t, parser.Errors, 0)
 
