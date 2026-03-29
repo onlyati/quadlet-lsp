@@ -43,15 +43,17 @@ Description= \
 
 	// Test outside of the line
 	nodeResult := quadlet.FindToken(NodePosition{0, 35})
-	require.Nil(t, nodeResult.Node)
+	require.Nil(t, nodeResult.CurrentNode)
+	require.Nil(t, nodeResult.ParentNode)
 
 	nodeResult = quadlet.FindToken(NodePosition{0, 1})
-	require.Nil(t, nodeResult.Node)
+	require.Nil(t, nodeResult.CurrentNode)
+	require.Nil(t, nodeResult.ParentNode)
 
 	// First comment line
 	nodeResult = quadlet.FindToken(NodePosition{0, 5})
-	assert.Equal(t, NodePosition{0, 3}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	assert.Nil(t, nodeResult.ParentNode)
+	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
 		assert.Equal(t, "# Test container", *v.Text)
 	default:
@@ -60,8 +62,8 @@ Description= \
 
 	// Second comment line
 	nodeResult = quadlet.FindToken(NodePosition{1, 5})
-	assert.Equal(t, NodePosition{0, 5}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	assert.Nil(t, nodeResult.ParentNode)
+	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
 		assert.Equal(t, "# Second line", *v.Text)
 	default:
@@ -70,8 +72,8 @@ Description= \
 
 	// Section's comment
 	nodeResult = quadlet.FindToken(NodePosition{3, 2})
-	assert.Equal(t, NodePosition{0, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	assert.Nil(t, nodeResult.ParentNode)
+	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
 		assert.Equal(t, "# Section doc", *v.Text)
 	default:
@@ -80,8 +82,9 @@ Description= \
 
 	// [Container] section
 	nodeResult = quadlet.FindToken(NodePosition{4, 3})
-	assert.Equal(t, NodePosition{0, 3}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	assert.Nil(t, nodeResult.ParentNode)
+	switch v := nodeResult.CurrentNode.(type) {
 	case *SectionNode:
 		assert.Equal(t, "[Container]", *v.Text)
 	default:
@@ -90,58 +93,105 @@ Description= \
 
 	// Image's comment
 	nodeResult = quadlet.FindToken(NodePosition{6, 2})
-	assert.Equal(t, NodePosition{0, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
 		assert.Equal(t, "# Image doc", *v.Text)
 	default:
 		require.Fail(t, "invalid type")
 	}
 
+	switch v := nodeResult.ParentNode.(type) {
+	case *SectionNode:
+		assert.Equal(t, "[Container]", *v.Text)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
 	// Image=foo.image Key
 	nodeResult = quadlet.FindToken(NodePosition{7, 2})
-	assert.Equal(t, NodePosition{0, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *AssignNode:
 		assert.Equal(t, "Image", *v.Name)
 	default:
 		require.Fail(t, "invalid type")
 	}
 
+	switch v := nodeResult.ParentNode.(type) {
+	case *SectionNode:
+		assert.Equal(t, "[Container]", *v.Text)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
 	// Image=foo.image Value
 	nodeResult = quadlet.FindToken(NodePosition{7, 8})
-	assert.Equal(t, NodePosition{0, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *ValueNode:
 		assert.Equal(t, "foo.image", *v.Value)
 	default:
 		require.Fail(t, "invalid type")
 	}
 
+	switch v := nodeResult.ParentNode.(type) {
+	case *AssignNode:
+		assert.Equal(t, "Image", *v.Name)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
 	// Label keyword
 	nodeResult = quadlet.FindToken(NodePosition{10, 2})
-	assert.Equal(t, NodePosition{0, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *AssignNode:
 		assert.Contains(t, "Label", *v.Name)
 	default:
 		require.Fail(t, "invalid type")
 	}
 
+	switch v := nodeResult.ParentNode.(type) {
+	case *SectionNode:
+		assert.Equal(t, "[Container]", *v.Text)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
 	// Label multi-line value (first line)
 	nodeResult = quadlet.FindToken(NodePosition{11, 2})
-	assert.Equal(t, NodePosition{0, 1}, nodeResult.RelPos) // Position relative to start of multi-line
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *ValueNode:
 		assert.Contains(t, *v.Value, "env=test")
 	default:
 		require.Fail(t, "invalid type")
 	}
 
+	switch v := nodeResult.ParentNode.(type) {
+	case *AssignNode:
+		assert.Equal(t, "Label", *v.Name)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
 	// [Unit] section
 	nodeResult = quadlet.FindToken(NodePosition{14, 3})
-	assert.Equal(t, NodePosition{0, 3}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.Nil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *SectionNode:
 		assert.Equal(t, "[Unit]", *v.Text)
 	default:
@@ -150,20 +200,38 @@ Description= \
 
 	// Description multi-line value (testing the "Foo" line)
 	nodeResult = quadlet.FindToken(NodePosition{17, 3})
-	assert.Equal(t, NodePosition{0, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *ValueNode:
 		assert.Equal(t, "Foo container", *v.Value)
 	default:
 		require.Fail(t, "invalid type")
 	}
 
+	switch v := nodeResult.ParentNode.(type) {
+	case *AssignNode:
+		assert.Equal(t, "Description", *v.Name)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
 	// Description multi-line value (testing the "container" line)
 	nodeResult = quadlet.FindToken(NodePosition{18, 3})
-	assert.Equal(t, NodePosition{1, 2}, nodeResult.RelPos)
-	switch v := nodeResult.Node.(type) {
+	require.NotNil(t, nodeResult.CurrentNode)
+	require.NotNil(t, nodeResult.ParentNode)
+
+	switch v := nodeResult.CurrentNode.(type) {
 	case *ValueNode:
 		assert.Equal(t, "Foo container", *v.Value)
+	default:
+		require.Fail(t, "invalid type")
+	}
+
+	switch v := nodeResult.ParentNode.(type) {
+	case *AssignNode:
+		assert.Equal(t, "Description", *v.Name)
 	default:
 		require.Fail(t, "invalid type")
 	}

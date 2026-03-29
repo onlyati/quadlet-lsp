@@ -13,8 +13,8 @@ type Node interface {
 }
 
 type FindTokenOutput struct {
-	Node   Node
-	RelPos NodePosition // Relative cursor position within found token
+	CurrentNode Node
+	ParentNode  Node
 }
 
 // QuadletNode represents the whole Quadlet file.
@@ -61,11 +61,8 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 	for _, node := range q.Documents {
 		if inLineFunc(position, node.StartPos, node.EndPos) {
 			return FindTokenOutput{
-				Node: node,
-				RelPos: NodePosition{
-					LineNumber: position.LineNumber - node.StartPos.LineNumber,
-					Position:   position.Position - node.StartPos.Position,
-				},
+				CurrentNode: node,
+				ParentNode:  nil,
 			}
 		}
 	}
@@ -75,21 +72,15 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 		for _, sectionDoc := range section.Documents {
 			if inLineFunc(position, sectionDoc.StartPos, sectionDoc.EndPos) {
 				return FindTokenOutput{
-					Node: sectionDoc,
-					RelPos: NodePosition{
-						LineNumber: position.LineNumber - sectionDoc.StartPos.LineNumber,
-						Position:   position.Position - sectionDoc.StartPos.Position,
-					},
+					CurrentNode: sectionDoc,
+					ParentNode:  nil,
 				}
 			}
 		}
 		if inLineFunc(position, section.StartPos, section.EndPos) {
 			return FindTokenOutput{
-				Node: section,
-				RelPos: NodePosition{
-					LineNumber: position.LineNumber - section.StartPos.LineNumber,
-					Position:   position.Position - section.StartPos.Position,
-				},
+				CurrentNode: section,
+				ParentNode:  nil,
 			}
 		}
 
@@ -99,40 +90,31 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 			for _, assigmentDoc := range assigments.Documents {
 				if inLineFunc(position, assigmentDoc.StartPos, assigmentDoc.EndPos) {
 					return FindTokenOutput{
-						Node: assigmentDoc,
-						RelPos: NodePosition{
-							LineNumber: position.LineNumber - assigmentDoc.StartPos.LineNumber,
-							Position:   position.Position - assigmentDoc.StartPos.Position,
-						},
+						CurrentNode: assigmentDoc,
+						ParentNode:  section,
 					}
 				}
 			}
 			// Search in assigment's value
 			if inLineFunc(position, assigments.Value.StartPos, assigments.Value.EndPos) {
 				return FindTokenOutput{
-					Node: assigments.Value,
-					RelPos: NodePosition{
-						LineNumber: position.LineNumber - assigments.Value.StartPos.LineNumber,
-						Position:   position.Position - assigments.Value.StartPos.Position,
-					},
+					CurrentNode: assigments.Value,
+					ParentNode:  assigments,
 				}
 			}
 
 			// Search in assigment
 			if inLineFunc(position, assigments.StartPos, assigments.EndPos) {
 				return FindTokenOutput{
-					Node: assigments,
-					RelPos: NodePosition{
-						LineNumber: position.LineNumber - assigments.StartPos.LineNumber,
-						Position:   position.Position - assigments.StartPos.Position,
-					},
+					CurrentNode: assigments,
+					ParentNode:  section,
 				}
 			}
 		}
 	}
 
 	return FindTokenOutput{
-		Node: nil,
+		CurrentNode: nil,
 	}
 }
 
