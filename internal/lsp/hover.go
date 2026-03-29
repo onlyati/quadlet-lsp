@@ -1,9 +1,8 @@
 package lsp
 
 import (
-	"strings"
-
 	"github.com/onlyati/quadlet-lsp/internal/hover"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -14,13 +13,15 @@ import (
 // markdown response back.
 func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	uri := string(params.TextDocument.URI)
-	text := docs.Read(uri)
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	editorLine := params.Position.Line
-	cursorPos := params.Position.Character
+	quadlet := docs.ReadQuadlet(uri)
+	tokenInfo := quadlet.FindToken(
+		parser.NodePosition{
+			LineNumber: params.Position.Line,
+			Position:   params.Position.Character,
+		},
+	)
 
-	section := findSection(lines, editorLine)
-	if section == "" {
+	if len(tokenInfo.ParentNodes) == 0 {
 		return nil, nil
 	}
 
@@ -30,12 +31,8 @@ func textHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.H
 	config.Mu.RUnlock()
 
 	return hover.HoverFunction(hover.HoverInformation{
-		Line:              lines[editorLine],
-		CharacterPosition: cursorPos,
-		Section:           section,
-		URI:               uri,
-		LineNumber:        editorLine,
-		RootDir:           rootDir,
-		Level:             *level,
+		RootDir:   rootDir,
+		Level:     *level,
+		TokenInfo: tokenInfo,
 	}), nil
 }

@@ -35,9 +35,24 @@ func (d *Documents) ListFileNames() []string {
 func (d *Documents) Add(uri, text string) {
 	d.mu.Lock()
 	uri = strings.TrimPrefix(uri, "file://")
-	d.files[uri] = text
-	d.parsers[uri] = parser.NewParser(uri)
+	if text != d.files[uri] {
+		d.files[uri] = text
+	}
 	d.mu.Unlock()
+}
+
+// Parse handles the heavy lifting to not make parse on each key stroke.
+func (d *Documents) Parse(uri string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	uri = strings.TrimPrefix(uri, "file://")
+
+	text, exists := d.files[uri]
+	if !exists {
+		return
+	}
+
+	d.parsers[uri] = parser.NewParserFromMemory(uri, text)
 }
 
 func (d *Documents) Delete(uri string) {

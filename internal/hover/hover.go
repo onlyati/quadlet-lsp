@@ -7,49 +7,43 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 type HoverInformation struct {
-	Line              string
-	URI               string
-	Section           string
-	LineNumber        protocol.UInteger
-	CharacterPosition protocol.UInteger
-	RootDir           string
-	Level             int
-	property          string
-	value             string
+	RootDir   string
+	TokenInfo parser.FindTokenOutput
+	Level     int
 }
 
 func HoverFunction(info HoverInformation) *protocol.Hover {
-	splitLine := strings.SplitN(info.Line, "=", 2)
-	if len(splitLine) < 2 {
-		return nil
-	}
-
-	info.property = splitLine[0]
-	info.value = splitLine[1]
-
-	// Verify where the cursor is
-	separatorPosition := strings.Index(info.Line, "=")
-	if info.CharacterPosition < protocol.UInteger(separatorPosition) {
+	switch info.TokenInfo.CurrentNode.(type) {
+	case *parser.AssignNode:
 		return handlePropertyHover(info)
-	} else {
-		// Check if cursor on systemd specifier
-		hoverValue := handleSystemSpecifier(info)
-		if hoverValue != nil {
-			return hoverValue
-		}
-
-		// Handle value specific hovers
+	case *parser.ValueNode:
 		return handleValueHover(info)
 	}
+	return nil
 }
 
 func handlePropertyHover(info HoverInformation) *protocol.Hover {
-	for _, item := range data.PropertiesMap[info.Section] {
-		if info.property == item.Label {
+	if len(info.TokenInfo.ParentNodes) == 0 {
+		return nil
+	}
+	section, ok := info.TokenInfo.ParentNodes[0].(*parser.SectionNode)
+	if !ok {
+		return nil
+	}
+	keyword, ok := info.TokenInfo.CurrentNode.(*parser.AssignNode)
+	if !ok {
+		return nil
+	}
+
+	sectionValue := strings.TrimPrefix(*section.Text, "[")
+	sectionValue = strings.TrimSuffix(sectionValue, "]")
+	for _, item := range data.PropertiesMap[sectionValue] {
+		if *keyword.Name == item.Label {
 			return &protocol.Hover{
 				Contents: protocol.MarkupContent{
 					Kind:  protocol.MarkupKindMarkdown,
@@ -70,8 +64,12 @@ func handleValueHover(info HoverInformation) *protocol.Hover {
 		"Pod":     handleValuePod,
 		"Network": handleValueNetwork,
 	}
+	keyword, ok := info.TokenInfo.ParentNodes[0].(*parser.AssignNode)
+	if !ok {
+		return nil
+	}
 
-	fn, found := handlerMap[info.property]
+	fn, found := handlerMap[*keyword.Name]
 	if found {
 		return fn(info)
 	}

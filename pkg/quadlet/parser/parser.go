@@ -46,6 +46,25 @@ func NewParser(path string) Parser {
 	return parser
 }
 
+func NewParserFromMemory(path, content string) Parser {
+	l := lexer.NewLexer(content)
+	l.Run()
+	parser := Parser{
+		Path: path,
+		Quadlet: &QuadletNode{
+			Documents: []*CommentNode{},
+			Sections:  []*SectionNode{},
+		},
+		tokenIndex:    -1,
+		tokens:        l.Tokens,
+		commentBuffer: []*CommentNode{},
+		Errors:        []ParserError{},
+	}
+	parser.Run()
+
+	return parser
+}
+
 // Run method iterate over the tokens and create an AST.
 func (p *Parser) Run() {
 	token := p.consumeToken()

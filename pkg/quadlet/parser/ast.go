@@ -6,7 +6,7 @@ import (
 	"github.com/onlyati/quadlet-lsp/pkg/quadlet/lexer"
 )
 
-type NodePosition lexer.TokenPosition
+type NodePosition = lexer.TokenPosition
 
 type Node interface {
 	String() string
@@ -14,7 +14,7 @@ type Node interface {
 
 type FindTokenOutput struct {
 	CurrentNode Node
-	ParentNode  Node
+	ParentNodes []Node
 }
 
 // QuadletNode represents the whole Quadlet file.
@@ -57,57 +57,65 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 		return true
 	}
 
+	if q == nil {
+		return FindTokenOutput{nil, nil}
+	}
+
 	// Search in document's comment
-	for _, node := range q.Documents {
-		if inLineFunc(position, node.StartPos, node.EndPos) {
-			return FindTokenOutput{
-				CurrentNode: node,
-				ParentNode:  nil,
+	if q.Documents != nil {
+		for _, node := range q.Documents {
+			if inLineFunc(position, node.StartPos, node.EndPos) {
+				return FindTokenOutput{
+					CurrentNode: node,
+					ParentNodes: nil,
+				}
 			}
 		}
 	}
 
-	for _, section := range q.Sections {
-		// Search in section's comment
-		for _, sectionDoc := range section.Documents {
-			if inLineFunc(position, sectionDoc.StartPos, sectionDoc.EndPos) {
-				return FindTokenOutput{
-					CurrentNode: sectionDoc,
-					ParentNode:  nil,
-				}
-			}
-		}
-		if inLineFunc(position, section.StartPos, section.EndPos) {
-			return FindTokenOutput{
-				CurrentNode: section,
-				ParentNode:  nil,
-			}
-		}
-
-		// Search in assigment
-		for _, assigments := range section.Assignments {
-			// Search in assingment's comment
-			for _, assigmentDoc := range assigments.Documents {
-				if inLineFunc(position, assigmentDoc.StartPos, assigmentDoc.EndPos) {
+	if q.Sections != nil {
+		for _, section := range q.Sections {
+			// Search in section's comment
+			for _, sectionDoc := range section.Documents {
+				if inLineFunc(position, sectionDoc.StartPos, sectionDoc.EndPos) {
 					return FindTokenOutput{
-						CurrentNode: assigmentDoc,
-						ParentNode:  section,
+						CurrentNode: sectionDoc,
+						ParentNodes: nil,
 					}
 				}
 			}
-			// Search in assigment's value
-			if inLineFunc(position, assigments.Value.StartPos, assigments.Value.EndPos) {
+			if inLineFunc(position, section.StartPos, section.EndPos) {
 				return FindTokenOutput{
-					CurrentNode: assigments.Value,
-					ParentNode:  assigments,
+					CurrentNode: section,
+					ParentNodes: nil,
 				}
 			}
 
 			// Search in assigment
-			if inLineFunc(position, assigments.StartPos, assigments.EndPos) {
-				return FindTokenOutput{
-					CurrentNode: assigments,
-					ParentNode:  section,
+			for _, assigments := range section.Assignments {
+				// Search in assingment's comment
+				for _, assigmentDoc := range assigments.Documents {
+					if inLineFunc(position, assigmentDoc.StartPos, assigmentDoc.EndPos) {
+						return FindTokenOutput{
+							CurrentNode: assigmentDoc,
+							ParentNodes: []Node{section},
+						}
+					}
+				}
+				// Search in assigment's value
+				if inLineFunc(position, assigments.Value.StartPos, assigments.Value.EndPos) {
+					return FindTokenOutput{
+						CurrentNode: assigments.Value,
+						ParentNodes: []Node{assigments, section},
+					}
+				}
+
+				// Search in assigment
+				if inLineFunc(position, assigments.StartPos, assigments.EndPos) {
+					return FindTokenOutput{
+						CurrentNode: assigments,
+						ParentNodes: []Node{section},
+					}
 				}
 			}
 		}
@@ -115,6 +123,7 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 
 	return FindTokenOutput{
 		CurrentNode: nil,
+		ParentNodes: nil,
 	}
 }
 
