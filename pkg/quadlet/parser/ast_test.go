@@ -42,16 +42,16 @@ Description= \
 	quadlet := parser.Quadlet
 
 	// Test outside of the line
-	nodeResult := quadlet.FindToken(NodePosition{0, 35})
+	nodeResult := quadlet.FindToken(NodePosition{LineNumber: 0, Position: 35})
 	require.Nil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 0)
 
-	nodeResult = quadlet.FindToken(NodePosition{0, 1})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 0, Position: 1})
 	require.Nil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 0)
 
 	// First comment line
-	nodeResult = quadlet.FindToken(NodePosition{0, 5})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 0, Position: 5})
 	assert.Len(t, nodeResult.ParentNodes, 0)
 	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
@@ -61,7 +61,7 @@ Description= \
 	}
 
 	// Second comment line
-	nodeResult = quadlet.FindToken(NodePosition{1, 5})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 1, Position: 5})
 	assert.Len(t, nodeResult.ParentNodes, 0)
 	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
@@ -71,7 +71,7 @@ Description= \
 	}
 
 	// Section's comment
-	nodeResult = quadlet.FindToken(NodePosition{3, 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 3, Position: 2})
 	assert.Len(t, nodeResult.ParentNodes, 0)
 	switch v := nodeResult.CurrentNode.(type) {
 	case *CommentNode:
@@ -81,7 +81,7 @@ Description= \
 	}
 
 	// [Container] section
-	nodeResult = quadlet.FindToken(NodePosition{4, 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 4, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	assert.Len(t, nodeResult.ParentNodes, 0)
 	switch v := nodeResult.CurrentNode.(type) {
@@ -92,7 +92,7 @@ Description= \
 	}
 
 	// Image's comment
-	nodeResult = quadlet.FindToken(NodePosition{6, 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 6, Position: 2})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 1)
 
@@ -111,7 +111,7 @@ Description= \
 	}
 
 	// Image=foo.image Key
-	nodeResult = quadlet.FindToken(NodePosition{7, 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 7, Position: 2})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 1)
 
@@ -130,7 +130,7 @@ Description= \
 	}
 
 	// Image=foo.image Value
-	nodeResult = quadlet.FindToken(NodePosition{7, 8})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 7, Position: 8})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 
@@ -156,7 +156,7 @@ Description= \
 	}
 
 	// Label keyword
-	nodeResult = quadlet.FindToken(NodePosition{10, 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 10, Position: 2})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 1)
 
@@ -175,7 +175,7 @@ Description= \
 	}
 
 	// Label multi-line value (first line)
-	nodeResult = quadlet.FindToken(NodePosition{11, 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 11, Position: 2})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 
@@ -201,7 +201,7 @@ Description= \
 	}
 
 	// [Unit] section
-	nodeResult = quadlet.FindToken(NodePosition{14, 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 14, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 0)
 
@@ -213,7 +213,7 @@ Description= \
 	}
 
 	// Description multi-line value (testing the "Foo" line)
-	nodeResult = quadlet.FindToken(NodePosition{17, 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 17, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 
@@ -239,7 +239,7 @@ Description= \
 	}
 
 	// Description multi-line value (testing the "container" line)
-	nodeResult = quadlet.FindToken(NodePosition{18, 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 18, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 
@@ -280,8 +280,8 @@ func Test_NodeQuadletString(t *testing.T) {
 						Name:      utils.AsPtr("Image"),
 						Documents: nil,
 						Value: &ValueNode{
-							StartPos: NodePosition{2, 0},
-							EndPos:   NodePosition{2, 12},
+							StartPos: NodePosition{LineNumber: 2, Position: 0},
+							EndPos:   NodePosition{LineNumber: 2, Position: 12},
 							Value:    utils.AsPtr("foo.image"),
 						},
 					},
@@ -289,8 +289,8 @@ func Test_NodeQuadletString(t *testing.T) {
 						Name:      utils.AsPtr("Label"),
 						Documents: nil,
 						Value: &ValueNode{
-							StartPos: NodePosition{3, 6},
-							EndPos:   NodePosition{3, 13},
+							StartPos: NodePosition{LineNumber: 3, Position: 6},
+							EndPos:   NodePosition{LineNumber: 3, Position: 13},
 							Value:    utils.AsPtr("env=test"),
 						},
 					},
@@ -300,13 +300,13 @@ func Test_NodeQuadletString(t *testing.T) {
 				Text: utils.AsPtr("[Unit]"),
 				Assignments: []*AssignNode{
 					{
-						StartPos:  NodePosition{5, 0},
-						EndPos:    NodePosition{4, 10},
+						StartPos:  NodePosition{LineNumber: 5, Position: 0},
+						EndPos:    NodePosition{LineNumber: 4, Position: 10},
 						Name:      utils.AsPtr("Description"),
 						Documents: nil,
 						Value: &ValueNode{
-							StartPos: NodePosition{5, 0},
-							EndPos:   NodePosition{4, 12},
+							StartPos: NodePosition{LineNumber: 5, Position: 0},
+							EndPos:   NodePosition{LineNumber: 4, Position: 12},
 							Value:    utils.AsPtr("Foo container"),
 						},
 					},
