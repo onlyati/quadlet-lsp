@@ -180,3 +180,74 @@ Description=Foo \
 	assert.Equal(t, NodePosition{LineNumber: 8, Position: 12}, descKeywordValue.StartPos)
 	assert.Equal(t, NodePosition{LineNumber: 9, Position: 11}, descKeywordValue.EndPos)
 }
+
+func BenchmarkNewParser(b *testing.B) {
+	tmpDir := b.TempDir()
+	mockText := `# disable-qsr: qsr014 qsr013
+#
+# Second comment line 🫠 emoji
+# 日本語 comment
+
+[Unit]
+Description=Gitea application
+Wants=gitea-db.service
+
+[Container]
+# Base options
+AutoUpdate=registry
+Image=docker.io/gitea/gitea:latest-rootless@sha256asdsadsad
+Pod=gitea.pod
+
+# Label options
+Label="type=dev"
+
+# Storage options
+Volume=/etc/localtime:/etc/localtime:ro
+Volume=/etc/timezone:/etc/timezone:ro
+Volume=foo.volume:/etc/asd:ro,z
+
+# Environment options
+Environment="GITEA__database__DB_TYPE=postgres"
+Environment="GITEA__database__HOST=127.0.0.1"
+Environment="GITEA__database__NAME=gitea"
+Environment="GITEA__database__USER=gitea"
+Environment='fooVariable=barValue'
+Environment=FOO=
+Environment=FOO=BAR FOO2=BAR2 "MyVar=MyValue is=>here" 'foo=bar' FOO3=BAR3
+
+# Secret options
+Secret=gitea-db-password,type=env,target=GITEA__database__PASSWD
+Secret=gitea-smtp-password,type=env,target=GITEA__mailer__PASSWD
+
+# Healthcheck options
+HealthCmd=/bin/curlcurl -k --fail --connect-timeout 5 \
+  https://127.0.0.1:3000/api/healthzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz \
+  asd \
+  hello
+HealthRetries=10
+HealthStartPeriod=15s
+HealthTimeout=15s
+
+# Other options
+Annotation="foo=bar"
+LogDriver=journald
+UserNS=keep-id
+
+[Service]
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=5
+
+[Install]
+WantedBy=default.target
+`
+	testutils.CreateTempDirBenchmark(b, tmpDir, "foo.container")
+	fullPath := path.Join(tmpDir, "foo.container")
+
+	// Reset the timer before the actual loop starts
+	b.ResetTimer()
+
+	for b.Loop() {
+		_ = NewParserFromMemory(fullPath, mockText)
+	}
+}

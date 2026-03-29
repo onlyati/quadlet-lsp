@@ -24,3 +24,11 @@ func CreateTempDir(t *testing.T, dir, name string) string {
 	assert.NoError(t, err)
 	return path
 }
+
+func CreateTempDirBenchmark(t *testing.B, dir, name string) string {
+	t.Helper()
+	path := filepath.Join(dir, name)
+	err := os.Mkdir(path, 0o755)
+	assert.NoError(t, err)
+	return path
+}
