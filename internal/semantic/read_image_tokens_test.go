@@ -13,7 +13,7 @@ func Test_parseQuadletImageValue(t *testing.T) {
 	input := `Image=docker.io/gitea/gitea:rootless@sha256asdasdasdasd
 Foo=bar`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -114,7 +114,7 @@ Foo=bar`
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -132,7 +132,7 @@ Foo=bar`
 func Test_parseQuadletImageValueWithoutHash(t *testing.T) {
 	input := "Image=docker.io/gitea/gitea.container:rootless"
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -198,7 +198,7 @@ func Test_parseQuadletImageValueWithoutHash(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -218,7 +218,7 @@ func Test_parseQuadletImageValueMultiline(t *testing.T) {
 Image= \
 	docker.io/gitea/gitea:rootless@sha256asdasdasdasd`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -298,7 +298,7 @@ Image= \
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 

@@ -73,11 +73,19 @@ func Test_LexerSection(t *testing.T) {
 		},
 		{
 			StartPos: TokenPosition{2, 0},
-			EndPos:   TokenPosition{3, 1},
+			EndPos:   TokenPosition{2, 4},
 			Position: 23,
-			Length:   utils.Utf16Len("[Foo\n]"),
+			Length:   utils.Utf16Len("[Foo"),
 			Type:     TokenTypeSection,
-			Text:     "[Foo\n]",
+			Text:     "[Foo",
+		},
+		{
+			StartPos: TokenPosition{3, 0},
+			EndPos:   TokenPosition{3, 1},
+			Position: 28,
+			Length:   utils.Utf16Len("]"),
+			Type:     TokenTypeSection,
+			Text:     "]",
 		},
 		{
 			StartPos: TokenPosition{4, 0},

@@ -87,11 +87,13 @@ func Start() {
 					}
 				}
 				docs.Add(uri, text) // Lightning fast, just maps a string
+				docs.ParseMutex.TryLock()
 			}
 
 			// If no incoming changes for a while, then start to parse and analyze it
 			diagDebouncer.Debounce(uri, 250*time.Millisecond, func() {
 				docs.Parse(uri)
+				docs.ParseMutex.Unlock()
 
 				checker := syntax.NewSyntaxChecker(docs.Read(uri), uri)
 				diags := checker.RunAll(config)

@@ -7,7 +7,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-type token struct {
+type semanticToken struct {
 	line      protocol.UInteger
 	charPos   protocol.UInteger
 	length    protocol.UInteger
@@ -22,7 +22,7 @@ type lexer struct {
 	lineNumber   protocol.UInteger
 	lineStart    protocol.UInteger
 	ch           rune
-	queue        []token
+	queue        []semanticToken
 }
 
 func newLexer(input string) *lexer {
@@ -33,7 +33,7 @@ func newLexer(input string) *lexer {
 		lineNumber:   0,
 		lineStart:    0,
 		ch:           0,
-		queue:        []token{},
+		queue:        []semanticToken{},
 	}
 	l.readRune()
 	return l
@@ -83,7 +83,7 @@ func (l *lexer) skipWhitespace() {
 	}
 }
 
-func (l *lexer) nextToken() token {
+func (l *lexer) nextToken() semanticToken {
 	// if something has been put into the queue, then empty it
 	if len(l.queue) > 0 {
 		tok := l.queue[0]
@@ -102,7 +102,7 @@ func (l *lexer) nextToken() token {
 		case '\\':
 			return l.readOperator()
 		case 0:
-			return token{
+			return semanticToken{
 				tokenType: "eof",
 				line:      l.lineNumber,
 				charPos:   l.position,

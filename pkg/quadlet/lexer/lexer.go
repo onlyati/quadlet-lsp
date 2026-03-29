@@ -157,7 +157,7 @@ func (l *Lexer) readUntil(parms readUntilParm) Token {
 		}
 	}
 
-	if parms.readLast {
+	if parms.readLast || l.character == ']' {
 		l.readRune()
 	}
 
@@ -260,11 +260,11 @@ func (l *Lexer) nextToken() {
 				tokenType:  TokenTypeComment,
 				readLast:   false,
 			}))
-		case '[':
+		case '[', ']':
 			l.Tokens = append(l.Tokens, l.readUntil(readUntilParm{
-				delimiters: map[rune]any{']': nil},
+				delimiters: map[rune]any{']': nil, '\n': nil},
 				tokenType:  TokenTypeSection,
-				readLast:   true,
+				readLast:   false,
 			}))
 		case 0:
 			l.Tokens = append(l.Tokens, NewToken(

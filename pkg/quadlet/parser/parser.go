@@ -18,7 +18,7 @@ type Parser struct {
 	Quadlet       *QuadletNode   // The parsed output
 	Errors        []ParserError  // If there is any error during reading record it
 	Path          string         // Location of the file
-	tokens        []lexer.Token  // Result of the lexer
+	LexerTokens   []lexer.Token  // Result of the lexer
 	tokenIndex    int            // Which token we are in iteration
 	commentBuffer []*CommentNode // Comments before statements are belongs to statement
 }
@@ -37,7 +37,7 @@ func NewParser(path string) Parser {
 			Sections:  []*SectionNode{},
 		},
 		tokenIndex:    -1,
-		tokens:        l.Tokens,
+		LexerTokens:   l.Tokens,
 		commentBuffer: []*CommentNode{},
 		Errors:        []ParserError{},
 	}
@@ -56,7 +56,7 @@ func NewParserFromMemory(path, content string) Parser {
 			Sections:  []*SectionNode{},
 		},
 		tokenIndex:    -1,
-		tokens:        l.Tokens,
+		LexerTokens:   l.Tokens,
 		commentBuffer: []*CommentNode{},
 		Errors:        []ParserError{},
 	}
@@ -204,22 +204,22 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 
 func (p *Parser) consumeToken() *lexer.Token {
 	p.tokenIndex++
-	if p.tokenIndex == len(p.tokens)-1 {
+	if p.tokenIndex == len(p.LexerTokens)-1 {
 		return nil
 	}
-	return &p.tokens[p.tokenIndex]
+	return &p.LexerTokens[p.tokenIndex]
 }
 
 func (p *Parser) prevToken() *lexer.Token {
 	if p.tokenIndex == 0 {
 		return nil
 	}
-	return &p.tokens[p.tokenIndex-1]
+	return &p.LexerTokens[p.tokenIndex-1]
 }
 
 func (p *Parser) peekToken() *lexer.Token {
-	if p.tokenIndex+1 < len(p.tokens)-1 {
-		return &p.tokens[p.tokenIndex+1]
+	if p.tokenIndex+1 < len(p.LexerTokens)-1 {
+		return &p.LexerTokens[p.tokenIndex+1]
 	}
 	return nil
 }

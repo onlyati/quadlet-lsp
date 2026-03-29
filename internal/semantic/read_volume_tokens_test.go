@@ -12,7 +12,7 @@ import (
 func Test_parseQuadletVolume(t *testing.T) {
 	input := `Volume=foo.volume:/app:ro,U`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -78,7 +78,7 @@ func Test_parseQuadletVolume(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -98,7 +98,7 @@ func Test_parseQuadletVolumeMultiline(t *testing.T) {
 Volume= \
 	foo.volume:/app:ro,U`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -164,7 +164,7 @@ Volume= \
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 

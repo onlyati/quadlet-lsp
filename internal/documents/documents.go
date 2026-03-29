@@ -5,13 +5,15 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/lexer"
 	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 )
 
 type Documents struct {
-	mu      sync.RWMutex
-	files   map[string]string
-	parsers map[string]parser.Parser
+	mu         sync.RWMutex
+	files      map[string]string
+	parsers    map[string]parser.Parser
+	ParseMutex sync.Mutex
 }
 
 func NewDocuments() Documents {
@@ -76,6 +78,15 @@ func (d *Documents) ReadQuadlet(uri string) *parser.QuadletNode {
 	d.mu.RLock()
 	uri = strings.TrimPrefix(uri, "file://")
 	text := d.parsers[uri].Quadlet
+	d.mu.RUnlock()
+
+	return text
+}
+
+func (d *Documents) ReadLexerTokens(uri string) []lexer.Token {
+	d.mu.RLock()
+	uri = strings.TrimPrefix(uri, "file://")
+	text := d.parsers[uri].LexerTokens
 	d.mu.RUnlock()
 
 	return text

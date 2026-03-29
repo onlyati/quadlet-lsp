@@ -15,7 +15,7 @@ func Test_parseQuadletCommentASCII(t *testing.T) {
 	# Second comment line
 `
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -32,7 +32,7 @@ func Test_parseQuadletCommentASCII(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -53,7 +53,7 @@ func Test_parseQuadletCommentUTF16(t *testing.T) {
 # 日本語 comment
 `
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -70,7 +70,7 @@ func Test_parseQuadletCommentUTF16(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -91,7 +91,7 @@ func Test_parseQuadletSection(t *testing.T) {
 [Unit]
 `
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -108,7 +108,7 @@ func Test_parseQuadletSection(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -130,7 +130,7 @@ Bar=foobar \
   foo
 `
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -189,7 +189,7 @@ Bar=foobar \
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
