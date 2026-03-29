@@ -12,7 +12,7 @@ import (
 func Test_parseQuadletPod(t *testing.T) {
 	input := `Pod=foo.pod`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -36,7 +36,7 @@ func Test_parseQuadletPod(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -56,7 +56,7 @@ func Test_parseQuadletPodMultiline(t *testing.T) {
 Pod=\
 	foo.pod`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -80,7 +80,7 @@ Pod=\
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 

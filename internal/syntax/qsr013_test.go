@@ -39,7 +39,7 @@ func TestQSR013_Valid(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr013(s)
@@ -69,7 +69,7 @@ func TestQSR013_Invalid(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr013(s)

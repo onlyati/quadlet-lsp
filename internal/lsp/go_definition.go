@@ -18,7 +18,7 @@ func textDefinition(
 	var location protocol.Location
 
 	uri := string(params.TextDocument.URI)
-	text := documents.Read(uri)
+	text := docs.Read(uri)
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 	editorLine := params.Position.Line
 	currentLine := lines[editorLine]

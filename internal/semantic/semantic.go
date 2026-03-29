@@ -3,6 +3,7 @@
 package semantic
 
 import (
+	quadlet_lexer "github.com/onlyati/quadlet-lsp/pkg/quadlet/lexer"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -35,14 +36,19 @@ var specialFunctionMap = map[string]func(*lexer){
 	"Annotation":  (*lexer).readLabelValue,
 }
 
-func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) {
-	tokens := parseQuadlet(fileText)
+func CalculateSemanticTokens(lexerTokens []quadlet_lexer.Token) (*protocol.SemanticTokens, error) {
+	converter := tokenConverter{
+		lexerTokens:    lexerTokens,
+		index:          -1,
+		semanticTokens: make([]semanticToken, 0, len(lexerTokens)),
+	}
+	converter.parseQuadlet()
 
-	data := make([]uint32, 0, len(tokens)*5)
+	data := make([]uint32, 0, len(converter.semanticTokens)*5)
 
 	var lastLine, lastChar uint32
 
-	for _, token := range tokens {
+	for _, token := range converter.semanticTokens {
 		deltaLine := token.line - lastLine
 		deltaStart := token.charPos
 		if deltaLine == 0 {
@@ -69,16 +75,80 @@ func CalculateSemanticTokens(fileText string) (*protocol.SemanticTokens, error) 
 	return &protocol.SemanticTokens{Data: data}, nil
 }
 
-func parseQuadlet(fileText string) []token {
-	tokens := []token{}
+type tokenConverter struct {
+	lexerTokens    []quadlet_lexer.Token
+	index          int
+	semanticTokens []semanticToken
+}
 
-	l := newLexer(fileText)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+func (t *tokenConverter) readToken() *quadlet_lexer.Token {
+	t.index++
+	if t.index == len(t.lexerTokens)-1 {
+		return nil
 	}
+	return &t.lexerTokens[t.index]
+}
 
-	return tokens
+// func (t *tokenConverter) lastToken() *semanticToken {
+// 	if t.index == 0 {
+// 		return nil
+// 	}
+// 	return &t.semanticTokens[t.index-1]
+// }
+
+// parseQuadlet translate the regular lexer tokens to semantic tokens
+func (t *tokenConverter) parseQuadlet() {
+	token := t.readToken()
+
+	for token != nil {
+		switch token.Type {
+		case quadlet_lexer.TokenTypeComment:
+			comment := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position,
+				length:    token.EndPos.Position - token.StartPos.Position,
+				tokenType: string(protocol.SemanticTokenTypeComment),
+				text:      token.Text,
+			}
+			t.semanticTokens = append(t.semanticTokens, comment)
+		case quadlet_lexer.TokenTypeSection:
+			section := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position,
+				length:    token.EndPos.Position - token.StartPos.Position,
+				tokenType: string(protocol.SemanticTokenTypeNamespace),
+				text:      token.Text,
+			}
+			t.semanticTokens = append(t.semanticTokens, section)
+		case quadlet_lexer.TokenTypeKeyword:
+			keyword := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position,
+				length:    token.EndPos.Position - token.StartPos.Position,
+				tokenType: string(protocol.SemanticTokenTypeKeyword),
+				text:      token.Text,
+			}
+			t.semanticTokens = append(t.semanticTokens, keyword)
+		case quadlet_lexer.TokenTypeValue:
+			value := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position,
+				length:    token.EndPos.Position - token.StartPos.Position,
+				tokenType: string(protocol.SemanticTokenTypeString),
+				text:      token.Text,
+			}
+			t.semanticTokens = append(t.semanticTokens, value)
+		case quadlet_lexer.TokenTypeAssign, quadlet_lexer.TokenTypeContSign:
+			op := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position,
+				length:    token.EndPos.Position - token.StartPos.Position,
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      token.Text,
+			}
+			t.semanticTokens = append(t.semanticTokens, op)
+		}
+
+		token = t.readToken()
+	}
 }

@@ -12,7 +12,7 @@ import (
 func Test_parseQuadletEnv(t *testing.T) {
 	input := `Environment=FOO=bar`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -50,7 +50,7 @@ func Test_parseQuadletEnv(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -68,7 +68,7 @@ func Test_parseQuadletEnv(t *testing.T) {
 func Test_parseQuadletEnvWithAposhtrophes(t *testing.T) {
 	input := `Environment="FOO=foo bar"`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -120,7 +120,7 @@ func Test_parseQuadletEnvWithAposhtrophes(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -138,7 +138,7 @@ func Test_parseQuadletEnvWithAposhtrophes(t *testing.T) {
 func Test_parseQuadletEnvWithQuoteMark(t *testing.T) {
 	input := `Environment='FOO=foo bar'`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -190,7 +190,7 @@ func Test_parseQuadletEnvWithQuoteMark(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -208,7 +208,7 @@ func Test_parseQuadletEnvWithQuoteMark(t *testing.T) {
 func Test_parseQuadletEnvComplex(t *testing.T) {
 	input := `Environment=FOO=BAR FOO2=BAR2 "MyVar=MyValue is=>here" 'foo=bar'`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -337,7 +337,7 @@ func Test_parseQuadletEnvComplex(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -358,7 +358,7 @@ Environment= \
 	"FOO=foo bar" \
 	foo=bar`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -431,7 +431,7 @@ Environment= \
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -449,7 +449,7 @@ Environment= \
 func Test_parseQuadletEnvWithNum(t *testing.T) {
 	input := `Environment=FOO=127.0.0.1`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -487,7 +487,7 @@ func Test_parseQuadletEnvWithNum(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 

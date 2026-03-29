@@ -11,7 +11,7 @@ import (
 
 func Format(context *glsp.Context, params *protocol.DocumentFormattingParams) ([]protocol.TextEdit, error) {
 	uri := string(params.TextDocument.URI)
-	text := documents.Read(uri)
+	text := docs.Read(uri)
 	textLines := strings.Split(text, "\n")
 
 	// Only make formatting if no syntax error in the file

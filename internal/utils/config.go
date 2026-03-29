@@ -58,7 +58,7 @@ func LoadConfig(workspaceRoot string, c Commander) (*QuadletConfig, error) {
 		config.Project.RootDir = config.WorkspaceRoot
 	}
 	if config.Project.DirLevel == nil {
-		config.Project.DirLevel = ReturnAsPtr(2)
+		config.Project.DirLevel = AsPtr(2)
 	}
 
 	if *config.Project.DirLevel < 0 {

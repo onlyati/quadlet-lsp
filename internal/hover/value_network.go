@@ -5,13 +5,18 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 // handleValuePod is looking for the the pod file and display its content on
 // hover output.
 func handleValueNetwork(info HoverInformation) *protocol.Hover {
-	network := info.value
+	value, ok := info.TokenInfo.CurrentNode.(*parser.ValueNode)
+	if !ok {
+		return nil
+	}
+	network := *value.Value
 	if strings.Contains(network, "@") {
 		network = utils.ConvertTemplateNameToFile(network)
 	}
@@ -39,6 +44,16 @@ func handleValueNetwork(info HoverInformation) *protocol.Hover {
 					Contents: protocol.MarkupContent{
 						Kind:  protocol.MarkupKindMarkdown,
 						Value: strings.Join(msg, "\n"),
+					},
+					Range: &protocol.Range{
+						Start: protocol.Position{
+							Line:      value.StartPos.LineNumber,
+							Character: value.StartPos.Position,
+						},
+						End: protocol.Position{
+							Line:      value.EndPos.LineNumber,
+							Character: value.EndPos.Position,
+						},
 					},
 				}
 			}

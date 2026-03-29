@@ -11,7 +11,7 @@ import (
 func Test_parseQuadletSecret(t *testing.T) {
 	input := `Secret=secret1,type=env,target=ENV1`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -91,7 +91,7 @@ func Test_parseQuadletSecret(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -111,7 +111,7 @@ func Test_parseQuadletSecretMultiline(t *testing.T) {
 Secret= \
 	secret1,type=env,target=ENV1`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -191,7 +191,7 @@ Secret= \
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 

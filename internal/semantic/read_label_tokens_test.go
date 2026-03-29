@@ -12,7 +12,7 @@ import (
 func Test_parseQuadletLabel(t *testing.T) {
 	input := `Label=FOO=bar`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -50,7 +50,7 @@ func Test_parseQuadletLabel(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -70,7 +70,7 @@ func Test_parseQuadletLabelMultiline(t *testing.T) {
 Label= \
 	FOO=bar`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -108,7 +108,7 @@ Label= \
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -126,7 +126,7 @@ Label= \
 func Test_parseQuadletLabelWithAposhtrophes(t *testing.T) {
 	input := `Label="FOO=foo bar"`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -178,7 +178,7 @@ func Test_parseQuadletLabelWithAposhtrophes(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 
@@ -196,7 +196,7 @@ func Test_parseQuadletLabelWithAposhtrophes(t *testing.T) {
 func Test_parseQuadletLabelMultiValue(t *testing.T) {
 	input := `Label=FOO=bar foo=bar`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -234,7 +234,7 @@ func Test_parseQuadletLabelMultiValue(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
+	tokens := []semanticToken{}
 	l := newLexer(input)
 	tok := l.nextToken()
 

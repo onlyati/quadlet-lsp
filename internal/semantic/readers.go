@@ -5,7 +5,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func (l *lexer) readOperator() token {
+func (l *lexer) readOperator() semanticToken {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
@@ -14,7 +14,7 @@ func (l *lexer) readOperator() token {
 	// Measure the content we just read in UTF-16 units
 	sectionText := l.input[startByte:l.position]
 
-	return token{
+	return semanticToken{
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(sectionText),
@@ -46,7 +46,7 @@ func (l *lexer) customReader(reader func(*lexer)) {
 	}
 }
 
-func (l *lexer) readUntil(delimiters map[rune]struct{}, tokenType string) token {
+func (l *lexer) readUntil(delimiters map[rune]struct{}, tokenType string) semanticToken {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
@@ -67,7 +67,7 @@ func (l *lexer) readUntil(delimiters map[rune]struct{}, tokenType string) token 
 	// Measure the content we just read in UTF-16 units
 	text := l.input[startByte:l.position]
 
-	return token{
+	return semanticToken{
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(text),
@@ -89,7 +89,7 @@ func (l *lexer) readAssignment() {
 
 	// If we hit a \n, it means it was a value line, if we hit '=' it is property
 	if l.ch == '\n' || l.ch == '\\' || l.ch == 0 {
-		l.queue = append(l.queue, token{
+		l.queue = append(l.queue, semanticToken{
 			line:      l.lineNumber,
 			charPos:   charPos,
 			length:    utils.Utf16Len(propText),
@@ -100,7 +100,7 @@ func (l *lexer) readAssignment() {
 	}
 
 	// We hit '=' a sign, put property to queue, then analyze line further
-	l.queue = append(l.queue, token{
+	l.queue = append(l.queue, semanticToken{
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(propText),
@@ -120,7 +120,7 @@ func (l *lexer) readAssignment() {
 	}
 }
 
-func (l *lexer) readSection() token {
+func (l *lexer) readSection() semanticToken {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
@@ -134,7 +134,7 @@ func (l *lexer) readSection() token {
 	// Measure the content we just read in UTF-16 units
 	sectionText := l.input[startByte:l.position]
 
-	return token{
+	return semanticToken{
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(sectionText),
@@ -143,7 +143,7 @@ func (l *lexer) readSection() token {
 	}
 }
 
-func (l *lexer) readComment() token {
+func (l *lexer) readComment() semanticToken {
 	startByte := l.position
 	charPos := utils.Utf16Len(l.input[l.lineStart:l.position]) // Calc column in UTF-16
 
@@ -154,7 +154,7 @@ func (l *lexer) readComment() token {
 	// Measure the content we just read in UTF-16 units
 	commentText := l.input[startByte:l.position]
 
-	return token{
+	return semanticToken{
 		line:      l.lineNumber,
 		charPos:   charPos,
 		length:    utils.Utf16Len(commentText),

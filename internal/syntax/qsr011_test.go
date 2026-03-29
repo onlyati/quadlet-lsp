@@ -61,7 +61,7 @@ func TestQSR011_ValidContainer(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr011(s)
@@ -86,7 +86,7 @@ func TestQSR011_InvalidContainer(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr011(s)
@@ -116,7 +116,7 @@ func TestQSR011_ValidPod(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr011(s)
@@ -143,7 +143,7 @@ func TestQSR011_InvalidPod(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr011(s)
@@ -169,7 +169,7 @@ func TestQSR011_InvalidDropins(t *testing.T) {
 		WorkspaceRoot: tmpDir,
 		Mu:            sync.RWMutex{},
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	s.commander = mockCommanderQSR011{}
@@ -197,7 +197,7 @@ func TestQSR011_InvalidMultiDropins(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 		Mu: sync.RWMutex{},
 	}
@@ -225,7 +225,7 @@ func TestQSR011_ValidPodDropins(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 		Mu: sync.RWMutex{},
 	}
@@ -252,7 +252,7 @@ func TestQSR011_MoreOption(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr011(s)
