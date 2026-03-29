@@ -49,6 +49,16 @@ func handlePropertyHover(info HoverInformation) *protocol.Hover {
 					Kind:  protocol.MarkupKindMarkdown,
 					Value: "**" + item.Label + "**\n\n" + strings.Join(item.Hover, "\n"),
 				},
+				Range: &protocol.Range{
+					Start: protocol.Position{
+						Line:      keyword.StartPos.LineNumber,
+						Character: keyword.StartPos.Position,
+					},
+					End: protocol.Position{
+						Line:      keyword.EndPos.LineNumber,
+						Character: keyword.EndPos.Position,
+					},
+				},
 			}
 		}
 	}

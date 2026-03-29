@@ -134,7 +134,8 @@ func (p *Parser) parseSection(token *lexer.Token) {
 
 func (p *Parser) parseAssignment(token *lexer.Token) {
 	assignment := AssignNode{
-		StartPos:  NodePosition(token.StartPos),
+		StartPos:  token.StartPos,
+		EndPos:    token.EndPos,
 		Documents: p.commentBuffer,
 		Name:      &token.Text,
 	}
@@ -198,7 +199,6 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 	value.Value = utils.AsPtr(strings.TrimSpace(valueString.String()))
 
 	assignment.Value = &value
-	assignment.EndPos = NodePosition(token.EndPos)
 	p.lastSection().Assignments = append(p.lastSection().Assignments, &assignment)
 }
 

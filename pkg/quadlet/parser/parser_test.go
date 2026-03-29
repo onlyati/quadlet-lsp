@@ -144,7 +144,7 @@ Description=Foo \
 	imageKeyword := containerSection.Assignments[0]
 	assert.Equal(t, "Image", *imageKeyword.Name)
 	assert.Equal(t, NodePosition{LineNumber: 3, Position: 0}, imageKeyword.StartPos)
-	assert.Equal(t, NodePosition{LineNumber: 3, Position: 15}, imageKeyword.EndPos)
+	assert.Equal(t, NodePosition{LineNumber: 3, Position: 5}, imageKeyword.EndPos)
 
 	imageKeywordValue := imageKeyword.Value
 	assert.Equal(t, "foo.image", *imageKeywordValue.Value)
@@ -155,7 +155,7 @@ Description=Foo \
 	labelKeyword := containerSection.Assignments[1]
 	assert.Equal(t, "Label", *labelKeyword.Name)
 	assert.Equal(t, NodePosition{LineNumber: 4, Position: 0}, labelKeyword.StartPos)
-	assert.Equal(t, NodePosition{LineNumber: 5, Position: 10}, labelKeyword.EndPos)
+	assert.Equal(t, NodePosition{LineNumber: 4, Position: 5}, labelKeyword.EndPos)
 
 	labelKeywordValue := containerSection.Assignments[1].Value
 	assert.Equal(t, "env=test", *labelKeywordValue.Value)
@@ -173,7 +173,7 @@ Description=Foo \
 	descKeyword := unitSection.Assignments[0]
 	assert.Equal(t, "Description", *descKeyword.Name)
 	assert.Equal(t, NodePosition{LineNumber: 8, Position: 0}, descKeyword.StartPos)
-	assert.Equal(t, NodePosition{LineNumber: 9, Position: 11}, descKeyword.EndPos)
+	assert.Equal(t, NodePosition{LineNumber: 8, Position: 11}, descKeyword.EndPos)
 
 	descKeywordValue := unitSection.Assignments[0].Value
 	assert.Equal(t, "Foo container", *descKeywordValue.Value)
