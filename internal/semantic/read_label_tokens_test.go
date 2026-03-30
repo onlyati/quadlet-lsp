@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -43,24 +44,23 @@ func Test_parseQuadletLabel(t *testing.T) {
 		},
 		{
 			line:      0,
-			charPos:   10,
+			charPos:   11,
 			length:    protocol.UInteger(utils.Utf16Len("bar")),
 			tokenType: string(protocol.SemanticTokenTypeString),
 			text:      "bar",
 		},
 	}
 
-	tokens := []semanticToken{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
@@ -86,6 +86,13 @@ Label= \
 			text:      "=",
 		},
 		{
+			line:      1,
+			charPos:   7,
+			length:    protocol.UInteger(utils.Utf16Len("\\")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "\\",
+		},
+		{
 			line:      2,
 			charPos:   1,
 			length:    protocol.UInteger(utils.Utf16Len("FOO")),
@@ -101,24 +108,23 @@ Label= \
 		},
 		{
 			line:      2,
-			charPos:   5,
+			charPos:   6,
 			length:    protocol.UInteger(utils.Utf16Len("bar")),
 			tokenType: string(protocol.SemanticTokenTypeString),
 			text:      "bar",
 		},
 	}
 
-	tokens := []semanticToken{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
@@ -145,7 +151,7 @@ func Test_parseQuadletLabelWithAposhtrophes(t *testing.T) {
 			line:      0,
 			charPos:   6,
 			length:    protocol.UInteger(utils.Utf16Len("\"")),
-			tokenType: string(protocol.SemanticTokenTypeOperator),
+			tokenType: string(protocol.SemanticTokenTypeString),
 			text:      "\"",
 		},
 		{
@@ -173,22 +179,21 @@ func Test_parseQuadletLabelWithAposhtrophes(t *testing.T) {
 			line:      0,
 			charPos:   18,
 			length:    protocol.UInteger(utils.Utf16Len("\"")),
-			tokenType: string(protocol.SemanticTokenTypeOperator),
+			tokenType: string(protocol.SemanticTokenTypeString),
 			text:      "\"",
 		},
 	}
 
-	tokens := []semanticToken{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
@@ -227,24 +232,23 @@ func Test_parseQuadletLabelMultiValue(t *testing.T) {
 		},
 		{
 			line:      0,
-			charPos:   10,
+			charPos:   11,
 			length:    protocol.UInteger(utils.Utf16Len("bar foo=bar")),
 			tokenType: string(protocol.SemanticTokenTypeString),
 			text:      "bar foo=bar",
 		},
 	}
 
-	tokens := []semanticToken{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }

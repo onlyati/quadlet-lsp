@@ -84,9 +84,12 @@ type tokenConverter struct {
 }
 
 var specialParsers = map[string]func(*tokenConverter, *quadlet_lexer.Token) []semanticToken{
-	"Network": (*tokenConverter).readNetworkValue,
-	"Image":   (*tokenConverter).readImageValue,
-	"Pod":     (*tokenConverter).readPodValue,
+	"Network":     (*tokenConverter).readNetworkValue,
+	"Image":       (*tokenConverter).readImageValue,
+	"Pod":         (*tokenConverter).readPodValue,
+	"Label":       (*tokenConverter).readLabelValue,
+	"Annotation":  (*tokenConverter).readLabelValue,
+	"Environment": (*tokenConverter).readLabelValue,
 }
 
 func (t *tokenConverter) readToken() *quadlet_lexer.Token {
@@ -95,6 +98,14 @@ func (t *tokenConverter) readToken() *quadlet_lexer.Token {
 		return nil
 	}
 	return &t.lexerTokens[t.index]
+}
+
+func (t *tokenConverter) peekToken() *quadlet_lexer.Token {
+	index := t.index + 1
+	if t.index == len(t.lexerTokens)-1 {
+		return nil
+	}
+	return &t.lexerTokens[index]
 }
 
 // parseQuadlet translate the regular lexer tokens to semantic tokens
@@ -296,6 +307,89 @@ func (t *tokenConverter) readImageValue(token *quadlet_lexer.Token) []semanticTo
 			})
 			lastPos += uint32(1)
 		}
+	}
+
+	return tokens
+}
+
+// readLabelValue is part of semantic token parsing for Label keyword.
+func (t *tokenConverter) readLabelValue(token *quadlet_lexer.Token) []semanticToken {
+	tokens := []semanticToken{}
+
+	lastPos := token.StartPos.Position
+	tokenBuf := strings.Builder{}
+	propFound := false
+	valueWritten := false
+
+	for i, c := range token.Text {
+		switch c {
+		case '"', '\'':
+			if propFound {
+				tokenStr := tokenBuf.String()
+				tokenBuf = strings.Builder{}
+				op := semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    uint32(len(tokenStr)),
+					tokenType: string(protocol.SemanticTokenTypeString),
+					text:      tokenStr,
+				}
+				tokens = append(tokens, op)
+				valueWritten = true
+			}
+			op := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position + uint32(i),
+				length:    uint32(1),
+				tokenType: string(protocol.SemanticTokenTypeString),
+				text:      string(c),
+			}
+			tokens = append(tokens, op)
+			lastPos = token.StartPos.Position + uint32(i) + 1
+		case '=':
+			if propFound {
+				tokenBuf.WriteRune(c)
+				continue
+			}
+			propFound = true
+			tokenStr := tokenBuf.String()
+			tokenBuf = strings.Builder{}
+
+			op := semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(tokenStr)),
+				tokenType: string(protocol.SemanticTokenTypeParameter),
+				text:      tokenStr,
+			}
+			tokens = append(tokens, op)
+
+			op = semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   token.StartPos.Position + uint32(i),
+				length:    uint32(1),
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      string(c),
+			}
+			tokens[len(tokens)-1].tokenType = string(protocol.SemanticTokenTypeParameter)
+			tokens = append(tokens, op)
+			lastPos = token.StartPos.Position + uint32(i) + 1
+		default:
+			tokenBuf.WriteRune(c)
+		}
+	}
+
+	if !valueWritten {
+		tokenStr := tokenBuf.String()
+		tokenBuf = strings.Builder{}
+		op := semanticToken{
+			line:      token.StartPos.LineNumber,
+			charPos:   lastPos + 1,
+			length:    uint32(len(tokenStr)),
+			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      tokenStr,
+		}
+		tokens = append(tokens, op)
 	}
 
 	return tokens
