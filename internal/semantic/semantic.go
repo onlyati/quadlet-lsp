@@ -100,14 +100,6 @@ func (t *tokenConverter) readToken() *quadlet_lexer.Token {
 	return &t.lexerTokens[t.index]
 }
 
-func (t *tokenConverter) peekToken() *quadlet_lexer.Token {
-	index := t.index + 1
-	if t.index == len(t.lexerTokens)-1 {
-		return nil
-	}
-	return &t.lexerTokens[index]
-}
-
 // parseQuadlet translate the regular lexer tokens to semantic tokens
 func (t *tokenConverter) parseQuadlet() {
 	token := t.readToken()
