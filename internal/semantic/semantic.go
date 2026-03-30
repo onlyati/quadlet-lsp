@@ -86,6 +86,7 @@ type tokenConverter struct {
 var specialParsers = map[string]func(*tokenConverter, *quadlet_lexer.Token) []semanticToken{
 	"Network": (*tokenConverter).readNetworkValue,
 	"Image":   (*tokenConverter).readImageValue,
+	"Pod":     (*tokenConverter).readPodValue,
 }
 
 func (t *tokenConverter) readToken() *quadlet_lexer.Token {
@@ -176,6 +177,23 @@ func (t *tokenConverter) readNetworkValue(token *quadlet_lexer.Token) []semantic
 	}}
 }
 
+// readPodValue is part of semantic token parsing for Pod keyword.
+func (t *tokenConverter) readPodValue(token *quadlet_lexer.Token) []semanticToken {
+	tokenType := protocol.SemanticTokenTypeString
+	if strings.HasSuffix(token.Text, ".pod") {
+		tokenType = protocol.SemanticTokenTypeParameter
+	}
+
+	return []semanticToken{{
+		line:      token.StartPos.LineNumber,
+		charPos:   token.StartPos.Position,
+		length:    token.EndPos.Position - token.StartPos.Position,
+		tokenType: string(tokenType),
+		text:      token.Text,
+	}}
+}
+
+// readImageValue is part of semantic token parsing for Image keyword.
 func (t *tokenConverter) readImageValue(token *quadlet_lexer.Token) []semanticToken {
 	if strings.HasSuffix(token.Text, ".image") || strings.HasSuffix(token.Text, ".build") {
 		return []semanticToken{{

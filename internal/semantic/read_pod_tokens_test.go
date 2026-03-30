@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -36,17 +37,16 @@ func Test_parseQuadletPod(t *testing.T) {
 		},
 	}
 
-	tokens := []semanticToken{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
@@ -72,6 +72,13 @@ Pod=\
 			text:      "=",
 		},
 		{
+			line:      1,
+			charPos:   4,
+			length:    protocol.UInteger(utils.Utf16Len("\\")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "\\",
+		},
+		{
 			line:      2,
 			charPos:   1,
 			length:    protocol.UInteger(utils.Utf16Len("foo.pod")),
@@ -80,17 +87,16 @@ Pod=\
 		},
 	}
 
-	tokens := []semanticToken{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
