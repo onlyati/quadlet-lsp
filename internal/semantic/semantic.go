@@ -83,8 +83,9 @@ type tokenConverter struct {
 	semanticTokens []semanticToken
 }
 
-var specialParsers = map[string]func(*tokenConverter, *quadlet_lexer.Token) protocol.SemanticTokenType{
+var specialParsers = map[string]func(*tokenConverter, *quadlet_lexer.Token) []semanticToken{
 	"Network": (*tokenConverter).readNetworkValue,
+	"Image":   (*tokenConverter).readImageValue,
 }
 
 func (t *tokenConverter) readToken() *quadlet_lexer.Token {
@@ -131,18 +132,19 @@ func (t *tokenConverter) parseQuadlet() {
 			t.semanticTokens = append(t.semanticTokens, keyword)
 			lastKeyword = token.Text
 		case quadlet_lexer.TokenTypeValue:
-			tokenType := protocol.SemanticTokenTypeString
 			if fn, ok := specialParsers[lastKeyword]; ok {
-				tokenType = fn(t, token)
+				valueTokens := fn(t, token)
+				t.semanticTokens = append(t.semanticTokens, valueTokens...)
+			} else {
+				value := semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   token.StartPos.Position,
+					length:    token.EndPos.Position - token.StartPos.Position,
+					tokenType: string(protocol.SemanticTokenTypeString),
+					text:      token.Text,
+				}
+				t.semanticTokens = append(t.semanticTokens, value)
 			}
-			value := semanticToken{
-				line:      token.StartPos.LineNumber,
-				charPos:   token.StartPos.Position,
-				length:    token.EndPos.Position - token.StartPos.Position,
-				tokenType: string(tokenType),
-				text:      token.Text,
-			}
-			t.semanticTokens = append(t.semanticTokens, value)
 		case quadlet_lexer.TokenTypeAssign, quadlet_lexer.TokenTypeContSign:
 			op := semanticToken{
 				line:      token.StartPos.LineNumber,
@@ -159,9 +161,124 @@ func (t *tokenConverter) parseQuadlet() {
 }
 
 // readNetworkValue is part of semantic token parsing for Network keyword.
-func (t *tokenConverter) readNetworkValue(lexerToken *quadlet_lexer.Token) protocol.SemanticTokenType {
-	if strings.HasSuffix(lexerToken.Text, ".network") {
-		return protocol.SemanticTokenTypeParameter
+func (t *tokenConverter) readNetworkValue(token *quadlet_lexer.Token) []semanticToken {
+	tokenType := protocol.SemanticTokenTypeString
+	if strings.HasSuffix(token.Text, ".network") {
+		tokenType = protocol.SemanticTokenTypeParameter
 	}
-	return protocol.SemanticTokenTypeString
+
+	return []semanticToken{{
+		line:      token.StartPos.LineNumber,
+		charPos:   token.StartPos.Position,
+		length:    token.EndPos.Position - token.StartPos.Position,
+		tokenType: string(tokenType),
+		text:      token.Text,
+	}}
+}
+
+func (t *tokenConverter) readImageValue(token *quadlet_lexer.Token) []semanticToken {
+	if strings.HasSuffix(token.Text, ".image") || strings.HasSuffix(token.Text, ".build") {
+		return []semanticToken{{
+			line:      token.StartPos.LineNumber,
+			charPos:   token.StartPos.Position,
+			length:    token.EndPos.Position - token.StartPos.Position,
+			tokenType: string(protocol.SemanticTokenTypeParameter),
+			text:      token.Text,
+		}}
+	}
+
+	tokens := []semanticToken{}
+
+	parts := strings.Split(token.Text, "/")
+	lastPos := token.StartPos.Position
+	for i, part := range parts {
+		switch i {
+		case 0:
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(part)),
+				tokenType: string(protocol.SemanticTokenTypeString),
+				text:      part,
+			})
+			lastPos += uint32(len(part))
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    1,
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      "/",
+			})
+			lastPos += uint32(1)
+		case len(parts) - 1:
+			// Last token handled due to ':' and '@' characters
+			imageParts := strings.SplitN(part, ":", 2)
+			lastIndex := 0
+			if len(imageParts) == 2 {
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    uint32(len(imageParts[0])),
+					tokenType: string(protocol.SemanticTokenTypeParameter),
+					text:      imageParts[0],
+				})
+				lastPos += uint32(len(imageParts[0]))
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    1,
+					tokenType: string(protocol.SemanticTokenTypeOperator),
+					text:      ":",
+				})
+				lastPos += uint32(1)
+				lastIndex = 1
+			}
+
+			tagParts := strings.SplitN(imageParts[lastIndex], "@", 2)
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(tagParts[0])),
+				tokenType: string(protocol.SemanticTokenTypeParameter),
+				text:      tagParts[0],
+			})
+			lastPos += uint32(len(tagParts[0]))
+			if len(tagParts) == 2 {
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    1,
+					tokenType: string(protocol.SemanticTokenTypeOperator),
+					text:      "@",
+				})
+				lastPos += uint32(1)
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    uint32(len(tagParts[1])),
+					tokenType: string(protocol.SemanticTokenTypeString),
+					text:      tagParts[1],
+				})
+			}
+		default:
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(part)),
+				tokenType: string(protocol.SemanticTokenTypeParameter),
+				text:      part,
+			})
+			lastPos += uint32(len(part))
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    1,
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      "/",
+			})
+			lastPos += uint32(1)
+		}
+	}
+
+	return tokens
 }
