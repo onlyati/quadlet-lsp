@@ -27,6 +27,14 @@ var LegendMap = func() map[string]uint32 {
 	return m
 }()
 
+type semanticToken struct {
+	line      protocol.UInteger
+	charPos   protocol.UInteger
+	length    protocol.UInteger
+	tokenType string
+	text      string
+}
+
 func CalculateSemanticTokens(lexerTokens []quadlet_lexer.Token) (*protocol.SemanticTokens, error) {
 	converter := tokenConverter{
 		lexerTokens:    lexerTokens,
