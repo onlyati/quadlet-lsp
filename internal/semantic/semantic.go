@@ -27,17 +27,6 @@ var LegendMap = func() map[string]uint32 {
 	return m
 }()
 
-var specialFunctionMap = map[string]func(*lexer){
-	"Image":       (*lexer).readImageValue,
-	"Volume":      (*lexer).readVolumeValue,
-	"Pod":         (*lexer).readPodValue,
-	"Network":     (*lexer).readNetworkValue,
-	"Secret":      (*lexer).readSecretValue,
-	"Environment": (*lexer).readEnvValue,
-	"Label":       (*lexer).readLabelValue,
-	"Annotation":  (*lexer).readLabelValue,
-}
-
 func CalculateSemanticTokens(lexerTokens []quadlet_lexer.Token) (*protocol.SemanticTokens, error) {
 	converter := tokenConverter{
 		lexerTokens:    lexerTokens,
@@ -90,6 +79,8 @@ var specialParsers = map[string]func(*tokenConverter, *quadlet_lexer.Token) []se
 	"Label":       (*tokenConverter).readLabelValue,
 	"Annotation":  (*tokenConverter).readLabelValue,
 	"Environment": (*tokenConverter).readLabelValue,
+	"Volume":      (*tokenConverter).readVolumeValue,
+	"Secret":      (*tokenConverter).readSecretValue,
 }
 
 func (t *tokenConverter) readToken() *quadlet_lexer.Token {
@@ -298,6 +289,154 @@ func (t *tokenConverter) readImageValue(token *quadlet_lexer.Token) []semanticTo
 				text:      "/",
 			})
 			lastPos += uint32(1)
+		}
+	}
+
+	return tokens
+}
+
+// readSecretValue is part of semantic token parsing for Secret keyword.
+func (t *tokenConverter) readSecretValue(token *quadlet_lexer.Token) []semanticToken {
+	tokens := []semanticToken{}
+
+	lastPos := token.StartPos.Position
+	parts := strings.Split(token.Text, ",")
+
+	for i, part := range parts {
+		sparts := strings.SplitN(part, "=", 2)
+		if len(sparts) == 1 {
+			// This is most probably name of the secret
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(sparts[0])),
+				tokenType: string(protocol.SemanticTokenTypeParameter),
+				text:      sparts[0],
+			})
+			lastPos += uint32(len(sparts[0]))
+		} else {
+			// This is paramter pairs for the secret
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(sparts[0])),
+				tokenType: string(protocol.SemanticTokenTypeString),
+				text:      sparts[0],
+			})
+			lastPos += uint32(len(sparts[0]))
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    1,
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      "=",
+			})
+			lastPos += uint32(1)
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    uint32(len(sparts[1])),
+				tokenType: string(protocol.SemanticTokenTypeParameter),
+				text:      sparts[1],
+			})
+			lastPos += uint32(len(sparts[1]))
+		}
+
+		if i != len(parts)-1 {
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    1,
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      ",",
+			})
+			lastPos += uint32(1)
+		}
+	}
+
+	return tokens
+}
+
+// readVolumeValue is part of semantic token parsing for Volume keyword.
+func (t *tokenConverter) readVolumeValue(token *quadlet_lexer.Token) []semanticToken {
+	tokens := []semanticToken{}
+
+	lastPos := token.StartPos.Position
+	parts := strings.Split(token.Text, ":")
+
+	// The source volume
+	tokens = append(tokens, semanticToken{
+		line:      token.StartPos.LineNumber,
+		charPos:   lastPos,
+		length:    uint32(len(parts[0])),
+		tokenType: string(protocol.SemanticTokenTypeParameter),
+		text:      parts[0],
+	})
+	lastPos += uint32(len(parts[0]))
+	if len(parts) > 1 {
+		tokens = append(tokens, semanticToken{
+			line:      token.StartPos.LineNumber,
+			charPos:   lastPos,
+			length:    1,
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      ":",
+		})
+		lastPos += uint32(1)
+	}
+
+	if len(parts) == 2 || len(parts) == 3 {
+		// This is the destination volume
+		tokens = append(tokens, semanticToken{
+			line:      token.StartPos.LineNumber,
+			charPos:   lastPos,
+			length:    uint32(len(parts[1])),
+			tokenType: string(protocol.SemanticTokenTypeString),
+			text:      parts[1],
+		})
+		lastPos += uint32(len(parts[1]))
+		if len(parts) > 2 {
+			tokens = append(tokens, semanticToken{
+				line:      token.StartPos.LineNumber,
+				charPos:   lastPos,
+				length:    1,
+				tokenType: string(protocol.SemanticTokenTypeOperator),
+				text:      ":",
+			})
+			lastPos += uint32(1)
+		}
+	}
+
+	if len(parts) == 3 {
+		// Part where flags are specified
+		sparts := strings.Split(parts[2], ",")
+		for i, spart := range sparts {
+			if i != len(sparts)-1 {
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    uint32(len(spart)),
+					tokenType: string(protocol.SemanticTokenTypeString),
+					text:      sparts[i],
+				})
+				lastPos += uint32(len(spart))
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    1,
+					tokenType: string(protocol.SemanticTokenTypeOperator),
+					text:      ",",
+				})
+				lastPos += uint32(1)
+			} else {
+				tokens = append(tokens, semanticToken{
+					line:      token.StartPos.LineNumber,
+					charPos:   lastPos,
+					length:    uint32(len(spart)),
+					tokenType: string(protocol.SemanticTokenTypeString),
+					text:      sparts[i],
+				})
+				lastPos += uint32(len(spart))
+			}
 		}
 	}
 
