@@ -5,11 +5,7 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func isItNewQuadlet(s Completion) bool {
-	return s.section == ""
-}
-
-func listNewQuadletTemplates(_ Completion) []protocol.CompletionItem {
+func listNewQuadletTemplates() []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
 
 	for k, category := range data.CategoryProperty {

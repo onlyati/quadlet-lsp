@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/completion"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
@@ -17,13 +18,23 @@ func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (a
 	editorLine := params.Position.Line
 	charPos := params.Position.Character
 
+	quadlet := docs.ReadQuadlet(uri)
+	tokenInfo := quadlet.FindToken(
+		parser.NodePosition{
+			LineNumber: params.Position.Line,
+			Position:   params.Position.Character,
+		},
+	)
+
 	s := completion.NewCompletion(
 		lines,
 		uri,
 		editorLine,
 		charPos,
+		&quadlet,
+		tokenInfo,
 	)
-
 	comps := s.RunCompletion(config)
+
 	return comps, nil
 }

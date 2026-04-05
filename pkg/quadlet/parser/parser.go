@@ -176,6 +176,10 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 			Text:  "unfinished line",
 			Token: token,
 		})
+		value.EndPos = NodePosition(token.EndPos)
+
+		assignment.Value = nil
+		p.lastSection().Assignments = append(p.lastSection().Assignments, &assignment)
 		return
 	}
 	for p.peekToken().Type == lexer.TokenTypeValue || p.peekToken().Type == lexer.TokenTypeContSign {

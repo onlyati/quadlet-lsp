@@ -5,18 +5,15 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 func listNewProperties(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
-
-	// If this is a continuation line, then it is not a new property
-	if s.line > 0 {
-		t := strings.TrimSpace(s.text[s.line-1])
-		if strings.HasSuffix(t, "\\") {
-			return completionItems
-		}
+	parentToken, ok := s.tokenInfo.ParentNodes[0].(*parser.SectionNode)
+	if !ok {
+		return nil
 	}
 
 	// Normal processing
@@ -24,7 +21,9 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 	podVer := s.config.Podman
 	s.config.Mu.RUnlock()
 
-	for _, p := range data.PropertiesMap[s.section] {
+	section := strings.TrimPrefix(*parentToken.Text, "[")
+	section = strings.TrimSuffix(section, "]")
+	for _, p := range data.PropertiesMap[section] {
 		checkVersion := podVer.GreaterOrEqual(p.MinVersion)
 		var textEdit protocol.TextEdit
 		if checkVersion {
@@ -35,10 +34,6 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 							Line:      s.line,
 							Character: 0,
 						},
-						End: protocol.Position{
-							Line:      s.line,
-							Character: uint32(len(s.text[s.line])),
-						},
 					},
 					NewText: p.Macro,
 				}
@@ -48,10 +43,6 @@ func listNewProperties(s Completion) []protocol.CompletionItem {
 						Start: protocol.Position{
 							Line:      s.line,
 							Character: 0,
-						},
-						End: protocol.Position{
-							Line:      s.line,
-							Character: uint32(len(s.text[s.line])),
 						},
 					},
 					NewText: fmt.Sprintf("%s=${1:value}\n$0", p.Label),

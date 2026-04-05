@@ -91,7 +91,7 @@ func Start() {
 			}
 
 			// If no incoming changes for a while, then start to parse and analyze it
-			diagDebouncer.Debounce(uri, 250*time.Millisecond, func() {
+			diagDebouncer.Debounce(uri, 10*time.Millisecond, func() {
 				docs.Parse(uri)
 				docs.ParseMutex.Unlock()
 

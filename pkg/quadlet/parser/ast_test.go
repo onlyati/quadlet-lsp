@@ -15,10 +15,11 @@ func Test_QuadletFind(t *testing.T) {
 # Second line
 
 # Section doc
-[Container]
+[Container]   
 
 # Image doc
 Image=foo.image
+Foo=
 
 # Label doc
 Label= \
@@ -41,8 +42,26 @@ Description= \
 
 	quadlet := parser.Quadlet
 
+	// Test with empty line
+	nodeResult := quadlet.FindToken(NodePosition{LineNumber: 5, Position: 0})
+	assert.Nil(t, nodeResult.CurrentNode)
+	require.Len(t, nodeResult.ParentNodes, 1, "if empty position, parent should be a section")
+
+	// Test after the section
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 4, Position: 12})
+	require.Nil(t, nodeResult.CurrentNode)
+	require.Len(t, nodeResult.ParentNodes, 1, "if empty position, parent should be a section")
+
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 8, Position: 5})
+	require.Nil(t, nodeResult.CurrentNode)
+	require.Len(t, nodeResult.ParentNodes, 2, "if empty position, parents should be section and assign")
+
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 13, Position: 0})
+	require.Nil(t, nodeResult.CurrentNode)
+	require.Len(t, nodeResult.ParentNodes, 1, "if empty position, parents should be section")
+
 	// Test outside of the line
-	nodeResult := quadlet.FindToken(NodePosition{LineNumber: 0, Position: 35})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 0, Position: 35})
 	require.Nil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 0)
 
@@ -156,7 +175,7 @@ Description= \
 	}
 
 	// Label keyword
-	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 10, Position: 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 11, Position: 2})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 1)
 
@@ -175,7 +194,7 @@ Description= \
 	}
 
 	// Label multi-line value (first line)
-	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 11, Position: 2})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 12, Position: 2})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 
@@ -201,7 +220,7 @@ Description= \
 	}
 
 	// [Unit] section
-	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 14, Position: 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 15, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 0)
 
@@ -213,7 +232,7 @@ Description= \
 	}
 
 	// Description multi-line value (testing the "Foo" line)
-	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 17, Position: 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 18, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 
@@ -239,7 +258,7 @@ Description= \
 	}
 
 	// Description multi-line value (testing the "container" line)
-	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 18, Position: 3})
+	nodeResult = quadlet.FindToken(NodePosition{LineNumber: 19, Position: 3})
 	require.NotNil(t, nodeResult.CurrentNode)
 	require.Len(t, nodeResult.ParentNodes, 2)
 

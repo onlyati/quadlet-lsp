@@ -57,24 +57,79 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 		return true
 	}
 
+	isOverFunc := func(position, prevEndPos, currStartPos NodePosition) bool {
+		// This scerio that previous end's line is over but not reach the
+		// current start's line, so between them.
+		if currStartPos.LineNumber > position.LineNumber {
+			return true
+		}
+
+		// This scenario we are the line of previous end's line, position must
+		// be checked.
+		if position.LineNumber == prevEndPos.LineNumber && position.Position > prevEndPos.Position {
+			return true
+		}
+
+		// Similar scenario like previous but now we are line of current's line.
+		if position.LineNumber == currStartPos.LineNumber && position.LineNumber < currStartPos.Position {
+			return true
+		}
+
+		return false
+	}
+
 	if q == nil {
 		return FindTokenOutput{nil, nil}
 	}
 
 	// Search in document's comment
+	var prevDocument *CommentNode = nil
 	if q.Documents != nil {
 		for _, node := range q.Documents {
+			if prevDocument != nil {
+				if isOverFunc(position, prevDocument.EndPos, node.StartPos) {
+					return FindTokenOutput{
+						CurrentNode: nil,
+						ParentNodes: nil,
+					}
+				}
+			}
+
 			if inLineFunc(position, node.StartPos, node.EndPos) {
 				return FindTokenOutput{
 					CurrentNode: node,
 					ParentNodes: nil,
 				}
 			}
+
+			prevDocument = node
 		}
 	}
 
+	var prevSection *SectionNode = nil
+	var prevAssign *AssignNode = nil
+
 	if q.Sections != nil {
 		for _, section := range q.Sections {
+
+			if prevAssign != nil && *prevAssign.Value.Value == "" {
+				if isOverFunc(position, prevAssign.EndPos, section.StartPos) {
+					return FindTokenOutput{
+						CurrentNode: nil,
+						ParentNodes: []Node{section, prevAssign},
+					}
+				}
+			}
+			if prevSection != nil {
+				if isOverFunc(position, prevSection.EndPos, section.StartPos) {
+					return FindTokenOutput{
+						CurrentNode: nil,
+						ParentNodes: []Node{prevSection},
+					}
+				}
+			}
+			prevAssign = nil
+
 			// Search in section's comment
 			for _, sectionDoc := range section.Documents {
 				if inLineFunc(position, sectionDoc.StartPos, sectionDoc.EndPos) {
@@ -92,9 +147,17 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 			}
 
 			// Search in assigment
-			for _, assigments := range section.Assignments {
+			for _, assingment := range section.Assignments {
+				if prevAssign != nil && *prevAssign.Value.Value == "" {
+					if isOverFunc(position, prevAssign.EndPos, assingment.StartPos) {
+						return FindTokenOutput{
+							CurrentNode: nil,
+							ParentNodes: []Node{section, prevAssign},
+						}
+					}
+				}
 				// Search in assingment's comment
-				for _, assigmentDoc := range assigments.Documents {
+				for _, assigmentDoc := range assingment.Documents {
 					if inLineFunc(position, assigmentDoc.StartPos, assigmentDoc.EndPos) {
 						return FindTokenOutput{
 							CurrentNode: assigmentDoc,
@@ -103,27 +166,47 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 					}
 				}
 				// Search in assigment's value
-				if inLineFunc(position, assigments.Value.StartPos, assigments.Value.EndPos) {
-					return FindTokenOutput{
-						CurrentNode: assigments.Value,
-						ParentNodes: []Node{assigments, section},
+				if assingment.Value != nil {
+					if inLineFunc(position, assingment.Value.StartPos, assingment.Value.EndPos) {
+						return FindTokenOutput{
+							CurrentNode: assingment.Value,
+							ParentNodes: []Node{assingment, section},
+						}
 					}
 				}
 
 				// Search in assigment
-				if inLineFunc(position, assigments.StartPos, assigments.EndPos) {
+				if inLineFunc(position, assingment.StartPos, assingment.EndPos) {
 					return FindTokenOutput{
-						CurrentNode: assigments,
+						CurrentNode: assingment,
 						ParentNodes: []Node{section},
 					}
 				}
+
+				if assingment.Value != nil {
+					if isOverFunc(position, assingment.EndPos, assingment.Value.StartPos) {
+						prevAssign = assingment
+						break
+					}
+				}
+
+				prevAssign = assingment
 			}
+
+			prevSection = section
 		}
 	}
 
-	return FindTokenOutput{
-		CurrentNode: nil,
-		ParentNodes: nil,
+	if prevAssign != nil && prevAssign.Value == nil {
+		return FindTokenOutput{
+			CurrentNode: nil,
+			ParentNodes: []Node{prevSection, prevAssign},
+		}
+	} else {
+		return FindTokenOutput{
+			CurrentNode: nil,
+			ParentNodes: []Node{prevSection},
+		}
 	}
 }
 

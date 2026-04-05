@@ -4,17 +4,20 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func isItPropertyCompletion(s Completion) bool {
-	// Check we are after '=' or after
-	idxEquale := uint32(strings.Index(s.text[s.line], "="))
-	return s.char > idxEquale
-}
-
 func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
+	sectionNode, ok := s.tokenInfo.ParentNodes[0].(*parser.SectionNode)
+	if !ok {
+		return nil
+	}
+	parentNode, ok := s.tokenInfo.ParentNodes[1].(*parser.AssignNode)
+	if !ok {
+		return nil
+	}
 
 	specialCompletions := map[string]func(s Completion) []protocol.CompletionItem{
 		"Image":       propertyListImages,
@@ -26,8 +29,7 @@ func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 		"UserNS":      propertyListUserIDs,
 	}
 
-	tmp := strings.Split(s.text[s.line], "=")
-	propName := tmp[0]
+	propName := *parentNode.Name
 
 	// Special handling on the line
 	if v, ok := specialCompletions[propName]; ok {
@@ -42,7 +44,9 @@ func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 	podmanVer := s.config.Podman
 	s.config.Mu.RUnlock()
 
-	for _, p := range data.PropertiesMap[s.section] {
+	section := strings.TrimPrefix(*sectionNode.Text, "[")
+	section = strings.TrimSuffix(section, "]")
+	for _, p := range data.PropertiesMap[section] {
 		labelCheck := propName == p.Label
 		versionCheck := podmanVer.GreaterOrEqual(p.MinVersion)
 		if labelCheck && versionCheck {
