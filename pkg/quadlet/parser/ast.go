@@ -199,8 +199,7 @@ type AssignNode struct {
 func (a *AssignNode) String() string {
 	strBuilder := strings.Builder{}
 
-	if a.Documents != nil {
-		strBuilder.WriteRune('\n')
+	if len(a.Documents) > 0 {
 		for _, doc := range a.Documents {
 			if doc != nil {
 				strBuilder.WriteString(doc.String())

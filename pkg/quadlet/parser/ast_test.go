@@ -400,8 +400,7 @@ func Test_NodeAssignString(t *testing.T) {
 		},
 	}
 
-	expected := `
-# qsr-disable: qsr016
+	expected := `# qsr-disable: qsr016
 # Image is in another file
 Image=foo.image
 `
@@ -422,8 +421,7 @@ func Test_NodeAssignStringWithLongValue(t *testing.T) {
 		},
 	}
 
-	expected := `
-# This is a hell long value
+	expected := `# This is a hell long value
 Description=Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse egestas \
   augue pretium lectus tristique interdum. Proin consequat rutrum ligula, sit amet \
   pretium lectus feugiat malesuada

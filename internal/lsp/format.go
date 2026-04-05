@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/format"
@@ -21,7 +22,12 @@ func Format(context *glsp.Context, params *protocol.DocumentFormattingParams) ([
 		return nil, nil
 	}
 
-	newText := format.FormatDocument(text)
+	p := docs.ReadParser(uri)
+	if len(p.Errors) > 0 {
+		return nil, errors.New("does not format until error present in file")
+	}
+
+	newText := format.FormatDocument(p.Quadlet)
 
 	return []protocol.TextEdit{
 		{

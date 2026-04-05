@@ -69,7 +69,7 @@ func NewParserFromMemory(path, content string) Parser {
 func (p *Parser) Run() {
 	token := p.consumeToken()
 	for token != nil {
-		if token.Type != lexer.TokenTypeComment && len(p.Quadlet.Documents) == 0 {
+		if token.Type != lexer.TokenTypeComment && len(p.Quadlet.Documents) == 0 && len(p.Quadlet.Sections) == 0 {
 			prevToken := p.prevToken()
 			if prevToken != nil {
 				if prevToken.Type == lexer.TokenTypeComment {
@@ -101,7 +101,7 @@ func (p *Parser) Run() {
 }
 
 func (p *Parser) parseComment(token *lexer.Token) {
-	if len(p.commentBuffer) > 0 && len(p.Quadlet.Documents) == 0 {
+	if len(p.commentBuffer) > 0 && len(p.Quadlet.Documents) == 0 && len(p.Quadlet.Sections) == 0 {
 		// If there was an empty line, then it is a Quadlet document
 		// and not belongs to section
 		if token.StartPos.LineNumber-p.commentBuffer[len(p.commentBuffer)-1].EndPos.LineNumber > 1 {

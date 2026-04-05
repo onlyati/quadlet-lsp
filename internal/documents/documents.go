@@ -74,10 +74,19 @@ func (d *Documents) Read(uri string) string {
 	return text
 }
 
-func (d *Documents) ReadQuadlet(uri string) *parser.QuadletNode {
+func (d *Documents) ReadQuadlet(uri string) parser.QuadletNode {
 	d.mu.RLock()
 	uri = strings.TrimPrefix(uri, "file://")
 	text := d.parsers[uri].Quadlet
+	d.mu.RUnlock()
+
+	return *text
+}
+
+func (d *Documents) ReadParser(uri string) parser.Parser {
+	d.mu.RLock()
+	uri = strings.TrimPrefix(uri, "file://")
+	text := d.parsers[uri]
 	d.mu.RUnlock()
 
 	return text

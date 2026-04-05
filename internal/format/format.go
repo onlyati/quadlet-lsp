@@ -8,241 +8,168 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 )
 
-type documentSchema struct {
-	header   []string
-	sections map[string]map[data.FormatGroup][]sectionElement
+// Define the preferred order of categories
+var categoryPriority = map[data.FormatGroup]int{
+	data.FormatGroupBase:        1,
+	data.FormatGroupEnvironment: 2,
+	data.FormatGroupNetwork:     3,
+	data.FormatGroupStorage:     4,
+	data.FormatGroupLabel:       5,
+	data.FormatGroupSecret:      6,
+	data.FormatGroupHealth:      7,
+	data.FormatGroupOther:       8,
 }
 
-type sectionElement struct {
-	property string
-	value    string
-}
+func FormatDocument(q *parser.QuadletNode) string {
+	reorderAssignments(q)
 
-type sectionElements []sectionElement
+	var sb strings.Builder
 
-func (a sectionElements) Len() int      { return len(a) }
-func (a sectionElements) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a sectionElements) Less(i, j int) bool {
-	if a[i].property == a[j].property {
-		return a[i].value < a[j].value
-	} else {
-		return a[i].property < a[j].property
+	for _, doc := range q.Documents {
+		sb.WriteString(doc.String())
 	}
-}
+	if len(q.Documents) > 0 {
+		sb.WriteRune('\n')
+	}
 
-func FormatDocument(text string) string {
-	inSection := ""
-	lastLine := ""
-	var lastFormatGroup data.FormatGroup
-	document := documentSchema{}
-	document.header = make([]string, 0)
-	document.sections = make(map[string]map[data.FormatGroup][]sectionElement, 0)
-
-	// Read the whole file
-	for line := range strings.SplitSeq(text, "\n") {
-		line := strings.TrimSpace(line)
-
-		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			section := strings.TrimPrefix(line, "[")
-			section = strings.TrimSuffix(section, "]")
-			inSection = section
-			document.sections[inSection] = make(map[data.FormatGroup][]sectionElement)
-			lastLine = ""
-			continue
+	for i, section := range q.Sections {
+		if i > 0 {
+			sb.WriteRune('\n')
 		}
 
-		if inSection == "" {
-			// Keep the first lines as is
-			document.header = append(document.header, line)
+		for _, doc := range section.Documents {
+			sb.WriteString(doc.String())
+		}
+		if section.Text != nil {
+			sb.WriteString(ensureBrackets(*section.Text) + "\n")
 		}
 
-		if inSection != "" {
-			// Parse the lines to the map except comment and empty lines
-			if strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
+		sectionName := strings.Trim(getSafeStr(section.Text), "[] ")
+		var lastGroup data.FormatGroup
+
+		for j, assign := range section.Assignments {
+			if assign == nil {
 				continue
 			}
 
-			if strings.HasSuffix(lastLine, " \\") {
-				// If this is a continuation then just append to the last item's value
-				actualValue := document.sections[inSection][lastFormatGroup][len(document.sections[inSection][lastFormatGroup])-1].value
-				actualValue = strings.TrimSuffix(actualValue, " \\")
-				actualValue = strings.TrimSpace(actualValue)
+			currentGroup := getGroupForAssignment(sectionName, assign.Name)
 
-				document.sections[inSection][lastFormatGroup][len(document.sections[inSection][lastFormatGroup])-1].value = actualValue + " " + line
-			} else {
-				parts := strings.SplitN(line, "=", 2)
-				if len(parts) != 2 {
-					continue
-				}
-				// If this is a new line then just parse it
-				formatterGroup := data.FormatGroupOther
-				for _, p := range data.PropertiesMap[inSection] {
-					if p.Label == parts[0] {
-						if p.FormatGroup != "" {
-							formatterGroup = p.FormatGroup
-						}
-						break
-					}
-				}
-
-				lastFormatGroup = formatterGroup
-				if len(document.sections[inSection][formatterGroup]) > 0 {
-					document.sections[inSection][formatterGroup] = append(document.sections[inSection][formatterGroup], sectionElement{
-						property: parts[0],
-						value:    parts[1],
-					})
-				} else {
-					document.sections[inSection][formatterGroup] = []sectionElement{
-						{
-							property: parts[0],
-							value:    parts[1],
-						},
-					}
-				}
-			}
-		}
-
-		lastLine = line
-	}
-
-	// Sort the arrays
-	for k, v := range document.sections {
-		if k == "Install" || k == "Unit" || k == "Service" {
-			// Remained untouced
-			continue
-		}
-
-		for _, vv := range v {
-			sort.Sort(sectionElements(vv))
-		}
-	}
-
-	// Generate the new text
-	var newTextBuilder strings.Builder
-	newTextBuilder.WriteString(strings.Join(document.header, "\n"))
-	if len(document.header) > 0 {
-		newTextBuilder.WriteString("\n")
-	}
-
-	sectionSeq := []string{
-		"Unit",
-		"Image",
-		"Container",
-		"Volume",
-		"Network",
-		"Kube",
-		"Pod",
-		"Build",
-		"Service",
-		"Install",
-	}
-
-	printSeq := []data.FormatGroup{
-		data.FormatGroupBase,
-		data.FormatGroupLabel,
-		data.FormatGroupStorage,
-		data.FormatGroupNetwork,
-		data.FormatGroupEnvironment,
-		data.FormatGroupSecret,
-		data.FormatGroupHealth,
-		data.FormatGroupOther,
-	}
-
-	for _, k := range sectionSeq {
-		if v, ok := document.sections[k]; ok {
-			newTextBuilder.WriteString("[" + k + "]\n")
-
-			for _, p := range printSeq {
-				if vv, ok := v[p]; ok {
-					if k != "Install" && k != "Unit" && k != "Service" {
-						newTextBuilder.WriteString("# " + string(p) + " options\n")
-					}
-					for _, element := range vv {
-						newLine := element.property + "=" + strings.TrimSpace(element.value)
-						if len(newLine) <= 80 {
-							// Short line, one line is enough
-							newTextBuilder.WriteString(newLine + "\n")
-						} else {
-							// Long line, split to multiple ones
-							newTextBuilder.WriteString(wrapLine(newLine, 80))
-						}
-					}
-					newTextBuilder.WriteString("\n")
-				}
+			if j > 0 && currentGroup != lastGroup {
+				sb.WriteRune('\n')
 			}
 
+			sb.WriteString(assign.String())
+			lastGroup = currentGroup
 		}
 	}
 
-	return newTextBuilder.String()
+	return sb.String()
 }
 
-func wrapLine(s string, width int) string {
-	offset := 2 // The ' \' continuation sign
-	width -= offset
-	lastPossibleCutPoint := 0
-	lastCutPoint := 0
-	o := ""
-	cutUrgent := false
-
-	for i, c := range s {
-		if i == 0 {
+func reorderAssignments(q *parser.QuadletNode) {
+	for _, section := range q.Sections {
+		if section.Text == nil || len(section.Assignments) == 0 {
 			continue
 		}
 
-		if c == ' ' && s[i-1] != ' ' {
-			if cutUrgent {
-				if offset == 2 {
-					offset = 4
-					width -= 2
-					o = s[lastPossibleCutPoint:i] + " \\\n"
-				} else {
-					o += " " + s[lastPossibleCutPoint:i] + " \\\n"
-				}
-				lastCutPoint = i
-				lastPossibleCutPoint = i
-				continue
-			}
-			lastPossibleCutPoint = i
-		}
+		sectionName := strings.Trim(*section.Text, "[]")
+		props, hasProps := data.PropertiesMap[sectionName]
 
-		t := (i - lastCutPoint) % width
-		if t == 0 {
-			if c == ' ' {
-				if offset == 2 {
-					offset = 4
-					width -= 2
-					o = s[lastCutPoint:i] + " \\\n"
-				} else {
-					o += " " + s[lastCutPoint:i] + " \\\n"
+		groupLookup := make(map[string]data.FormatGroup)
+		if hasProps {
+			for _, item := range props {
+				group := item.FormatGroup
+				if group == "" {
+					group = data.FormatGroupOther
 				}
-				lastCutPoint = i
-			} else {
-				if lastCutPoint == lastPossibleCutPoint {
-					cutUrgent = true
-					continue
-				}
-				if offset == 2 {
-					offset = 4
-					width -= 2
-					o = s[lastCutPoint:lastPossibleCutPoint] + " \\\n"
-				} else {
-					o += " " + s[lastCutPoint:lastPossibleCutPoint] + " \\\n"
-				}
-				lastCutPoint = lastPossibleCutPoint
+				groupLookup[item.Label] = group
 			}
 		}
+
+		sort.SliceStable(section.Assignments, func(i, j int) bool {
+			a := section.Assignments[i]
+			b := section.Assignments[j]
+
+			nameA := ""
+			if a.Name != nil {
+				nameA = *a.Name
+			}
+			nameB := ""
+			if b.Name != nil {
+				nameB = *b.Name
+			}
+
+			catA := groupLookup[nameA]
+			if catA == "" {
+				catA = data.FormatGroupOther
+			}
+			catB := groupLookup[nameB]
+			if catB == "" {
+				catB = data.FormatGroupOther
+			}
+
+			if catA != catB {
+				return categoryPriority[catA] < categoryPriority[catB]
+			}
+
+			// If names are different, sort by Name
+			if nameA != nameB {
+				return nameA < nameB
+			}
+
+			// Names are same, sort by Value
+			valA := ""
+			if a.Value != nil && a.Value.Value != nil {
+				valA = *a.Value.Value
+			}
+			valB := ""
+			if b.Value != nil && b.Value.Value != nil {
+				valB = *b.Value.Value
+			}
+
+			return valA < valB
+		})
+	}
+}
+
+func getGroupForAssignment(sectionName string, name *string) data.FormatGroup {
+	if name == nil {
+		return data.FormatGroupOther
 	}
 
-	if lastCutPoint != len(s) {
-		if offset == 2 {
-			o = s[lastCutPoint:] + "\n"
-		} else {
-			o += " " + s[lastCutPoint:] + "\n"
+	props, ok := data.PropertiesMap[sectionName]
+	if !ok {
+		return data.FormatGroupOther
+	}
+
+	for _, p := range props {
+		if p.Label == *name {
+			if p.FormatGroup == "" {
+				return data.FormatGroupOther
+			}
+			return p.FormatGroup
 		}
 	}
+	return data.FormatGroupOther
+}
 
-	return o
+func ensureBrackets(h string) string {
+	h = strings.TrimSpace(h)
+	if !strings.HasPrefix(h, "[") {
+		h = "[" + h
+	}
+	if !strings.HasSuffix(h, "]") {
+		h = h + "]"
+	}
+	return h
+}
+
+func getSafeStr(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
 }

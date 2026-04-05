@@ -181,6 +181,38 @@ Description=Foo \
 	assert.Equal(t, NodePosition{LineNumber: 9, Position: 11}, descKeywordValue.EndPos)
 }
 
+func TestParserAssignmentComment(t *testing.T) {
+	input := `[Container]
+
+# Debian image
+Image=docker.io/library/debian
+`
+
+	tmpDir := t.TempDir()
+	testutils.CreateTempFile(t, tmpDir, "foo.container", input)
+
+	parser := NewParser(path.Join(tmpDir, "foo.container"))
+
+	require.Len(t, parser.Errors, 0)
+	assert.Len(t, parser.Quadlet.Documents, 0)
+
+	// [Container]
+	containerSection := parser.Quadlet.Sections[0]
+	assert.Equal(t, "[Container]", *containerSection.Text)
+	assert.Equal(t, NodePosition{LineNumber: 0, Position: 0}, containerSection.StartPos)
+	assert.Equal(t, NodePosition{LineNumber: 0, Position: 11}, containerSection.EndPos)
+	require.Len(t, parser.Quadlet.Sections[0].Assignments, 1)
+	assert.Len(t, parser.Quadlet.Sections[0].Documents, 0)
+
+	// [Container] => Image
+	imageAssignment := containerSection.Assignments[0]
+	assert.Equal(t, "Image", *imageAssignment.Name)
+	assert.Equal(t, NodePosition{LineNumber: 3, Position: 0}, imageAssignment.StartPos)
+	assert.Equal(t, NodePosition{LineNumber: 3, Position: 5}, imageAssignment.EndPos)
+
+	require.Len(t, imageAssignment.Documents, 1)
+}
+
 func BenchmarkNewParser(b *testing.B) {
 	tmpDir := b.TempDir()
 	mockText := `# disable-qsr: qsr014 qsr013
