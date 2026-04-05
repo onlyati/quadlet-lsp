@@ -1,8 +1,8 @@
 package lsp
 
 import (
+	"github.com/onlyati/quadlet-lsp/internal/documents"
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
-	"github.com/onlyati/quadlet-lsp/internal/utils"
 	_ "github.com/tliron/commonlog/simple"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -10,7 +10,7 @@ import (
 
 func SyntaxCheckOnSave(context *glsp.Context, params *protocol.DidSaveTextDocumentParams) error {
 	uri := string(params.TextDocument.URI)
-	text := documents.Read(uri)
+	text := docs.Read(uri)
 
 	checker := syntax.NewSyntaxChecker(text, uri)
 
@@ -31,7 +31,7 @@ func SyntaxCheckOnSave(context *glsp.Context, params *protocol.DidSaveTextDocume
 	return nil
 }
 
-func CheckAllOpenFileForSyntax(context *glsp.Context, d *utils.Documents) {
+func CheckAllOpenFileForSyntax(context *glsp.Context, d *documents.Documents) {
 	context.Notify(protocol.ServerWindowShowMessage, protocol.ShowMessageParams{
 		Type:    protocol.MessageTypeInfo,
 		Message: "Check syntax of all open files",

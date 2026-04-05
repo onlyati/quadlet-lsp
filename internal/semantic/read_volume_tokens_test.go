@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -12,7 +13,7 @@ import (
 func Test_parseQuadletVolume(t *testing.T) {
 	input := `Volume=foo.volume:/app:ro,U`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      0,
 			charPos:   0,
@@ -78,17 +79,16 @@ func Test_parseQuadletVolume(t *testing.T) {
 		},
 	}
 
-	tokens := []token{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }
@@ -98,7 +98,7 @@ func Test_parseQuadletVolumeMultiline(t *testing.T) {
 Volume= \
 	foo.volume:/app:ro,U`
 
-	expected := []token{
+	expected := []semanticToken{
 		{
 			line:      1,
 			charPos:   0,
@@ -112,6 +112,13 @@ Volume= \
 			length:    protocol.UInteger(utils.Utf16Len("=")),
 			tokenType: string(protocol.SemanticTokenTypeOperator),
 			text:      "=",
+		},
+		{
+			line:      1,
+			charPos:   8,
+			length:    protocol.UInteger(utils.Utf16Len("\\")),
+			tokenType: string(protocol.SemanticTokenTypeOperator),
+			text:      "\\",
 		},
 		{
 			line:      2,
@@ -164,17 +171,16 @@ Volume= \
 		},
 	}
 
-	tokens := []token{}
-	l := newLexer(input)
-	tok := l.nextToken()
-
-	for tok.tokenType != "eof" {
-		tokens = append(tokens, tok)
-		tok = l.nextToken()
+	parser := parser.NewParserFromMemory("foo.container", input)
+	tc := tokenConverter{
+		lexerTokens:    parser.LexerTokens,
+		index:          -1,
+		semanticTokens: []semanticToken{},
 	}
+	tc.parseQuadlet()
 
-	assert.Len(t, tokens, len(expected), "invalid number of elements in tokens")
-	for i, token := range tokens {
+	assert.Len(t, tc.semanticTokens, len(expected), "invalid number of elements in tokens")
+	for i, token := range tc.semanticTokens {
 		require.Equal(t, expected[i], token, "invalid token parsed at %d.", i)
 	}
 }

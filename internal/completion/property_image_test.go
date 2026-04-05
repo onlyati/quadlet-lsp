@@ -28,7 +28,7 @@ func TestPropertyImage_Valid(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 

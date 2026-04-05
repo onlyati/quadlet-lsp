@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/onlyati/quadlet-lsp/internal/documents"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig, docs *utils.Documents) {
+func startFileWatcher(ctx *glsp.Context, path string, cfg *utils.QuadletConfig, docs *documents.Documents) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Println("failed to create watcher:", err)

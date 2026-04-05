@@ -19,7 +19,7 @@ func TestQSR025_ValidBase(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 
@@ -40,7 +40,7 @@ func TestQSR025_ValidDropins(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 
@@ -62,7 +62,7 @@ func TestQSR025_ValidNestedDropins(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 
@@ -83,7 +83,7 @@ func TestQSR025_Invalid(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 

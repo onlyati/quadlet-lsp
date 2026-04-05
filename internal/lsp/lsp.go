@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/onlyati/quadlet-lsp/internal/commands"
 	"github.com/onlyati/quadlet-lsp/internal/data"
+	"github.com/onlyati/quadlet-lsp/internal/documents"
 	"github.com/onlyati/quadlet-lsp/internal/semantic"
 	"github.com/onlyati/quadlet-lsp/internal/syntax"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -23,11 +25,12 @@ import (
 const lsName = "quadlet"
 
 var (
-	version   = data.ProgramVersion
-	handler   protocol.Handler
-	config    *utils.QuadletConfig
-	documents = utils.NewDocuments()
-	commander commands.EditorCommandExecutor
+	version       = data.ProgramVersion
+	handler       protocol.Handler
+	config        *utils.QuadletConfig
+	docs          = documents.NewDocuments()
+	commander     commands.EditorCommandExecutor
+	diagDebouncer = documents.NewDocumentDebouncer()
 )
 
 // Start Entry point of the language server
@@ -49,10 +52,11 @@ func Start() {
 		// like looking for references.
 		TextDocumentDidOpen: func(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			documents.Add(uri, params.TextDocument.Text)
+			docs.Add(uri, params.TextDocument.Text)
+			docs.Parse(uri)
 
 			// Check syntax when file is open
-			checker := syntax.NewSyntaxChecker(documents.Read(uri), uri)
+			checker := syntax.NewSyntaxChecker(docs.Read(uri), uri)
 
 			diags := checker.RunAll(config)
 			if len(diags) > 0 {
@@ -71,7 +75,9 @@ func Start() {
 		},
 		TextDocumentDidChange: func(ctx *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			if text, ok := documents.CheckURI(uri); ok {
+
+			// Save the changes in memory when file change
+			if text, ok := docs.CheckURI(uri); ok {
 				for _, change := range params.ContentChanges {
 					if change_, ok := change.(protocol.TextDocumentContentChangeEvent); ok {
 						startIndex, endIndex := change_.Range.IndexesIn(text)
@@ -80,30 +86,36 @@ func Start() {
 						text = change_.Text
 					}
 				}
-				documents.Add(uri, text)
+				docs.Add(uri, text) // Lightning fast, just maps a string
+				docs.ParseMutex.TryLock()
 			}
 
-			// Check syntax when file is changed
-			checker := syntax.NewSyntaxChecker(documents.Read(uri), uri)
+			// If no incoming changes for a while, then start to parse and analyze it
+			diagDebouncer.Debounce(uri, 250*time.Millisecond, func() {
+				docs.Parse(uri)
+				docs.ParseMutex.Unlock()
 
-			diags := checker.RunAll(config)
-			if len(diags) > 0 {
-				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
-					URI:         protocol.DocumentUri(uri),
-					Diagnostics: diags,
-				})
-			} else {
-				ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
-					URI:         protocol.DocumentUri(uri),
-					Diagnostics: []protocol.Diagnostic{},
-				})
-			}
+				checker := syntax.NewSyntaxChecker(docs.Read(uri), uri)
+				diags := checker.RunAll(config)
+
+				if len(diags) > 0 {
+					ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+						URI:         protocol.DocumentUri(uri),
+						Diagnostics: diags,
+					})
+				} else {
+					ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+						URI:         protocol.DocumentUri(uri),
+						Diagnostics: []protocol.Diagnostic{},
+					})
+				}
+			})
 
 			return nil
 		},
 		TextDocumentDidClose: func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
 			uri := string(params.TextDocument.URI)
-			documents.Delete(uri)
+			docs.Delete(uri)
 			return nil
 		},
 
@@ -172,7 +184,7 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 		context,
 		path.Join(workspaceDir, ".quadletrc.json"),
 		config,
-		&documents,
+		&docs,
 	)
 
 	// Setup server
