@@ -27,7 +27,7 @@ func TestPropertyCompletion(t *testing.T) {
 	for i, scenario := range scenarios {
 		p := parser.NewParserFromMemory("foo.container", scenario.input)
 		tokenInfo := p.Quadlet.FindToken(scenario.position)
-		require.Len(t, tokenInfo.ParentNodes, 2)
+		require.Len(t, tokenInfo.ParentNodes, 2, "failed at scenario %d", i)
 
 		s := NewCompletion(
 			[]string{},

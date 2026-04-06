@@ -167,6 +167,12 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 				}
 				// Search in assigment's value
 				if assingment.Value != nil {
+					if inLineFunc(position, assingment.Value.StartPos, assingment.Value.EndPos) {
+						return FindTokenOutput{
+							CurrentNode: assingment.Value,
+							ParentNodes: []Node{assingment, section},
+						}
+					}
 					// If cursor is past the '=' but before the value ends (or at the end of an empty value)
 					if position.LineNumber == assingment.Value.StartPos.LineNumber &&
 						position.Position >= assingment.Value.StartPos.Position {
