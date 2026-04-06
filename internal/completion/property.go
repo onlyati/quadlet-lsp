@@ -1,6 +1,7 @@
 package completion
 
 import (
+	"log"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
@@ -10,11 +11,11 @@ import (
 
 func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 	var completionItems []protocol.CompletionItem
-	sectionNode, ok := s.tokenInfo.ParentNodes[0].(*parser.SectionNode)
+	sectionNode, ok := s.tokenInfo.ParentNodes[1].(*parser.SectionNode)
 	if !ok {
 		return nil
 	}
-	parentNode, ok := s.tokenInfo.ParentNodes[1].(*parser.AssignNode)
+	parentNode, ok := s.tokenInfo.ParentNodes[0].(*parser.AssignNode)
 	if !ok {
 		return nil
 	}
@@ -46,6 +47,7 @@ func listPropertyCompletions(s Completion) []protocol.CompletionItem {
 
 	section := strings.TrimPrefix(*sectionNode.Text, "[")
 	section = strings.TrimSuffix(section, "]")
+	log.Println("section is: " + section)
 	for _, p := range data.PropertiesMap[section] {
 		labelCheck := propName == p.Label
 		versionCheck := podmanVer.GreaterOrEqual(p.MinVersion)

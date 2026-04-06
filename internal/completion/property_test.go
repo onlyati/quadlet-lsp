@@ -18,11 +18,16 @@ func TestPropertyCompletion(t *testing.T) {
 			"[Container]\nDNS=",
 			parser.NodePosition{LineNumber: 1, Position: 4},
 		},
+		{
+			"[Container]\nDNS=\nNetwork=foo.network",
+			parser.NodePosition{LineNumber: 1, Position: 4},
+		},
 	}
 
 	for i, scenario := range scenarios {
 		p := parser.NewParserFromMemory("foo.container", scenario.input)
 		tokenInfo := p.Quadlet.FindToken(scenario.position)
+		require.Len(t, tokenInfo.ParentNodes, 2)
 
 		s := NewCompletion(
 			[]string{},

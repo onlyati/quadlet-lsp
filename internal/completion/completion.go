@@ -3,6 +3,8 @@
 package completion
 
 import (
+	"log"
+
 	"github.com/onlyati/quadlet-lsp/internal/utils"
 	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -48,6 +50,8 @@ func NewCompletion(
 func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.CompletionItem {
 	s.config = config
 
+	log.Printf("number of parents: %d, value of current node: %+v", len(s.tokenInfo.ParentNodes), s.tokenInfo.CurrentNode)
+
 	// File has no sections provide new templates
 	if len(s.quadlet.Sections) == 0 {
 		return listNewQuadletTemplates()
@@ -58,7 +62,7 @@ func (s Completion) RunCompletion(config *utils.QuadletConfig) []protocol.Comple
 		return nil
 	}
 
-	// User start to type '[something'
+	// User start to type '[something]'
 	if _, ok := s.tokenInfo.CurrentNode.(*parser.SectionNode); ok {
 		return listSections()
 	}

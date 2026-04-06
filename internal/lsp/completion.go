@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"log"
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/completion"
@@ -11,6 +12,7 @@ import (
 
 // This function handles the completion event that is received.
 func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
+	log.Println("received a completion request")
 	// executor := utils.CommandExecutor{}
 	uri := string(params.TextDocument.URI)
 	text := docs.Read(uri)
@@ -36,5 +38,6 @@ func textCompletion(context *glsp.Context, params *protocol.CompletionParams) (a
 	)
 	comps := s.RunCompletion(config)
 
+	log.Printf("return %d completion", len(comps))
 	return comps, nil
 }

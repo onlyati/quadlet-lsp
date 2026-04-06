@@ -71,7 +71,7 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 		}
 
 		// Similar scenario like previous but now we are line of current's line.
-		if position.LineNumber == currStartPos.LineNumber && position.LineNumber < currStartPos.Position {
+		if position.LineNumber == currStartPos.LineNumber && position.Position < currStartPos.Position {
 			return true
 		}
 
@@ -116,7 +116,7 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 				if isOverFunc(position, prevAssign.EndPos, section.StartPos) {
 					return FindTokenOutput{
 						CurrentNode: nil,
-						ParentNodes: []Node{section, prevAssign},
+						ParentNodes: []Node{prevAssign, prevSection},
 					}
 				}
 			}
@@ -152,7 +152,7 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 					if isOverFunc(position, prevAssign.EndPos, assingment.StartPos) {
 						return FindTokenOutput{
 							CurrentNode: nil,
-							ParentNodes: []Node{section, prevAssign},
+							ParentNodes: []Node{prevAssign, section},
 						}
 					}
 				}
@@ -167,7 +167,9 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 				}
 				// Search in assigment's value
 				if assingment.Value != nil {
-					if inLineFunc(position, assingment.Value.StartPos, assingment.Value.EndPos) {
+					// If cursor is past the '=' but before the value ends (or at the end of an empty value)
+					if position.LineNumber == assingment.Value.StartPos.LineNumber &&
+						position.Position >= assingment.Value.StartPos.Position {
 						return FindTokenOutput{
 							CurrentNode: assingment.Value,
 							ParentNodes: []Node{assingment, section},
@@ -200,7 +202,7 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 	if prevAssign != nil && prevAssign.Value == nil {
 		return FindTokenOutput{
 			CurrentNode: nil,
-			ParentNodes: []Node{prevSection, prevAssign},
+			ParentNodes: []Node{prevAssign, prevSection},
 		}
 	} else {
 		return FindTokenOutput{
