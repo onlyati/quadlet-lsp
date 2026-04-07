@@ -14,11 +14,11 @@ import (
 // Define the preferred order of categories
 var categoryPriority = map[data.FormatGroup]int{
 	data.FormatGroupBase:        1,
-	data.FormatGroupEnvironment: 2,
-	data.FormatGroupNetwork:     3,
-	data.FormatGroupStorage:     4,
-	data.FormatGroupLabel:       5,
-	data.FormatGroupSecret:      6,
+	data.FormatGroupLabel:       2,
+	data.FormatGroupEnvironment: 3,
+	data.FormatGroupSecret:      4,
+	data.FormatGroupNetwork:     5,
+	data.FormatGroupStorage:     6,
 	data.FormatGroupHealth:      7,
 	data.FormatGroupOther:       8,
 }
