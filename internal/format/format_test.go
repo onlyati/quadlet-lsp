@@ -87,15 +87,15 @@ Environment=SMTP_NAME=noreply@thinkaboutit.tech
 Environment=SMTP_PORT=587
 Environment=SMTP_SECURE=tls
 
-PublishPort=8080:8080
-
-Volume=nc-app.volume:/var/www/html
-
 Secret=nc-admin-pw,type=env,target=NEXTCLOUD_ADMIN_PASSWORD
 Secret=nc-db-password,type=env,target=POSTGRES_PASSWORD
 Secret=ovh-s3-access-key,type=env,target=OBJECTSTORE_S3_KEY
 Secret=ovh-s3-secret-key,type=env,target=OBJECTSTORE_S3_SECRET
 Secret=tai-noreply,type=env,target=SMTP_PASSWORD
+
+PublishPort=8080:8080
+
+Volume=nc-app.volume:/var/www/html
 
 Memory=512M
 
@@ -109,6 +109,8 @@ WantedBy=default.target
 `
 	parser := parser.NewParserFromMemory("foo.container", source)
 	newText := FormatDocument(parser.Quadlet)
+	t.Log(expected)
+	t.Log(newText)
 
 	for i, c := range newText {
 		require.Less(t, i, len(expected), "result longer than expected")
