@@ -159,7 +159,7 @@ Description=Foo \
 
 	labelKeywordValue := containerSection.Assignments[1].Value
 	assert.Equal(t, "env=test", *labelKeywordValue.Value)
-	assert.Equal(t, NodePosition{LineNumber: 5, Position: 2}, labelKeywordValue.StartPos)
+	assert.Equal(t, NodePosition{LineNumber: 4, Position: 7}, labelKeywordValue.StartPos)
 	assert.Equal(t, NodePosition{LineNumber: 5, Position: 10}, labelKeywordValue.EndPos)
 
 	// [Unit]

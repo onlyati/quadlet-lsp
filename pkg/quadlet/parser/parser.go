@@ -168,7 +168,9 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 	token = p.consumeToken()
 
 	// Read until we read value and continue sign
-	value := ValueNode{}
+	value := ValueNode{
+		StartPos: token.EndPos,
+	}
 	valueString := strings.Builder{}
 	startNotSet := true
 	if p.peekToken() == nil {
@@ -184,6 +186,13 @@ func (p *Parser) parseAssignment(token *lexer.Token) {
 	}
 	for p.peekToken().Type == lexer.TokenTypeValue || p.peekToken().Type == lexer.TokenTypeContSign {
 		token = p.consumeToken()
+
+		if token.Type == lexer.TokenTypeContSign {
+			if startNotSet {
+				value.StartPos = NodePosition(token.StartPos)
+				startNotSet = false
+			}
+		}
 
 		if token.Type == lexer.TokenTypeValue {
 			if startNotSet {

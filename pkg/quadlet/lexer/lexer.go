@@ -214,7 +214,7 @@ func (l *Lexer) readKeyValuePair() {
 					return
 				}
 			}
-		case 0:
+		case 0, '#':
 			return
 		case '\\':
 			l.Tokens = append(l.Tokens, l.readOneRune(TokenTypeContSign))

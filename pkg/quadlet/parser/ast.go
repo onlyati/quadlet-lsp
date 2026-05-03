@@ -205,16 +205,24 @@ func (q *QuadletNode) FindToken(position NodePosition) FindTokenOutput {
 		}
 	}
 
-	if prevAssign != nil && prevAssign.Value == nil {
-		return FindTokenOutput{
-			CurrentNode: nil,
-			ParentNodes: []Node{prevAssign, prevSection},
+	if prevAssign != nil {
+		if prevAssign.Value == nil {
+			return FindTokenOutput{
+				CurrentNode: nil,
+				ParentNodes: []Node{prevAssign, prevSection},
+			}
 		}
-	} else {
-		return FindTokenOutput{
-			CurrentNode: nil,
-			ParentNodes: []Node{prevSection},
+		if *prevAssign.Value.Value == "" {
+			return FindTokenOutput{
+				CurrentNode: nil,
+				ParentNodes: []Node{prevAssign, prevSection},
+			}
 		}
+	}
+
+	return FindTokenOutput{
+		CurrentNode: nil,
+		ParentNodes: []Node{prevSection},
 	}
 }
 
