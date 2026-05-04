@@ -3,7 +3,7 @@ module github.com/onlyati/quadlet-lsp
 go 1.25.5
 
 require (
-	github.com/fsnotify/fsnotify v1.9.0
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/stretchr/testify v1.11.1
 	github.com/tliron/commonlog v0.2.21
