@@ -5,13 +5,18 @@ import (
 	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/utils"
+	"github.com/onlyati/quadlet-lsp/pkg/quadlet/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
 // handleValuePod is looking for the the pod file and display its content on
 // hover output.
 func handleValuePod(info HoverInformation) *protocol.Hover {
-	pod := info.value
+	value, ok := info.TokenInfo.CurrentNode.(*parser.ValueNode)
+	if !ok {
+		return nil
+	}
+	pod := *value.Value
 	if strings.Contains(pod, "@") {
 		pod = utils.ConvertTemplateNameToFile(pod)
 	}

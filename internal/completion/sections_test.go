@@ -21,7 +21,7 @@ func TestSection_Valid(t *testing.T) {
 		"Install",
 	}
 
-	diags := listSections(Completion{})
+	diags := listSections()
 	result := []string{}
 
 	for _, diag := range diags {

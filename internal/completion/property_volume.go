@@ -32,6 +32,7 @@ func propertyListVolumes(s Completion) []protocol.CompletionItem {
 			{Label: "z", Kind: &valueKind},
 			{Label: "Z", Kind: &valueKind},
 			{Label: "O", Kind: &valueKind},
+			{Label: "U", Kind: &valueKind},
 			{Label: "copy", Kind: &valueKind},
 			{Label: "nocopy", Kind: &valueKind},
 			{Label: "dev", Kind: &valueKind},

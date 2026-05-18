@@ -7,3 +7,4 @@ linters:
     exhaustruct:
       include:
         - 'github\.com/onlyati/quadlet-lsp/internal/semantic\..*'
+        - 'github\.com/onlyati/quadlet-lsp/pkg/quadlet/lexer\..*'

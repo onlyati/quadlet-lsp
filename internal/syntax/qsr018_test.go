@@ -24,7 +24,7 @@ func TestQSR018_Valid(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr018(s)
@@ -46,7 +46,7 @@ func TestQSR018_Invalid(t *testing.T) {
 		s.config = &utils.QuadletConfig{
 			WorkspaceRoot: tmpDir,
 			Project: utils.ProjectProperty{
-				DirLevel: utils.ReturnAsPtr(2),
+				DirLevel: utils.AsPtr(2),
 			},
 		}
 		diags := qsr018(s)
@@ -71,7 +71,7 @@ func TestQSR018_InvalidWithDropins(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 		Mu: sync.RWMutex{},
 	}
@@ -99,7 +99,7 @@ func TestQSR018_InvalidWithDropinsMoreLevel(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 		Mu: sync.RWMutex{},
 	}

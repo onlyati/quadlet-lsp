@@ -19,7 +19,7 @@ func TestQSR006_Valid(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	diags := qsr006(s)
@@ -36,7 +36,7 @@ func TestQSR006_ValidVolume(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	diags := qsr006(s)
@@ -52,7 +52,7 @@ func TestQSR006_ValidVolumeNested(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	diags := qsr006(s)
@@ -66,7 +66,7 @@ func TestQSR006_Skipped(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	diags := qsr006(s)
@@ -82,7 +82,7 @@ func TestQSR006_Invalid(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	diags := qsr006(s)

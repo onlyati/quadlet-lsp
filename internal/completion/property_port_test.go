@@ -60,7 +60,7 @@ func TestPropertyPort_ValidRawImage(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	s.text = []string{"[Container]", "Image=scr.io/org/mock1:latest", "PublishPort=69:"}
@@ -93,7 +93,7 @@ func TestPropertyPort_ValidImageFile(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	s.text = []string{"[Container]", "Image=bar.image", "PublishPort=69:"}
@@ -128,7 +128,7 @@ func TestPropertyPort_ValidPod(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	s.text = []string{"[Pod]", "PublishPort=69:"}
@@ -161,7 +161,7 @@ func TestPropertyPort_ValidRawImageInDropins1(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	s.text = []string{"[Container]", "PublishPort=69:"}
@@ -194,7 +194,7 @@ func TestPropertyPort_ValidRawImageInDropins2(t *testing.T) {
 	s.config = &utils.QuadletConfig{
 		WorkspaceRoot: tmpDir,
 		Project: utils.ProjectProperty{
-			DirLevel: utils.ReturnAsPtr(2),
+			DirLevel: utils.AsPtr(2),
 		},
 	}
 	s.text = []string{"[Container]", "PublishPort=69:"}
