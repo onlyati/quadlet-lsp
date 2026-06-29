@@ -8,3 +8,5 @@ result/
 # ignore generated docs
 book/
 site/
+
+coverage.out

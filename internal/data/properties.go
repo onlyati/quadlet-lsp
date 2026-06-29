@@ -1740,6 +1740,13 @@ $0
 				},
 			},
 			{
+				Label: "GID",
+				Hover: []string{
+					"The GID that the volume will be created as. Differently than Group=, the specified value is not passed to the mount operation. The specified GID will own the volume’s mount point directory and affects the volume chown operation.",
+				},
+				MinVersion: utils.BuildPodmanVersion(6, 0, 0),
+			},
+			{
 				Label: "GlobalArgs",
 				Hover: []string{
 					"This key contains a list of arguments passed directly between `podman` and `volume` in the generated file. It can be used to access Podman features otherwise unsupported by the generator. Since the generator is unaware of what unexpected interactions can be caused by these arguments, it is not recommended to use this option.",
@@ -1799,6 +1806,13 @@ $0
 				Hover: []string{
 					"The filesystem type of `Device` as used by the **mount(8)** commands `-t` option.",
 				},
+			},
+			{
+				Label: "UID",
+				Hover: []string{
+					"The UID that the volume will be created as. Differently than User, the specified value is not passed to the mount operation. The specified UID will own the volume’s mount point directory and affects the volume chown operation.",
+				},
+				MinVersion: utils.BuildPodmanVersion(6, 0, 0),
 			},
 			{
 				Label: "User",
