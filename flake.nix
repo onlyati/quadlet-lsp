@@ -5,63 +5,70 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-  }: let
-    allSystems = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
-    forAllSystems = nixpkgs.lib.genAttrs allSystems;
-    nixpkgsFor = forAllSystems (system: import nixpkgs {inherit system;});
-  in {
-    packages = forAllSystems (system: let
-      pkgs = nixpkgsFor.${system};
-    in {
-      default =
-        pkgs.buildGo125Module rec
+  outputs =
+    {
+      self,
+      nixpkgs,
+    }:
+    let
+      allSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs allSystems;
+      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
+    in
+    {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
         {
-          pname = "quadlet-lsp";
-          version = "0.7.3";
+          default = pkgs.buildGo125Module rec {
+            pname = "quadlet-lsp";
+            version = "0.7.4";
 
-          src = pkgs.fetchFromGitHub {
-            owner = "onlyati";
-            repo = "quadlet-lsp";
-            rev = "v${version}";
-            hash = "sha256-VMd3mSiegM5RFF6msEumezcwYfZm9intPsU7yg7i5x4=";
+            src = pkgs.fetchFromGitHub {
+              owner = "onlyati";
+              repo = "quadlet-lsp";
+              rev = "v${version}";
+              hash = "sha256-4BEgrWCqEHUGxpB9DfSG5p6NrPR6Cp1IkkYhYVqFfig=";
+            };
+
+            vendorHash = null;
+
+            meta = {
+              description = "LSP implementation for Podman Quadlet files";
+
+              longDescription = ''
+                This is an implementation of the language server for Podman Quadlet files.
+
+                Features include code completion, hover menu, go to definition/references, syntax checking, and executing built-in commands.
+              '';
+
+              homepage = "https://github.com/onlyati/quadlet-lsp";
+              license = pkgs.lib.licenses.gpl3;
+            };
           };
+        }
+      );
 
-          vendorHash = null;
-
-          meta = {
-            description = "LSP implementation for Podman Quadlet files";
-
-            longDescription = ''
-              This is an implementation of the language server for Podman Quadlet files.
-
-              Features include code completion, hover menu, go to definition/references, syntax checking, and executing built-in commands.
-            '';
-
-            homepage = "https://github.com/onlyati/quadlet-lsp";
-            license = pkgs.lib.licenses.gpl3;
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              pkgs.go
+              pkgs.gotools
+            ];
           };
-        };
-    });
-
-    devShells = forAllSystems (
-      system: let
-        pkgs = nixpkgsFor.${system};
-      in {
-        default = pkgs.mkShell {
-          packages = [
-            pkgs.go
-            pkgs.gotools
-          ];
-        };
-      }
-    );
-  };
+        }
+      );
+    };
 }
