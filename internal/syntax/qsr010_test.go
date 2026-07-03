@@ -64,6 +64,18 @@ func TestQSR010_Valid(t *testing.T) {
 			"[Container]\nPublishPort=10.0.0.1:22000:22000/udp",
 			"test13.container",
 		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=[::]:22000:22000/udp",
+			"test14.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=[::1]:22000:22000/udp",
+			"test14.container",
+		),
+		NewSyntaxChecker(
+			"[Container]\nPublishPort=[2001:db8::1]:22000:22000/udp",
+			"test14.container",
+		),
 	}
 
 	for _, s := range cases {
