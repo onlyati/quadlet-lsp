@@ -1,5 +1,38 @@
 # Changelog of Quadlet-LSP
 
+## v0.7.5
+
+### Fixes
+
+- Add ipv6 validation for QSR010A
+  <https://github.com/onlyati/quadlet-lsp/pull/209>
+
+## v0.7.4
+
+### Features
+
+- Add UID and GID properties <https://github.com/onlyati/quadlet-lsp/pull/200>
+- Implement semantic tokens <https://github.com/onlyati/quadlet-lsp/pull/194>
+
+### Maintenance
+
+- Bump github.com/fsnotify/fsnotify from 1.9.0 to 1.10.1
+  <https://github.com/onlyati/quadlet-lsp/pull/198>
+- upgrade modules <https://github.com/onlyati/quadlet-lsp/pull/207>
+
+### Repository
+
+- Watch github actions <https://github.com/onlyati/quadlet-lsp/pull/201>
+- Bump actions/checkout from 4 to 7 by
+  <https://github.com/onlyati/quadlet-lsp/pull/205>
+- Bump actions/setup-python from 5 to 6 by
+  <https://github.com/onlyati/quadlet-lsp/pull/204>
+- Bump goreleaser/goreleaser-action from 6 to 7
+  <https://github.com/onlyati/quadlet-lsp/pull/203>
+- Bump actions/setup-go from 5 to 6
+  bhttps://github.com/onlyati/quadlet-lsp/pull/202
+- Upgrade go version <https://github.com/onlyati/quadlet-lsp/pull/206>
+
 ## V0.7.3
 
 ### Features
@@ -8,7 +41,8 @@
   (<https://github.com/onlyati/quadlet-lsp/pull/185>)
 - [feature] Add new `AppArmor` keyword from Podman 5.8.0
   (<https://github.com/onlyati/quadlet-lsp/pull/186>)
-- [doc] Create a document site (<https://github.com/onlyati/quadlet-lsp/pull/187>)
+- [doc] Create a document site
+  (<https://github.com/onlyati/quadlet-lsp/pull/187>)
 
 ### Bugfixes
 
