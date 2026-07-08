@@ -1,0 +1,18 @@
+name: Publish document on-demand
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  generate_document:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.14
+      - name: Install dependencies
+        run: |
+          pip install mkdocs mkdocs-material
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
