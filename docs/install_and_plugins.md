@@ -31,31 +31,6 @@ language server.
     sudo dnf install quadlet-lsp
     ```
 
-=== "Debian/Ubuntu"
-
-    This method is supported for Debian 13. Add the following registry, that hosted
-    by me, then update:
-
-    ```bash
-    $ sudo curl \
-        https://git.thinkaboutit.tech/api/packages/pandora/debian/repository.key \
-        -o /etc/apt/keyrings/gitea-pandora.asc
-    $ sudo tee /etc/apt/sources.list.d/onlyati.sources > /dev/null <<'EOF'
-    Types: deb
-    URIs: https://git.thinkaboutit.tech/api/packages/pandora/debian
-    Suites: trixie
-    Components: main
-    Signed-By: /etc/apt/keyrings/gitea-pandora.asc
-    EOF
-    $ sudo apt update
-    ```
-
-    Then simply install:
-
-    ```bash
-    sudo apt install quadlet-lsp
-    ```
-
 === ".deb and .rpm packages"
 
     Check GitHub [release page](https://github.com/onlyati/quadlet-lsp/releases) and
