@@ -35,7 +35,7 @@
               owner = "onlyati";
               repo = "quadlet-lsp";
               rev = "v${version}";
-              hash = "sha256-tQ35YMqMjlcMMixh/1yZYemmhaJe07fkIH4vKskvYXY=";
+              hash = "sha256-4BEgrWCqEHUGxpB9DfSG5p6NrPR6Cp1IkkYhYVqFfig=";
             };
 
             vendorHash = null;
