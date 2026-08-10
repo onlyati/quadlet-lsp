@@ -3,6 +3,7 @@ package syntax
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -76,20 +77,11 @@ func qsr011Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 	tmp = strings.Split(usedPort, "/")
 	usedPort = tmp[0]
 
-	if !slices.Contains(qsr011Ports, usedPort) {
-		if len(qsr011FailedCheck) == 0 {
-			return []protocol.Diagnostic{
-				{
-					Range: protocol.Range{
-						Start: protocol.Position{Line: q.LineNumber, Character: 0},
-						End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
-					},
-					Severity: &errDiag,
-					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
-					Message:  fmt.Sprintf("Port is not exposed in the image, exposed ports: %v", qsr011Ports),
-				},
-			}
-		} else {
+	ports := []string{}
+	if strings.Contains(usedPort, "-") {
+		r := strings.SplitN(usedPort, "-", 2)
+		startPort, err := strconv.Atoi(r[0])
+		if err != nil {
 			return []protocol.Diagnostic{
 				{
 					Range: protocol.Range{
@@ -98,8 +90,59 @@ func qsr011Action(q utils.QuadletLine, _ utils.PodmanVersion) []protocol.Diagnos
 					},
 					Severity: &infoDiag,
 					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
-					Message:  fmt.Sprintf("Not able to verify exposed ports, because image not pulled: %v", qsr011FailedCheck),
+					Message:  fmt.Sprintf("Not able to verify exposed ports, because start port is not a number: %v", r[0]),
 				},
+			}
+		}
+
+		endPort, err := strconv.Atoi(r[1])
+		if err != nil {
+			return []protocol.Diagnostic{
+				{
+					Range: protocol.Range{
+						Start: protocol.Position{Line: q.LineNumber, Character: 0},
+						End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+					},
+					Severity: &infoDiag,
+					Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
+					Message:  fmt.Sprintf("Not able to verify exposed ports, because end port is not a number: %v", r[1]),
+				},
+			}
+		}
+
+		for i := startPort; i <= endPort; i++ {
+			ports = append(ports, fmt.Sprintf("%d", i))
+		}
+	} else {
+		ports = []string{usedPort}
+	}
+
+	for _, p := range ports {
+		if !slices.Contains(qsr011Ports, p) {
+			if len(qsr011FailedCheck) == 0 {
+				return []protocol.Diagnostic{
+					{
+						Range: protocol.Range{
+							Start: protocol.Position{Line: q.LineNumber, Character: 0},
+							End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+						},
+						Severity: &errDiag,
+						Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
+						Message:  fmt.Sprintf("Port (%s) is not exposed in the image, exposed ports: %v", p, qsr011Ports),
+					},
+				}
+			} else {
+				return []protocol.Diagnostic{
+					{
+						Range: protocol.Range{
+							Start: protocol.Position{Line: q.LineNumber, Character: 0},
+							End:   protocol.Position{Line: q.LineNumber, Character: q.Length},
+						},
+						Severity: &infoDiag,
+						Source:   utils.ReturnAsStringPtr("quadlet-lsp.qsr011"),
+						Message:  fmt.Sprintf("Not able to verify exposed ports, because image not pulled: %v", qsr011FailedCheck),
+					},
+				}
 			}
 		}
 	}
