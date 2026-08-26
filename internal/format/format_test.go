@@ -57,6 +57,9 @@ Secret=ovh-s3-secret-key,type=env,target=OBJECTSTORE_S3_SECRET
 
 PublishPort=8080:8080
 
+[X-Backup]
+When=0 1 * * *
+
 
 [Service]
 Restart=on-failure
@@ -118,6 +121,9 @@ StartLimitBurst=5
 
 [Install]
 WantedBy=default.target
+
+[X-Backup]
+When=0 1 * * *
 
 `
 	newText := FormatDocument(source)

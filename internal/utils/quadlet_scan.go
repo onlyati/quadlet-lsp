@@ -38,7 +38,7 @@ func ScanQadlet(
 	var returnValue []protocol.Diagnostic
 
 	currentSection := ""
-	sectionRegexp := regexp.MustCompile(`^\[([A-Za-z]+)\]$`)
+	sectionRegexp := regexp.MustCompile(`^\[([A-Za-z-]+)\]$`)
 
 	// If properts[*] = "*", it means scan all lines
 	_, scanAllLines := properties[ScanProperty{Section: "*", Property: "*"}]
