@@ -720,6 +720,20 @@ $0
 				FormatGroup: FormatGroupBase,
 			},
 			{
+				Label: "ImageVolume",
+				Hover: []string{
+					"Tells Podman how to handle the builtin image volumes. Default is bind.",
+				},
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				FormatGroup: FormatGroupBase,
+				MultipleAdd: false,
+				Parameters: []string{
+					"bind",
+					"tmpfs",
+					"ignore",
+				},
+			},
+			{
 				Label: "IP",
 				Hover: []string{
 					"Specify a static IPv4 address for the container, for example **10.88.64.128**. Equivalent to the Podman `--ip` option.",
