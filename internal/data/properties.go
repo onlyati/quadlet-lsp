@@ -875,6 +875,18 @@ $0
 				MultipleAdd: true,
 			},
 			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit by appending `-volume` to the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
+			},
+			{
 				Label: "PublishPort",
 				Hover: []string{
 					"Exposes a port, or a range of ports (e.g. `50-59`), from the container to the host. Equivalent to the Podman `--publish` option. The format is similar to the Podman options, which is of the form `ip:hostPort:containerPort`, `ip::containerPort`, `hostPort:containerPort` or `containerPort`, where the number of host and container ports must be the same (in the case of a range).",
@@ -1009,6 +1021,18 @@ $0
 				Hover: []string{
 					"Set the label process type for the container processes.",
 				},
+			},
+			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit using the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
 			},
 			{
 				Label: "ShmSize",
@@ -1541,6 +1565,18 @@ $0
 				MultipleAdd: true,
 			},
 			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit using the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
+			},
+			{
 				Label: "SetWorkingDirectory",
 				Hover: []string{
 					"Set the `WorkingDirectory` field of the `Service` group of the Systemd service unit file. Used to allow `podman kube play` to correctly resolve relative paths. Supported values are `yaml` and `unit` to set the working directory to that of the YAML or Quadlet Unit file respectively.",
@@ -1713,6 +1749,18 @@ $0
 				MultipleAdd: true,
 			},
 			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit by appending `-network` to the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
+			},
+			{
 				Label: "Subnet",
 				Hover: []string{
 					"The subnet in CIDR notation.",
@@ -1814,6 +1862,18 @@ $0
 					"This key can be listed multiple times.",
 				},
 				MultipleAdd: true,
+			},
+			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit by appending `-volume` to the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
 			},
 			{
 				Label: "Type",
@@ -1957,6 +2017,18 @@ $0
 					"Delay between retries. Equivalent to the Podman `--retry-delay` option.",
 				},
 				MinVersion: utils.BuildPodmanVersion(5, 5, 0),
+			},
+			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit by appending `-image` to the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
 			},
 			{
 				Label: "TLSVerify",
@@ -2183,6 +2255,18 @@ $0
 					"",
 					"This is equivalent to the `--secret` option of `podman build` and generally has the form `secret[,opt=opt ...]`.",
 				},
+			},
+			{
+				Label: "ServiceName",
+				Hover: []string{
+					"By default, Quadlet will name the systemd service unit by appending `-build` to the name of the Quadlet.",
+					"Setting this key overrides this behavior by instructing Quadlet to use the provided name.",
+					"",
+					"Note, the name should not include the `.service` file extension",
+				},
+				FormatGroup: FormatGroupBase,
+				MinVersion:  utils.BuildPodmanVersion(6, 1, 0),
+				MultipleAdd: false,
 			},
 			{
 				Label: "SetWorkingDirectory",
