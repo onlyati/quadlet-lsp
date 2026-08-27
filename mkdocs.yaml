@@ -10,9 +10,7 @@ extra:
   consent:
     title: Cookie consent
     description: >-
-      We use cookies to recognize your repeated visits and preferences, as well
-      as to measure the effectiveness of our documentation.
-
+      We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation.
 theme:
   name: material
   features:
@@ -22,7 +20,6 @@ theme:
     - search.highlight
     - content.code.copy
     - content.tabs.link
-
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -36,7 +33,6 @@ markdown_extensions:
   - toc
   - pymdownx.tabbed:
       alternate_style: true
-
 nav:
   - Home: index.md
   - Installation and Plugins: install_and_plugins.md
@@ -69,6 +65,6 @@ nav:
       - "Not recommended property usage in Service section (QSR024)": QSR024.md
       - "Image is missing in container (QSR025)": QSR025.md
       - "Artifact is missing in artifact (QSR026)": QSR026.md
-
+      - "Invalid value of ImageVolume (QSR027)": QSR027.md
 plugins:
   - search
