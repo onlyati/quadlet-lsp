@@ -27,15 +27,15 @@
           pkgs = nixpkgsFor.${system};
         in
         {
-          default = pkgs.buildGo125Module rec {
+          default = pkgs.buildGo126Module rec {
             pname = "quadlet-lsp";
-            version = "0.7.5";
+            version = "0.8.0";
 
             src = pkgs.fetchFromGitHub {
               owner = "onlyati";
               repo = "quadlet-lsp";
               rev = "v${version}";
-              hash = "sha256-tQ35YMqMjlcMMixh/1yZYemmhaJe07fkIH4vKskvYXY=";
+              hash = "sha256-S4FniTf5HDAMNkc8g6u43O4qjUzi089r91G7X7R/H5I=";
             };
 
             vendorHash = null;
