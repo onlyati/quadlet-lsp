@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/onlyati/quadlet-lsp/internal/data"
 	"github.com/onlyati/quadlet-lsp/internal/utils"
@@ -36,6 +37,10 @@ func qsr003Action(q utils.QuadletLine, p utils.PodmanVersion, _ any) []protocol.
 	section := q.Section[1 : len(q.Section)-1]
 	if section == "Service" {
 		// The [Service] is not implemented
+		return nil
+	}
+
+	if strings.HasPrefix(section, "X-") || strings.HasPrefix(q.Property, "X-") {
 		return nil
 	}
 

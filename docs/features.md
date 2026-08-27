@@ -125,6 +125,8 @@ rules:
 - Each comment line is removed, except from the beginning of the file.
 - Properties are grouped based on topics.
 - Within the topics, settings are sorted based on alphabetical order.
+- The additional sections which starts with `X-` are put at the end of the file.
+  The values in these rows are not wrapped, they remained as is.
 
 Example formatted file:
 

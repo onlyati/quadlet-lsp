@@ -4,6 +4,8 @@
 package format
 
 import (
+	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -109,7 +111,7 @@ func FormatDocument(text string) string {
 
 	// Sort the arrays
 	for k, v := range document.sections {
-		if k == "Install" || k == "Unit" || k == "Service" {
+		if k == "Install" || k == "Unit" || k == "Service" || strings.HasPrefix(k, "X-") {
 			// Remained untouced
 			continue
 		}
@@ -173,6 +175,19 @@ func FormatDocument(text string) string {
 				}
 			}
 
+		}
+	}
+
+	// Add the extra sections which is not standard like X-Lines
+	for k, v := range document.sections {
+		if !slices.Contains(sectionSeq, k) {
+			fmt.Fprintf(&newTextBuilder, "[%s]\n", k)
+			for _, p := range v {
+				for _, element := range p {
+					fmt.Fprintf(&newTextBuilder, "%s=%s\n", element.property, element.value)
+				}
+			}
+			newTextBuilder.WriteString("\n")
 		}
 	}
 

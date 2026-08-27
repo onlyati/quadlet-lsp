@@ -51,6 +51,26 @@ func TestQSR003_UnknownSection(t *testing.T) {
 	assert.Equal(t, "quadlet-lsp.qsr003", *diags[1].Source)
 }
 
+func TestQSR003_XLines(t *testing.T) {
+	s := NewSyntaxChecker(
+		`
+[Container]
+Image=docker.io/library/debian:trixie-slim
+
+[X-Maintenance]
+When=0 1 * * *
+Restart-Pod=allowed
+X-Fallback=forbidden
+`,
+		"test.container",
+	)
+	s.config = &utils.QuadletConfig{
+		Podman: utils.BuildPodmanVersion(5, 5, 2),
+	}
+	diags := qsr003(s)
+	require.Len(t, diags, 0)
+}
+
 func TestQSR003_OldVersion(t *testing.T) {
 	// Memory for container is available from 5.5.0
 	s := NewSyntaxChecker("[Container]\nContainerName=app\nMemory=512M", "test.container")
