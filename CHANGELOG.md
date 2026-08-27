@@ -1,5 +1,38 @@
 # Changelog of Quadlet-LSP
 
+## v0.8.0
+
+### Features
+
+- Handle `X-` lines and sections
+  <https://github.com/onlyati/quadlet-lsp/pull/225>
+- Add `ImageVolume` property and QSR027
+  <https://github.com/onlyati/quadlet-lsp/pull/226>
+- Add ServiceName property <https://github.com/onlyati/quadlet-lsp/pull/227>
+
+### Fixes
+
+- PublishPort can use port ranges
+  <https://github.com/onlyati/quadlet-lsp/pull/223>
+
+### Maintenance
+
+- Bump actions/setup-go from 6 to 7
+  <https://github.com/onlyati/quadlet-lsp/pull/216>
+- Bump actions/setup-python from 6 to 7
+  <https://github.com/onlyati/quadlet-lsp/pull/217>
+- Bump github.com/stretchr/testify from 1.11.1 to 1.12.1
+  <https://github.com/onlyati/quadlet-lsp/pull/224>
+
+### Repository
+
+- Remove Debian/Ubuntu repo from doc
+  <https://github.com/onlyati/quadlet-lsp/pull/213>
+- Add GitHub Actions workflow for document publishing
+  <https://github.com/onlyati/quadlet-lsp/pull/214>
+- Add publish_docs.yml workflow file
+  <https://github.com/onlyati/quadlet-lsp/pull/215>
+
 ## v0.7.5
 
 ### Fixes
