@@ -1,6 +1,6 @@
 Name:           quadlet-lsp
-Version:        0.8.0
-Release:        0.8.0
+Version:        0.8.1
+Release:        0.8.1
 Summary:        Podman Quadlet Language Server
 
 License:        GPLv3
@@ -27,7 +27,7 @@ Following features are currently available:
 %autosetup -n %{name}-%{version}
 
 %build
-CGO_ENABLED=0 go build -mod=vendor -o %{name}
+CGO_ENABLED=0 go build -mod=vendor -ldflags "-s -w -X github.com/onlyati/quadlet-lsp/internal/data.ProgramVersion=%{version}" -o %{name}
 
 %install
 install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
