@@ -27,7 +27,7 @@ Following features are currently available:
 %autosetup -n %{name}-%{version}
 
 %build
-CGO_ENABLED=0 go build -mod=vendor -ldflags "-s -w -X github.com/onlyati/quadlet-lsp/internal/data.ProgramVersion=%{version}" -o %{name}
+CGO_ENABLED=0 go build -mod=vendor -ldflags "-X github.com/onlyati/quadlet-lsp/internal/data.ProgramVersion=%{version}" -o %{name}
 
 %install
 install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
@@ -44,11 +44,11 @@ install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
 - Release v0.8.1 language server
 * Thu Aug 27 2026 Attila Molnar <onlyati@pm.me>
 - Release v0.8.0 language server
-* San Feb 23 2026 Attila Molnar <onlyati@pm.me>
+* Sun Feb 23 2026 Attila Molnar <onlyati@pm.me>
 - Release v0.7.3 language server
-* San Jan 18 2026 Attila Molnar <onlyati@pm.me>
+* Sun Jan 18 2026 Attila Molnar <onlyati@pm.me>
 - Release v0.7.2 language server
-* San Dec 08 2026 Attila Molnar <onlyati@pm.me>
+* Sun Dec 08 2026 Attila Molnar <onlyati@pm.me>
 - Release v0.7.0 language server
 * Tue Nov 11 2025 Attila Molnar <onlyati@pm.me>
 - Release v0.6.0 language server
