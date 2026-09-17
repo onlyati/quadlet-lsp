@@ -1,5 +1,12 @@
 # Changelog of Quadlet-LSP
 
+## v0.8.1
+
+### Fixes
+
+- Get the version number dynamically from build
+  <https://github.com/onlyati/quadlet-lsp/pull/231>
+
 ## v0.8.0
 
 ### Features
