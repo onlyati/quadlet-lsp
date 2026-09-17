@@ -40,12 +40,14 @@ install -Dm0755 %{name} "%{buildroot}%{_bindir}/%{name}"
 %{_bindir}/%{name}
 
 %changelog
+* Thu Sep 17 2026 Attila Molnar <onlyati@pm.me>
+- Release v0.8.1 language server
 * Thu Aug 27 2026 Attila Molnar <onlyati@pm.me>
-- Release v0.8.0 languager server
+- Release v0.8.0 language server
 * San Feb 23 2026 Attila Molnar <onlyati@pm.me>
-- Release v0.7.3 languager server
+- Release v0.7.3 language server
 * San Jan 18 2026 Attila Molnar <onlyati@pm.me>
-- Release v0.7.2 languager server
+- Release v0.7.2 language server
 * San Dec 08 2026 Attila Molnar <onlyati@pm.me>
 - Release v0.7.0 language server
 * Tue Nov 11 2025 Attila Molnar <onlyati@pm.me>
