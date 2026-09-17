@@ -40,6 +40,12 @@
 
             vendorHash = null;
 
+            ldflags = [
+              "-s"
+              "-w"
+              "-X github.com/onlyati/quadlet-lsp/internal/data.ProgramVersion=${version}"
+            ];
+
             meta = {
               description = "LSP implementation for Podman Quadlet files";
 
