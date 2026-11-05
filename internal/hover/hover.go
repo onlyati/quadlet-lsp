@@ -23,6 +23,10 @@ type HoverInformation struct {
 }
 
 func HoverFunction(info HoverInformation) *protocol.Hover {
+	if info.CharacterPosition < uint32(0) || info.CharacterPosition >= uint32(len(info.Line)) {
+		return nil
+	}
+
 	splitLine := strings.SplitN(info.Line, "=", 2)
 	if len(splitLine) < 2 {
 		return nil

@@ -51,6 +51,12 @@ func TestSystemdSpecifierEscaping(t *testing.T) {
 			Section:           "Container",
 			CharacterPosition: uint32(3),
 		},
+		{
+			Line:              "%%%%a",
+			URI:               "file://test.pod",
+			Section:           "Container",
+			CharacterPosition: uint32(5),
+		},
 	}
 
 	for _, info := range cases {
