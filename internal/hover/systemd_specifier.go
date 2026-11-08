@@ -8,6 +8,10 @@ import (
 )
 
 func handleSystemSpecifier(info HoverInformation) *protocol.Hover {
+	if info.CharacterPosition < uint32(0) || info.CharacterPosition >= uint32(len(info.Line)) {
+		return nil
+	}
+
 	standOnPercentage := info.Line[info.CharacterPosition] == '%'
 	if !standOnPercentage {
 		return nil
